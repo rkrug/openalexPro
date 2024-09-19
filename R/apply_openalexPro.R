@@ -9,7 +9,8 @@
 #' @param which Which function to fix. Can be "oa_request", "api_request", or
 #'   both.
 #' @md
-#'
+#' @rdname apply_openalexPro
+#' @export
 
 apply_openalexPro <- function(which = c("oa_request")) {
   if ("oa_request" %in% which) {
@@ -29,7 +30,9 @@ apply_openalexPro <- function(which = c("oa_request")) {
 #' apply_openalexPro()
 #' unapply_openalexPro()
 #' }
+#' @rdname apply_openalexPro
 #' @export
+#'
 unapply_openalexPro <- function() {
   unloadNamespace("openalexR")
   library(openalexR)
