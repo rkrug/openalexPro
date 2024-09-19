@@ -1,0 +1,15 @@
+Package: openalexPro
+Type: Package
+Title: Providing a more advanced access to OpenAlex. It uses 'openalexR' for most of the hard work
+  but introdue=ces some new features useful for the power user.
+Version: 0.3
+Date: 2024-09-19
+Author: Rainer M Krug
+Maintainer: Rainer M Krug <Rainer@krugs.de>
+Description: More about what it does (maybe more than one line).
+License: GPL (>= 2)
+Encoding: UTF-8
+RoxygenNote: 7.3.2
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
