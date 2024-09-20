@@ -3,7 +3,7 @@
 #' This function extracts the institution country codes of authors from given corpus in `parquet` format.
 #'
 #' @param corpus the corpus in parquet format
-#' @param parquet_dataset parquet dataset of the result. If `partition` is `NULL', a file, otherwise a directorty.
+#' @param corpus_authors parquet dataset of the result. If `partition` is `NULL', a file, otherwise a directorty.
 #' @param partition The column which should be used to partition the table. Hive partitioning is used.
 #'   Set to NULL to not partition the table.
 
@@ -21,14 +21,14 @@
 #'   institution_country_code = c("US", "UK", "DE"),
 #'   stringsAsFactors = FALSE
 #' )
-#' extract_countries(authors)
+#' extract_authors(authors)
 #' }
 #'
 #' @md
 
-extract_countries <- function(
+extract_authors <- function(
     corpus,
-    parquet_dataset = "corpus_authors",
+    corpus_authors = "corpus_authors",
     partition = "country") {
   ## Check if corpusr is specified
   if (is.null(corpus)) {
@@ -52,6 +52,7 @@ extract_countries <- function(
     "COPY ( ",
     "   SELECT ",
     "       id AS work_id, ",
+    "       publication_year,",
     "       author_position, ",
     "       UNNEST(author), ",
     "       UNNEST(countries) AS country ",
@@ -59,11 +60,12 @@ extract_countries <- function(
     "   (",
     "      SELECT ",
     "          id,",
+    "          publication_year,",
     "          UNNEST(authorships, max_depth := 2)",
     "      FROM ",
     "          corpus",
     "   )",
-    ") TO '", parquet_dataset, "' ",
+    ") TO '", corpus_authors, "' ",
     "(FORMAT PARQUET, COMPRESSION SNAPPY",
     ifelse(
       is.null(partition),
@@ -77,5 +79,5 @@ extract_countries <- function(
 
   ###
 
-  return(normalizePath(parquet_dataset))
+  return(normalizePath(corpus_authors))
 }
