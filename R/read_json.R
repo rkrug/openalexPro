@@ -13,14 +13,20 @@
 #'   JSON files to Apache Parquet files and to copy the result to the specified
 #'   directory.
 #'
+#' @importFrom tibble as_tibble
+#' @importFrom DBI dbConnect dbDisconnect dbExecute dbGetQuery
+#' @importFrom duckdb duckdb
+#'
 #' @md
 #'
 #' @examples
-#' json_to_tibble(json_dir = "data/json")
+#' \dontrun{
+#' read_json(json_dir = "json")
+#' }
 #'
 #' @export
-json_to_tibble <- function(
-    json_dir = file.path("data", "json")) {
+read_json <- function(
+    json_dir = file.path("corpus_json")) {
   ## Create in memory DuckDB
   con <- DBI::dbConnect(duckdb::duckdb())
 

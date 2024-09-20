@@ -7,7 +7,7 @@
 #' For the documentation please see `openalexR::oa_request()`
 #'
 #' @param json_dir directory where the JSON files are saved. Default is NULL
-#'
+#' 
 #' @return If `json_dir` is `NULL`, the return value from call to `openalexR::oa_request()`,
 #'   otherwise the complete path to the expanded and normalized `json_dir`.
 #'

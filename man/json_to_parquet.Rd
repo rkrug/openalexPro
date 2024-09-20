@@ -5,15 +5,15 @@
 \title{Convert JSON files to Apache Parquet files}
 \usage{
 json_to_parquet(
-  json_dir = file.path("data", "json"),
-  parquet_dataset = file.path("data", "data"),
-  partition = NULL
+  json_dir = NULL,
+  corpus = file.path("corpus"),
+  partition = "publication_year"
 )
 }
 \arguments{
 \item{json_dir}{The directory of JSON files returned from \code{oa_request(..., json_dir = "FOLDER")}.}
 
-\item{parquet_dataset}{parquet dataset.}
+\item{corpus}{parquet dataset. If \code{partition} is `NULL', a file, otherwise a directorty.}
 
 \item{partition}{The column which should be used to partition the table. Hive partitioning is used.
 Set to NULL to not partition the table.}
@@ -34,6 +34,7 @@ JSON files to Apache Parquet files and to copy the result to the specified
 directory.
 }
 \examples{
-json_to_parquet(json_dir = "data/json", parquet_dataset = "data/arrow")
-
+\dontrun{
+json_to_parquet(json_dir = "json", corpus = "arrow")
+}
 }
