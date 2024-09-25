@@ -28,8 +28,13 @@ api_request <- function(
     return(list())
   }
 
-  parsed <- jsonlite::fromJSON(m, simplifyVector = FALSE)
-
+  if (is.null(json_dir)) {
+    parsed <- jsonlite::fromJSON(m, simplifyVector = FALSE)
+  } else {
+    ## TOD: in this case only parsed$meta$next_cursor is needed - can it be extracted quicker?
+    parsed <- jsonlite::fromJSON(m, simplifyVector = FALSE)
+  }
+  
   if (httr::status_code(res) == 200) {
     if (httr::http_type(res) != "application/json") {
       stop("API did not return json", call. = FALSE)

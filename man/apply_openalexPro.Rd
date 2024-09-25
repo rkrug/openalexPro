@@ -5,7 +5,7 @@
 \alias{unapply_openalexPro}
 \title{Apply changes to the package \code{openalexR}}
 \usage{
-apply_openalexPro(which = c("oa_request"))
+apply_openalexPro()
 
 unapply_openalexPro()
 }

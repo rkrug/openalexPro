@@ -14,11 +14,9 @@
 #' @importFrom utils assignInNamespace
 #' @export
 
-apply_openalexPro <- function(which = c("oa_request")) {
-  if ("oa_request" %in% which) {
-    utils::assignInNamespace("api_request", api_request, ns = "openalexR")
-    utils::assignInNamespace("oa_request", oa_request, ns = "openalexR") # works
-  }
+apply_openalexPro <- function() {
+  utils::assignInNamespace("api_request", api_request, ns = "openalexR")
+  utils::assignInNamespace("oa_request", oa_request, ns = "openalexR") # works
 }
 
 

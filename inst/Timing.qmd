@@ -1,0 +1,100 @@
+---
+title: "Untitled"
+format: html
+---
+
+# openalexR package
+```{r}
+#| label: setup_openalexR
+
+library(openalexR)
+```
+
+## 1000
+```{r}
+#| label: get_1000_openalexR
+
+system.time({
+  res <- oa_query(
+    topics.id = "T10091",
+    entity = "works",
+    options = list(sample = 1000, seed = 1)
+  ) |>
+    oa_request(
+      verbose = TRUE
+    )
+})
+
+```
+
+## 10000
+
+```{r}
+#| label: get_10000_openalexR
+
+system.time({
+  res <- oa_query(
+    topics.id = "T10091",
+    entity = "works",
+    options = list(sample = 10000, seed = 1)
+  ) |>
+    oa_request(
+      verbose = TRUE
+    )
+})
+```
+
+# openalexPro
+
+```{r}
+#| lable: setup_openalexR
+#|
+
+library(openalexPro)
+apply_openalexPro()
+```
+
+
+## 1000
+```{r}
+#| label: get_1000_openalexPro
+
+unlink("json_10000", recursive = TRUE)
+
+system.time({
+  res <- oa_query(
+    topics.id = "T10091",
+    entity = "works",
+    options = list(sample = 1000, seed = 1)
+  ) |>
+    openalexR::oa_request(
+      verbose = TRUE,
+      json_dir = "json_1000"
+    )
+})
+
+```
+
+## 10000
+
+```{r}
+#| label: get_10000_openalexPro
+
+unlink("json_10000", recursive = TRUE)
+
+library(lineprof)
+
+system.time({
+  l <- lineprof({
+    res <- oa_query(
+      topics.id = "T10091",
+      entity = "works",
+      options = list(sample = 10000, seed = 1)
+    ) |>
+      openalexR::oa_request(
+        verbose = TRUE,
+        json_dir = "json_10000"
+      )
+  })
+})
+```
