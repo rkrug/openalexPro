@@ -31,6 +31,11 @@ json_to_parquet <- function(
     json_dir = NULL,
     corpus = file.path("corpus"),
     partition = "publication_year") {
+  if (file.exists(corpus)) {
+    message("Deleting `", corpus, "` to avoid inconsistencies.")
+    unlink(corpus, recursive = TRUE)
+  }
+
   ## Check if json_dir is specified
   if (is.null(json_dir)) {
     stop("No json_dir specified!")

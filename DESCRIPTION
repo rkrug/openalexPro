@@ -16,6 +16,9 @@ Suggests:
 Imports:
     duckdb,
     DBI,
+    dplyr,
     arrow,
-    tibble
+    tibble,
+    RcppSimdJson,
+    httr
 Config/testthat/edition: 3

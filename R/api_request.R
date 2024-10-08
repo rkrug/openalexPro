@@ -4,11 +4,6 @@ api_request <- function(
     query,
     api_key = oa_apikey(),
     json_dir = NULL) {
-  if (!is.null(json_dir)) {
-    if (!dir.exists(json_dir)) {
-      dir.create(json_dir, recursive = TRUE)
-    }
-  }
   res <- httr::GET(query_url, ua, query = query, httr::add_headers(api_key = api_key))
 
   if (httr::status_code(res) == 400) {
@@ -29,12 +24,12 @@ api_request <- function(
   }
 
   if (is.null(json_dir)) {
-    parsed <- jsonlite::fromJSON(m, simplifyVector = FALSE)
+    parsed <- RcppSimdJson::fparse(m) # jsonlite::fromJSON(m, simplifyVector = FALSE)
   } else {
     ## TOD: in this case only parsed$meta$next_cursor is needed - can it be extracted quicker?
-    parsed <- jsonlite::fromJSON(m, simplifyVector = FALSE)
+    parsed <- list(meta = RcppSimdJson::fparse(m, query = "/meta")) # jsonlite::fromJSON(m, simplifyVector = FALSE)
   }
-  
+
   if (httr::status_code(res) == 200) {
     if (httr::http_type(res) != "application/json") {
       stop("API did not return json", call. = FALSE)
@@ -49,7 +44,7 @@ api_request <- function(
         ) |>
           basename() |>
           gsub(
-            pattern = ".json|result_",
+            pattern = ".json|page_",
             replacement = ""
           ) |>
           as.numeric() |>
@@ -61,7 +56,7 @@ api_request <- function(
       if (is.infinite(last_num)) {
         last_num <- 0
       }
-      json_name <- file.path(json_dir, paste0("result_", last_num + 1, ".json"))
+      json_name <- file.path(json_dir, paste0("page_", last_num + 1, ".json"))
 
       writeLines(
         m,

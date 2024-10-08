@@ -51,7 +51,6 @@ system.time({
 #|
 
 library(openalexPro)
-apply_openalexPro()
 ```
 
 
@@ -59,7 +58,7 @@ apply_openalexPro()
 ```{r}
 #| label: get_1000_openalexPro
 
-unlink("json_10000", recursive = TRUE)
+unlink("json_1000", recursive = TRUE)
 
 system.time({
   res <- oa_query(
@@ -67,7 +66,7 @@ system.time({
     entity = "works",
     options = list(sample = 1000, seed = 1)
   ) |>
-    openalexR::oa_request(
+    openalexPro::oa_request(
       verbose = TRUE,
       json_dir = "json_1000"
     )
@@ -82,19 +81,16 @@ system.time({
 
 unlink("json_10000", recursive = TRUE)
 
-library(lineprof)
 
 system.time({
-  l <- lineprof({
-    res <- oa_query(
-      topics.id = "T10091",
-      entity = "works",
-      options = list(sample = 10000, seed = 1)
-    ) |>
-      openalexR::oa_request(
-        verbose = TRUE,
-        json_dir = "json_10000"
-      )
-  })
+  res <- oa_query(
+    topics.id = "T10091",
+    entity = "works",
+    options = list(sample = 10000, seed = 1)
+  ) |>
+    openalexR::oa_request(
+      verbose = TRUE,
+      json_dir = "json_10000"
+    )
 })
 ```

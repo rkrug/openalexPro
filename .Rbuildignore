@@ -4,3 +4,11 @@
 ^corpus$
 ^corpus_authors$
 ^corpus_json$
+^inst/json_1000$
+^inst/json_10000$
+^icorpus.parquet$
+^invertedabstract.json$
+^json_files$
+^README.qmd$
+^TODO.md$
+^corpus.parquet$

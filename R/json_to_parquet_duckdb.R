@@ -27,9 +27,9 @@
 #' json_to_parquet(json_dir = "json", corpus = "arrow")
 #' }
 #' @export
-json_to_parquet <- function(
-    json_dir = NULL,
-    corpus = file.path("corpus"),
+json_to_parquet_duckdb <- function(
+    json_dir = system.file("json_1000", package = "openalexPro"),
+    corpus = "corpus",
     partition = "publication_year") {
   ## Check if json_dir is specified
   if (is.null(json_dir)) {
@@ -56,16 +56,26 @@ json_to_parquet <- function(
   ) |>
     DBI::dbExecute(conn = con)
 
+
   paste0(
     # "COPY ( ",
     "   SELECT ",
     "       *, ",
+    "       UNLIST(",
+    "          json_extract_string(abstract_inverted_index, '$.*'))::integer[] AS aii, ",
+    "          json_keys(abstract_inverted_index) AS keys) ",
+    "          SELECT ",
+    "            unnest(aii) as i, ",
+    "            array_extract(keys, i) AS t order by i asc) ",
+    "          SELECT ",
+    "           string_agg(t, ' '",
+    "       ) AS abs_aii",
     "       array_to_string(abstract_inverted_index, ' ') AS abstract",
     "   FROM (",
     "       SELECT ",
     "           UNNEST(results,  max_depth := 2) ",
     "       FROM ",
-    "           read_ndjson('", json_dir, "/*.json')",
+    "           read_json_auto('", json_dir, "/*.json')",
     "       )" # ,
     #   "    ) TO '", corpus, "' ",
     #   "(FORMAT PARQUET, COMPRESSION SNAPPY",
@@ -110,8 +120,8 @@ json_to_parquet <- function(
 # Inverting the abstract inverted index it looks like you can not get a "lossless" variant back since certain stopwords are removed (I think). Currently this is where I give up (and I'm not sure about what causes the ndjson difference visavi the json directly provided from the API that you are running into):
 
 # ```sql
-# from (from (from read_json_auto('https://api.openalex.org/works/W2741809807', ignore_errors = true)
-# select id, unlist(json_extract_string(abstract_inverted_index, '$.*'))::integer[] as aii, json_keys(abstract_inverted_index) as keys) select unnest(aii) as i, array_extract(keys, i) as t order by i asc) select string_agg(t, ' ') as abs_aii;
+#   from (from (from read_json_auto('https://api.openalex.org/works/W2741809807', ignore_errors = true)
+#   select id, unlist(json_extract_string(abstract_inverted_index, '$.*'))::integer[] as aii, json_keys(abstract_inverted_index) as keys) select unnest(aii) as i, array_extract(keys, i) as t order by i asc) select string_agg(t, ' ') as abs_aii;
 # ```
 
 # For this work id it gives this slightly "lossy" inverted inverted abstract:

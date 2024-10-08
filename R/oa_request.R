@@ -7,12 +7,12 @@
 #' For the documentation please see `openalexR::oa_request()`
 #'
 #' @param json_dir directory where the JSON files are saved. Default is NULL
-#' 
+#'
 #' @return If `json_dir` is `NULL`, the return value from call to `openalexR::oa_request()`,
 #'   otherwise the complete path to the expanded and normalized `json_dir`.
 #'
 #' @md
-#'
+#' @export
 #'
 oa_request <- function(
     query_url,
@@ -24,6 +24,14 @@ oa_request <- function(
     api_key = oa_apikey(),
     verbose = FALSE,
     json_dir = NULL) {
+  if (!is.null(json_dir)) {
+    message("Deleting and recreating `", json_dir, "` directory to avoid inconsistencies.")
+    if (dir.exists(json_dir)) {
+      unlink(json_dir, recursive = TRUE)
+    }
+    dir.create(json_dir, recursive = TRUE)
+  }
+
   # https://httr.r-lib.org/articles/api-packages.html#set-a-user-agent
   ua <- httr::user_agent("https://github.com/ropensci/openalexR/")
 
@@ -46,7 +54,7 @@ oa_request <- function(
   }
 
   # first, download info about n. of items returned by the query
-  res <- api_request(query_url, ua, query = query_ls, api_key = api_key)
+  res <- openalexPro:::api_request(query_url, ua, query = query_ls, api_key = api_key)
 
   if (!is.null(res$meta)) {
     ## return only item counting
@@ -70,7 +78,7 @@ oa_request <- function(
       if (verbose) cat("=")
       Sys.sleep(1 / 10)
       query_ls[[paging]] <- next_page
-      res <- api_request(query_url, ua, query = query_ls, json_dir = json_dir)
+      res <- openalexPro:::api_request(query_url, ua, query = query_ls, json_dir = json_dir)
       if (is.null(json_dir)) {
         data <- c(data, res[[result_name]])
       }
@@ -118,7 +126,7 @@ oa_request <- function(
     Sys.sleep(1 / 10)
     next_page <- openalexR:::get_next_page(paging, i, res)
     query_ls[[paging]] <- next_page
-    res <- api_request(query_url, ua, query = query_ls, json_dir = json_dir)
+    res <- openalexPro:::api_request(query_url, ua, query = query_ls, json_dir = json_dir)
     if (is.null(json_dir)) {
       if (!is.null(res[[result_name]])) data[[i]] <- res[[result_name]]
     }
