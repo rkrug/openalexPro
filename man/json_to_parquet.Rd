@@ -7,7 +7,8 @@
 json_to_parquet(
   json_dir = NULL,
   corpus = file.path("corpus"),
-  partition = "publication_year"
+  partition = "publication_year",
+  delete_json = FALSE
 )
 }
 \arguments{
@@ -15,8 +16,9 @@ json_to_parquet(
 
 \item{corpus}{parquet dataset. If \code{partition} is `NULL', a file, otherwise a directorty.}
 
-\item{partition}{The column which should be used to partition the table. Hive partitioning is used.
-Set to NULL to not partition the table.}
+\item{partition}{The column which should be used to partition the table. Hive partitioning is used.}
+
+\item{delete_json}{If \code{TRUE} the \code{json_dir} directory will be deleted after conversion}
 }
 \value{
 The function does not return anything, but it creates a directory with

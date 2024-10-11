@@ -1,6 +1,8 @@
 # openalexPro README
 Rainer M Krug
-2024-10-08
+2024-10-11
+
+# This Package is experimental - use at own risk, but please let me know if things do not work!
 
 # openalexPro
 
@@ -91,34 +93,45 @@ Details will follow.
 ## Central functions
 
 To download a corpus as a number of json files in the directory
-“corpus_json”, you can run
+`corpus_json` and convert it a parquet dataset in the directory `corpus`
+you can run
 
 ``` r
 library(openalexPro)
 
 res <- oa_query(
-  topics.id = "T10091",
-  entity = "works",
-  options = list(sample = 500, seed = 1)
+  title_and_abstract.search = "biodiversity AND conservation AND IPBES",
+  entity = "works"
 ) |>
   openalexPro::oa_request(
     verbose = TRUE,
     json_dir = "json_files"
+  ) |>
+  json_to_parquet(
+    corpus = "corpus"
   )
-```
-
-To convert the downloaded json files into a parquet dataset, run
-
-``` r
-json_to_parquet(
-  json_dir = "json_files",
-  corpus = "corpus",
-  partition = "publication_year"
-)
 ```
 
 which will create a by `publication_year` partitioned parquet dataset
 located in the folder `corpus` or
+
+If you do not need the json files, you can ommit the argument `json_dir`
+and a temporaty directory will be used and which will be deleted after
+the conversion:
+
+``` r
+res <- oa_query(
+  title_and_abstract.search = "biodiversity AND conservation AND IPBES",
+  entity = "works"
+) |>
+  openalexPro::oa_request(
+    verbose = TRUE
+  ) |>
+  json_to_parquet(
+    corpus = "corpus",
+    delete_json = TRUE
+  )
+```
 
 ``` r
 json_to_parquet(

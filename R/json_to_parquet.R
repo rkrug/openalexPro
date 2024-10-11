@@ -6,7 +6,7 @@
 #' @param json_dir The directory of JSON files returned from `oa_request(..., json_dir = "FOLDER")`.
 #' @param corpus parquet dataset. If `partition` is `NULL', a file, otherwise a directorty.
 #' @param partition The column which should be used to partition the table. Hive partitioning is used.
-#'   Set to NULL to not partition the table.
+#' @param delete_json If `TRUE` the `json_dir` directory will be deleted after conversion
 #'
 #' @return The function does not return anything, but it creates a directory with
 #'   Apache Parquet files.
@@ -30,9 +30,10 @@
 json_to_parquet <- function(
     json_dir = NULL,
     corpus = file.path("corpus"),
-    partition = "publication_year") {
+    partition = "publication_year",
+    delete_json = FALSE) {
   if (file.exists(corpus)) {
-    message("Deleting `", corpus, "` to avoid inconsistencies.")
+    message("Deleting and recreating `", corpus, "` to avoid inconsistencies.")
     unlink(corpus, recursive = TRUE)
   }
 
@@ -50,23 +51,19 @@ json_to_parquet <- function(
     DBI::dbDisconnect(con, shutdown = TRUE)
   )
 
-  ## Install and load jsonq
-  paste0(
-    "INSTALL json"
-  ) |>
-    DBI::dbExecute(conn = con)
+  ## Setup VIEWS
 
-  paste0(
-    "LOAD json"
-  ) |>
+  system.file("views_json.sql", package = "openalexPro") |>
+    load_sql_file() |>
+    gsub(pattern = "%%JSON_DIR%%", replacement = json_dir) |>
     DBI::dbExecute(conn = con)
 
   paste0(
     "COPY ( ",
     "   SELECT ",
-    "       UNNEST(results,  max_depth := 2) ",
+    "       * ",
     "   FROM ",
-    "       read_ndjson('", json_dir, "/*.json')",
+    "       for_parquet",
     ") TO '", corpus, "' ",
     "(FORMAT PARQUET, COMPRESSION SNAPPY",
     ifelse(
@@ -77,5 +74,10 @@ json_to_parquet <- function(
   ) |>
     DBI::dbExecute(conn = con)
 
+  ##
+  if (delete_json) {
+    unlink(json_dir, recursive = TRUE)
+  }
+  ##
   return(normalizePath(corpus))
 }

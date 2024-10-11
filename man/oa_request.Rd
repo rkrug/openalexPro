@@ -17,6 +17,22 @@ oa_request(
 )
 }
 \arguments{
+\item{query_url}{The URL of the API query.}
+
+\item{per_page}{The number of items to be returned per page. Defaults to 200.}
+
+\item{paging}{The type of paging. Possible values are "page" and "cursor".}
+
+\item{pages}{The number of pages to be downloaded. If \code{NULL}, all pages will be downloaded.}
+
+\item{count_only}{Logical indicating whether to return only the count of the items returned by the query.}
+
+\item{mailto}{The email address of the user. See \code{openalexR::oa_email()}.}
+
+\item{api_key}{The API key of the user. See \code{openalexR::oa_apikey()}.}
+
+\item{verbose}{Logical indicating whether to show a progress bar.}
+
 \item{json_dir}{directory where the JSON files are saved. Default is NULL}
 }
 \value{

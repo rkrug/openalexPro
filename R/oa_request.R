@@ -6,12 +6,24 @@
 #'
 #' For the documentation please see `openalexR::oa_request()`
 #'
+#' @param query_url The URL of the API query.
+#' @param per_page The number of items to be returned per page. Defaults to 200.
+#' @param paging The type of paging. Possible values are "page" and "cursor".
+#' @param pages The number of pages to be downloaded. If `NULL`, all pages will be downloaded.
+#' @param count_only Logical indicating whether to return only the count of the items returned by the query.
+#' @param mailto The email address of the user. See `openalexR::oa_email()`.
+#' @param api_key The API key of the user. See `openalexR::oa_apikey()`.
+#' @param verbose Logical indicating whether to show a progress bar.
 #' @param json_dir directory where the JSON files are saved. Default is NULL
 #'
 #' @return If `json_dir` is `NULL`, the return value from call to `openalexR::oa_request()`,
 #'   otherwise the complete path to the expanded and normalized `json_dir`.
 #'
 #' @md
+#'
+#' @importFrom openalexR oa_email oa_apikey oa_request oa_fetch oa_snowball
+#' @importFrom utils tail
+#'
 #' @export
 #'
 oa_request <- function(
@@ -25,11 +37,17 @@ oa_request <- function(
     verbose = FALSE,
     json_dir = NULL) {
   if (!is.null(json_dir)) {
-    message("Deleting and recreating `", json_dir, "` directory to avoid inconsistencies.")
+    message("Deleting and recreating `", json_dir, "` to avoid inconsistencies.")
     if (dir.exists(json_dir)) {
       unlink(json_dir, recursive = TRUE)
     }
     dir.create(json_dir, recursive = TRUE)
+  }
+
+  if (is.null(json_dir)) {
+    json_dir <- tempfile()
+    dir.create(json_dir, recursive = TRUE)
+    message("`json_dir` is NULL. Using Temporary directory : ", json_dir)
   }
 
   # https://httr.r-lib.org/articles/api-packages.html#set-a-user-agent
@@ -54,7 +72,7 @@ oa_request <- function(
   }
 
   # first, download info about n. of items returned by the query
-  res <- openalexPro:::api_request(query_url, ua, query = query_ls, api_key = api_key)
+  res <- api_request(query_url, ua, query = query_ls, api_key = api_key)
 
   if (!is.null(res$meta)) {
     ## return only item counting
@@ -78,7 +96,7 @@ oa_request <- function(
       if (verbose) cat("=")
       Sys.sleep(1 / 10)
       query_ls[[paging]] <- next_page
-      res <- openalexPro:::api_request(query_url, ua, query = query_ls, json_dir = json_dir)
+      res <- api_request(query_url, ua, query = query_ls, json_dir = json_dir)
       if (is.null(json_dir)) {
         data <- c(data, res[[result_name]])
       }
@@ -126,34 +144,36 @@ oa_request <- function(
     Sys.sleep(1 / 10)
     next_page <- openalexR:::get_next_page(paging, i, res)
     query_ls[[paging]] <- next_page
-    res <- openalexPro:::api_request(query_url, ua, query = query_ls, json_dir = json_dir)
-    if (is.null(json_dir)) {
-      if (!is.null(res[[result_name]])) data[[i]] <- res[[result_name]]
-    }
+    res <- api_request(query_url, ua, query = query_ls, json_dir = json_dir)
+    # if (is.null(json_dir)) {
+    #   if (!is.null(res[[result_name]])) data[[i]] <- res[[result_name]]
+    # }
   }
 
-  data <- unlist(data, recursive = FALSE)
+  # if (is.null(json_dir)) {
+  #   data <- unlist(data, recursive = FALSE)
 
-  if (grepl("filter", query_url) && grepl("works", query_url)) {
-    truncated <- unlist(openalexR:::truncated_authors(data))
-    if (length(truncated)) {
-      truncated <- openalexR:::shorten_oaid(truncated)
-      warning(
-        "\nThe following work(s) have truncated lists of authors: ",
-        paste(truncated, collapse = ", "),
-        ".\nQuery each work separately by its identifier to get full list of authors.\n",
-        "For example:\n  ",
-        paste0(
-          "lapply(c(\"",
-          paste(utils::head(truncated, 2), collapse = "\", \""),
-          "\"), \\(x) oa_fetch(identifier = x))"
-        ),
-        "\nDetails at https://docs.openalex.org/api-entities/authors/limitations."
-      )
-    }
-  }
-  if (!is.null(json_dir)) {
-    data <- normalizePath(json_dir)
-  }
+  #   if (grepl("filter", query_url) && grepl("works", query_url)) {
+  #     truncated <- unlist(openalexR:::truncated_authors(data))
+  #     if (length(truncated)) {
+  #       truncated <- openalexR:::shorten_oaid(truncated)
+  #       warning(
+  #         "\nThe following work(s) have truncated lists of authors: ",
+  #         paste(truncated, collapse = ", "),
+  #         ".\nQuery each work separately by its identifier to get full list of authors.\n",
+  #         "For example:\n  ",
+  #         paste0(
+  #           "lapply(c(\"",
+  #           paste(utils::head(truncated, 2), collapse = "\", \""),
+  #           "\"), \\(x) oa_fetch(identifier = x))"
+  #         ),
+  #         "\nDetails at https://docs.openalex.org/api-entities/authors/limitations."
+  #       )
+  #     }
+  #   }
+  # } else {
+  data <- normalizePath(json_dir)
+  # }
+  ##
   return(data)
 }

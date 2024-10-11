@@ -12,3 +12,4 @@
 ^README.qmd$
 ^TODO.md$
 ^corpus.parquet$
+^.vscode$
