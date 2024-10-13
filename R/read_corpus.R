@@ -6,6 +6,9 @@
 #' @param corpus The directory of the Parquet files.
 #' @param return_data Logical indicating whether to return an Arrow Dataset
 #'   (default) or a `tibble`.
+#' @param compp_mode Compatibility mode with `openalexR` return values from  `openalexR::fetch( output = "tibble")` (default: `FALSE`).
+#'   If `TRUE,`, the format of the returned values is identical to `openalexR::fetch( output = "tibble")`,
+#'   if `FALSE`, the format may be functionally identical, but not structurally.
 #'
 #' @return An Arrow Dataset or a `tibble`.
 #'
@@ -17,8 +20,17 @@
 #' @export
 read_corpus <- function(
     corpus,
-    return_data = FALSE) {
+    return_data = FALSE,
+    comp_mode = FALSE) {
   result <- arrow::open_dataset(corpus)
+  if (comp_mode) {
+    result <- result |>
+      dplyr::mutate(
+        citation = NULL,
+        ab = abstract,
+        abstract = NULL
+      )
+  }
   if (return_data) {
     result <- dplyr::collect(result)
   }

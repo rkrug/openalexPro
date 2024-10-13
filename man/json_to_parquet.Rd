@@ -6,7 +6,7 @@
 \usage{
 json_to_parquet(
   json_dir = NULL,
-  corpus = file.path("corpus"),
+  corpus = tempfile(fileext = ".corpus"),
   partition = "publication_year",
   delete_json = FALSE
 )
@@ -14,7 +14,7 @@ json_to_parquet(
 \arguments{
 \item{json_dir}{The directory of JSON files returned from \code{oa_request(..., json_dir = "FOLDER")}.}
 
-\item{corpus}{parquet dataset. If \code{partition} is `NULL', a file, otherwise a directorty.}
+\item{corpus}{parquet dataset; default: temporary directory.}
 
 \item{partition}{The column which should be used to partition the table. Hive partitioning is used.}
 

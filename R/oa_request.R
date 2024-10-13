@@ -14,7 +14,7 @@
 #' @param mailto The email address of the user. See `openalexR::oa_email()`.
 #' @param api_key The API key of the user. See `openalexR::oa_apikey()`.
 #' @param verbose Logical indicating whether to show a progress bar.
-#' @param json_dir directory where the JSON files are saved. Default is NULL
+#' @param json_dir directory where the JSON files are saved. Default is a temporary directory
 #'
 #' @return If `json_dir` is `NULL`, the return value from call to `openalexR::oa_request()`,
 #'   otherwise the complete path to the expanded and normalized `json_dir`.
@@ -35,7 +35,7 @@ oa_request <- function(
     mailto = oa_email(),
     api_key = oa_apikey(),
     verbose = FALSE,
-    json_dir = NULL) {
+    json_dir = tempfile(fileext = ".json_dir")) {
   if (!is.null(json_dir)) {
     message("Deleting and recreating `", json_dir, "` to avoid inconsistencies.")
     if (dir.exists(json_dir)) {
@@ -44,11 +44,6 @@ oa_request <- function(
     dir.create(json_dir, recursive = TRUE)
   }
 
-  if (is.null(json_dir)) {
-    json_dir <- tempfile()
-    dir.create(json_dir, recursive = TRUE)
-    message("`json_dir` is NULL. Using Temporary directory : ", json_dir)
-  }
 
   # https://httr.r-lib.org/articles/api-packages.html#set-a-user-agent
   ua <- httr::user_agent("https://github.com/ropensci/openalexR/")

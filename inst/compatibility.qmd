@@ -1,0 +1,102 @@
+---
+title: "Compatibility with `openalexR`"
+format: 
+  html:
+    toc: true
+execute: 
+  cache: true
+
+vignette: >
+  %\VignetteIndexEntry{Vignette's Title}
+  %\VignetteEngine{quarto::html}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(openalexPro)
+```
+
+# Compatibility between `opelalexR` and `openalexPro`
+One of the aims of this package is compatibility with `openalexR::oa_fetch(output = "tibble")`.
+
+Here we will demonstrte how this can be achieved annd what the differences are. 
+
+For copmparison, we will fetch the results usong `openalexR::fetch()` here:
+
+```{r}
+#| label: openalexR_fetch
+oaR <- openalexR::oa_fetch(
+  entity = "works",
+  output = "tibble",
+  title_and_abstract.search = "biodiversity AND conservation AND IPBES",
+) |>
+  dplyr::arrange(id)
+```
+
+Now we will do the same using `openalexPro::oa_request()`:
+```{r}
+#| label: openalexPro_fetch
+#|
+
+corpus <- oa_query(
+  title_and_abstract.search = "biodiversity AND conservation AND IPBES",
+  entity = "works"
+) |>
+  oa_request(
+    verbose = TRUE
+  ) |>
+  json_to_parquet()
+
+oaPro <- read_corpus(
+  corpus = corpus,
+)
+
+oaPro_comp <- read_corpus(
+  corpus = corpus,
+  comp_mode = TRUE,
+  return_data = TRUE
+) |>
+  dplyr::arrange(id)
+```
+
+# Comparison
+
+## ids
+First we check if the same papers are retrieved:
+
+```{r}
+identical(
+  setdiff(oaR$id, oaPro_comp$id),
+  setdiff(oaR$id, oaPro_comp$id)
+)
+```
+
+If `TRUE`, the same works are retrieved.
+
+## Structure
+
+```{r}
+waldo::compare(oaR, oaPro_comp)
+```
+
+Let's compare the names. The following columns are in both `oaR` and `oaPro_comp`:
+```{r}
+intersect(names(oaR), names(oaPro_comp))
+```
+
+The following are missing from `oaPro_comp`:
+```{r}
+setdiff(names(oaR), names(oaPro_comp))
+```
+
+and these are missing from `oaR`:
+```{r}
+setdiff(names(oaPro_comp), names(oaR))
+```

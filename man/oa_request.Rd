@@ -13,7 +13,7 @@ oa_request(
   mailto = oa_email(),
   api_key = oa_apikey(),
   verbose = FALSE,
-  json_dir = NULL
+  json_dir = tempfile(fileext = ".json_dir")
 )
 }
 \arguments{
@@ -33,7 +33,7 @@ oa_request(
 
 \item{verbose}{Logical indicating whether to show a progress bar.}
 
-\item{json_dir}{directory where the JSON files are saved. Default is NULL}
+\item{json_dir}{directory where the JSON files are saved. Default is a temporary directory}
 }
 \value{
 If \code{json_dir} is \code{NULL}, the return value from call to \code{openalexR::oa_request()},

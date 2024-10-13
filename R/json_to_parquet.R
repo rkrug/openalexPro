@@ -4,7 +4,7 @@
 #'  and converts it to a Apache Parquet dataset.
 #'
 #' @param json_dir The directory of JSON files returned from `oa_request(..., json_dir = "FOLDER")`.
-#' @param corpus parquet dataset. If `partition` is `NULL', a file, otherwise a directorty.
+#' @param corpus parquet dataset; default: temporary directory.
 #' @param partition The column which should be used to partition the table. Hive partitioning is used.
 #' @param delete_json If `TRUE` the `json_dir` directory will be deleted after conversion
 #'
@@ -29,18 +29,22 @@
 #' @export
 json_to_parquet <- function(
     json_dir = NULL,
-    corpus = file.path("corpus"),
+    corpus = tempfile(fileext = ".corpus"),
     partition = "publication_year",
     delete_json = FALSE) {
-  if (file.exists(corpus)) {
-    message("Deleting and recreating `", corpus, "` to avoid inconsistencies.")
-    unlink(corpus, recursive = TRUE)
-  }
-
   ## Check if json_dir is specified
   if (is.null(json_dir)) {
-    stop("No json_dir specified!")
+    stop("No json_dir to convert from specified!")
   }
+
+  if (file.exists(corpus)) {
+    message("Deleting and recreating `", corpus, "` to avoid inconsistencies.")
+    if (dir.exists(corpus)) {
+      unlink(corpus, recursive = TRUE)
+    }
+    dir.create(corpus, recursive = TRUE)
+  }
+
 
   ## Define set of json files
 

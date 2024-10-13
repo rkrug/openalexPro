@@ -1,6 +1,6 @@
 # openalexPro README
 Rainer M Krug
-2024-10-11
+2024-10-13
 
 # This Package is experimental - use at own risk, but please let me know if things do not work!
 
@@ -23,7 +23,8 @@ These json files are processed further by additional functions and it is
 planned to make resulting oblects compatible with `openalexR` objects.
 These are
 
-- `openalexR` `list` type result from `oa_fetch()`
+<!-- - `openalexR` `list` type result from `oa_fetch()` -->
+
 - `openalexR` `tibble` / `data.frame` type result from `oa_fetch()`
 - `openalexR` snowball `list` as returned by `oa_snowball()`
 
