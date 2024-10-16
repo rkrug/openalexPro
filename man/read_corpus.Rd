@@ -12,7 +12,7 @@ read_corpus(corpus, return_data = FALSE, comp_mode = FALSE)
 \item{return_data}{Logical indicating whether to return an Arrow Dataset
 (default) or a \code{tibble}.}
 
-\item{compp_mode}{Compatibility mode with \code{openalexR} return values from  \code{openalexR::fetch( output = "tibble")} (default: \code{FALSE}).
+\item{comp_mode}{Compatibility mode with \code{openalexR} return values from  \code{openalexR::fetch( output = "tibble")} (default: \code{FALSE}).
 If \verb{TRUE,}, the format of the returned values is identical to \code{openalexR::fetch( output = "tibble")},
 if \code{FALSE}, the format may be functionally identical, but not structurally.}
 }

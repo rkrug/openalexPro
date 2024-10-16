@@ -14,19 +14,20 @@
 #' @param mailto The email address of the user. See `openalexR::oa_email()`.
 #' @param api_key The API key of the user. See `openalexR::oa_apikey()`.
 #' @param verbose Logical indicating whether to show a progress bar.
-#' @param json_dir directory where the JSON files are saved. Default is a temporary directory
+#' @param json_dir directory where the JSON files are saved. Default is a temporary directory. If `NULL`,
+#'   the return value from call to `openalexR::oa_request()` with all the arguments is returned.
 #'
 #' @return If `json_dir` is `NULL`, the return value from call to `openalexR::oa_request()`,
 #'   otherwise the complete path to the expanded and normalized `json_dir`.
 #'
 #' @md
 #'
-#' @importFrom openalexR oa_email oa_apikey oa_request oa_fetch oa_snowball
+#' @importFrom openalexR oa_email oa_apikey
 #' @importFrom utils tail
 #'
 #' @export
 #'
-oa_request <- function(
+pro_request <- function(
     query_url,
     per_page = 200,
     paging = "cursor",
@@ -36,8 +37,29 @@ oa_request <- function(
     api_key = oa_apikey(),
     verbose = FALSE,
     json_dir = tempfile(fileext = ".json_dir")) {
+  if (is.null(json_dir)) {
+    return(
+      openalexR::oa_request(
+        query_url = query_url,
+        per_page = per_page,
+        paging = paging,
+        pages = pages,
+        count_only = count_only,
+        mailto = mailto,
+        api_key = api_key,
+        verbose = verbose
+      )
+    )
+  }
+  #
+  #
+  #
+
   if (!is.null(json_dir)) {
-    message("Deleting and recreating `", json_dir, "` to avoid inconsistencies.")
+    if (verbose) {
+      message("Deleting and recreating `", json_dir, "` to avoid inconsistencies.")
+    }
+
     if (dir.exists(json_dir)) {
       unlink(json_dir, recursive = TRUE)
     }

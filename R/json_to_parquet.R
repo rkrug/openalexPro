@@ -1,13 +1,13 @@
 #' Convert JSON files to Apache Parquet files
 #'
-#' The function takes a directory of JSON files as written from a call to `oa_request(..., json_dir = "FOLDER")`
+#' The function takes a directory of JSON files as written from a call to `pro_request(..., json_dir = "FOLDER")`
 #'  and converts it to a Apache Parquet dataset.
 #'
-#' @param json_dir The directory of JSON files returned from `oa_request(..., json_dir = "FOLDER")`.
+#' @param json_dir The directory of JSON files returned from `pro_request(..., json_dir = "FOLDER")`.
 #' @param corpus parquet dataset; default: temporary directory.
 #' @param partition The column which should be used to partition the table. Hive partitioning is used.
 #' @param delete_json If `TRUE` the `json_dir` directory will be deleted after conversion
-#'
+#' @param verbose Logical indicating whether to show a verbose information. Defaults to `FALSE`
 #' @return The function does not return anything, but it creates a directory with
 #'   Apache Parquet files.
 #'
@@ -31,14 +31,17 @@ json_to_parquet <- function(
     json_dir = NULL,
     corpus = tempfile(fileext = ".corpus"),
     partition = "publication_year",
-    delete_json = FALSE) {
+    delete_json = FALSE,
+    verbose = FALSE) {
   ## Check if json_dir is specified
   if (is.null(json_dir)) {
     stop("No json_dir to convert from specified!")
   }
 
   if (file.exists(corpus)) {
-    message("Deleting and recreating `", corpus, "` to avoid inconsistencies.")
+    if (verbose) {
+      message("Deleting and recreating `", corpus, "` to avoid inconsistencies.")
+    }
     if (dir.exists(corpus)) {
       unlink(corpus, recursive = TRUE)
     }
@@ -57,7 +60,7 @@ json_to_parquet <- function(
 
   ## Setup VIEWS
 
-  system.file("views_json.sql", package = "openalexPro") |>
+  system.file("json_to_parquet.sql", package = "openalexPro") |>
     load_sql_file() |>
     gsub(pattern = "%%JSON_DIR%%", replacement = json_dir) |>
     DBI::dbExecute(conn = con)

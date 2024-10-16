@@ -8,24 +8,27 @@ json_to_parquet(
   json_dir = NULL,
   corpus = tempfile(fileext = ".corpus"),
   partition = "publication_year",
-  delete_json = FALSE
+  delete_json = FALSE,
+  verbose = FALSE
 )
 }
 \arguments{
-\item{json_dir}{The directory of JSON files returned from \code{oa_request(..., json_dir = "FOLDER")}.}
+\item{json_dir}{The directory of JSON files returned from \code{pro_request(..., json_dir = "FOLDER")}.}
 
 \item{corpus}{parquet dataset; default: temporary directory.}
 
 \item{partition}{The column which should be used to partition the table. Hive partitioning is used.}
 
 \item{delete_json}{If \code{TRUE} the \code{json_dir} directory will be deleted after conversion}
+
+\item{verbose}{Logical indicating whether to show a verbose information. Defaults to \code{FALSE}}
 }
 \value{
 The function does not return anything, but it creates a directory with
 Apache Parquet files.
 }
 \description{
-The function takes a directory of JSON files as written from a call to \code{oa_request(..., json_dir = "FOLDER")}
+The function takes a directory of JSON files as written from a call to \code{pro_request(..., json_dir = "FOLDER")}
 and converts it to a Apache Parquet dataset.
 }
 \details{

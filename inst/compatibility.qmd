@@ -4,7 +4,7 @@ format:
   html:
     toc: true
 execute: 
-  cache: true
+  cache: false
 
 vignette: >
   %\VignetteIndexEntry{Vignette's Title}
@@ -40,7 +40,7 @@ oaR <- openalexR::oa_fetch(
   dplyr::arrange(id)
 ```
 
-Now we will do the same using `openalexPro::oa_request()`:
+Now we will do the same using `openalexPro::pro_request()`:
 ```{r}
 #| label: openalexPro_fetch
 #|
@@ -49,7 +49,7 @@ corpus <- oa_query(
   title_and_abstract.search = "biodiversity AND conservation AND IPBES",
   entity = "works"
 ) |>
-  oa_request(
+  pro_request(
     verbose = TRUE
   ) |>
   json_to_parquet()
@@ -68,7 +68,7 @@ oaPro_comp <- read_corpus(
 
 # Comparison
 
-## ids
+## Works retrieved (works)
 First we check if the same papers are retrieved:
 
 ```{r}
@@ -80,11 +80,7 @@ identical(
 
 If `TRUE`, the same works are retrieved.
 
-## Structure
-
-```{r}
-waldo::compare(oaR, oaPro_comp)
-```
+## Names of Columns
 
 Let's compare the names. The following columns are in both `oaR` and `oaPro_comp`:
 ```{r}
@@ -99,4 +95,13 @@ setdiff(names(oaR), names(oaPro_comp))
 and these are missing from `oaR`:
 ```{r}
 setdiff(names(oaPro_comp), names(oaR))
+```
+
+
+## Further Comparison
+
+The comparison of structure is difficult at the moment, wherefore we will skip it. Here are just some metrics:
+
+```{r}
+waldo::compare(oaR, oaPro_comp)
 ```

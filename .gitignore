@@ -42,5 +42,6 @@ corpus_json/
 inst/json_1000
 inst/json_10000
 corpus.parquet
+snowball/
 
 /.quarto/

@@ -1,6 +1,6 @@
 # openalexPro README
 Rainer M Krug
-2024-10-13
+2024-10-16
 
 # This Package is experimental - use at own risk, but please let me know if things do not work!
 
@@ -35,17 +35,17 @@ example graphing (`openalexGraph`). TODO: add ideas
 ### Changes from `openalexR`
 
 Unfortunately, it is not easily possible to download the return values
-from the api calls in `openalexR`. Therefore, the approach used here iat
-the moment, is to make a few small changes in the following two
-functions:
+from the api calls in `openalexR`. Therefore, the approach used here at
+the moment, is to define new functions with a few changes to the
+original functions:
 
-- `openalexR::oa_request()`:
+- `openalexPro::pro_request()` (based on `openalexR::oa_request()`):
   - add argument `json_dir` to which save the json files which is
     forwarded to `openalexR:::api_request()`. if `json_dir` is `NULL`
     the return values are identical to the ones from `openalexR`,
     otherwise the return value is the complete path to the expanded and
     normalized `json_dir`.
-- `openalexR:::api_request()`
+- `openalexR:::api_request()` (based on `openalexR::oa_request()`):
   - add argument `json_dir` to which save the json files. json files are
     saved per call to the OpenAlex API when appropriate. when the API is
     called to get the overall number of works in the results, these are
@@ -104,7 +104,7 @@ res <- oa_query(
   title_and_abstract.search = "biodiversity AND conservation AND IPBES",
   entity = "works"
 ) |>
-  openalexPro::oa_request(
+  openalexPro::pro_request(
     verbose = TRUE,
     json_dir = "json_files"
   ) |>
@@ -125,7 +125,7 @@ res <- oa_query(
   title_and_abstract.search = "biodiversity AND conservation AND IPBES",
   entity = "works"
 ) |>
-  openalexPro::oa_request(
+  openalexPro::pro_request(
     verbose = TRUE
   ) |>
   json_to_parquet(

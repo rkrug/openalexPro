@@ -13,3 +13,5 @@
 ^TODO.md$
 ^corpus.parquet$
 ^.vscode$
+^snowball$
+^inst/compatibility_cache$
