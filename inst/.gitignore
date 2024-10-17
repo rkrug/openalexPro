@@ -1,2 +1,3 @@
 /.quarto/
-/compatibility_cache/
+/compatibility_*/
+/compatibility/

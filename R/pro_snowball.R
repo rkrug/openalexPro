@@ -44,7 +44,7 @@ pro_snowball <- function(
     snowball = tempfile(fileext = ".snowball"),
     partition = NULL,
     verbose = FALSE) {
-  snowball <- normalizePath(snowball)
+  snowball <- normalizePath(snowball, mustWork = FALSE)
 
   if (dir.exists(snowball)) {
     if (verbose) {
