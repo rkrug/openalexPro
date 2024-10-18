@@ -39,3 +39,9 @@ read_corpus <- function(
   ##
   return(result)
 }
+
+globalVariables(
+  c(
+    "authorships"
+  )
+)

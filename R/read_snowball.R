@@ -62,3 +62,10 @@ read_snowball <- function(
     )
   )
 }
+
+globalVariables(
+  c(
+    "from_source",
+    "to_source"
+  )
+)

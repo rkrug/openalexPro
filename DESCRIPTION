@@ -1,5 +1,5 @@
-Package: openalexPro
 Type: Package
+Package: openalexPro
 Title: Providing a more advanced access to OpenAlex for the power user
 Version: 0.6.0
 Date: 2024-09-19
@@ -7,20 +7,18 @@ Author: Rainer M Krug
 Maintainer: Rainer M Krug <Rainer@krugs.de>
 Description: More about what it does (maybe more than one line).
 License: GPL (>= 2)
-Encoding: UTF-8
-RoxygenNote: 7.3.2
-Depends: 
-    openalexR (>= 1.4.0)
+Imports:
+    arrow,
+    DBI,
+    dplyr,
+    duckdb,
+    httr,
+    openalexR (>= 1.4.0),
+    RcppSimdJson
 Suggests: 
     knitr,
     rmarkdown,
     testthat (>= 3.0.0)
-Imports:
-    duckdb,
-    DBI,
-    dplyr,
-    arrow,
-    RcppSimdJson,
-    httr
 Config/testthat/edition: 3
-
+Encoding: UTF-8
+RoxygenNote: 7.3.2

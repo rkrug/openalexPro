@@ -22,7 +22,7 @@
 #'
 #' @md
 #'
-#' @importFrom openalexR oa_email oa_apikey
+#' @importFrom openalexR oa_request
 #' @importFrom utils tail
 #'
 #' @export
@@ -81,7 +81,7 @@ pro_request <- function(
   }
 
   if (!is.null(mailto)) {
-    if (openalexR:::isValidEmail(mailto)) {
+    if (isValidEmail(mailto)) {
       query_ls[["mailto"]] <- mailto
     } else {
       message(mailto, " is not a valid email address")
@@ -107,7 +107,7 @@ pro_request <- function(
     data <- vector("list")
     res <- NULL
     i <- 1
-    next_page <- openalexR:::get_next_page("cursor", i, res)
+    next_page <- get_next_page("cursor", i, res)
     if (verbose) cat("\nDownloading groups...\n|")
     while (!is.null(next_page)) {
       if (verbose) cat("=")
@@ -118,7 +118,7 @@ pro_request <- function(
         data <- c(data, res[[result_name]])
       }
       i <- i + 1
-      next_page <- openalexR:::get_next_page("cursor", i, res)
+      next_page <- get_next_page("cursor", i, res)
     }
     cat("\n")
     return(data)
@@ -150,7 +150,7 @@ pro_request <- function(
       "Getting ", n_pages, pg_plural, " of results",
       " with a total of ", n_items, " records..."
     )
-    pb <- openalexR:::oa_progress(n = n_pages, text = "OpenAlex downloading")
+    pb <- oa_progress(n = n_pages, text = "OpenAlex downloading")
   }
 
   # Activation of cursor pagination
@@ -159,7 +159,7 @@ pro_request <- function(
   for (i in pages) {
     if (verbose) pb$tick()
     Sys.sleep(1 / 10)
-    next_page <- openalexR:::get_next_page(paging, i, res)
+    next_page <- get_next_page(paging, i, res)
     query_ls[[paging]] <- next_page
     res <- api_request(query_url, ua, query = query_ls, json_dir = json_dir)
     # if (is.null(json_dir)) {
@@ -171,9 +171,9 @@ pro_request <- function(
   #   data <- unlist(data, recursive = FALSE)
 
   #   if (grepl("filter", query_url) && grepl("works", query_url)) {
-  #     truncated <- unlist(openalexR:::truncated_authors(data))
+  #     truncated <- unlist(truncated_authors(data))
   #     if (length(truncated)) {
-  #       truncated <- openalexR:::shorten_oaid(truncated)
+  #       truncated <- shorten_oaid(truncated)
   #       warning(
   #         "\nThe following work(s) have truncated lists of authors: ",
   #         paste(truncated, collapse = ", "),
