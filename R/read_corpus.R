@@ -21,7 +21,8 @@
 read_corpus <- function(
     corpus,
     return_data = FALSE,
-    comp_mode = FALSE) {
+    comp_mode = FALSE,
+    duplicate_ids = TRUE) {
   result <- arrow::open_dataset(corpus)
   if (comp_mode) {
     result <- result |>
@@ -33,6 +34,11 @@ read_corpus <- function(
         author = authorships
       )
   }
+  ##
+  if (duplicate_ids) {
+    result <- result |> dplyr::distinct(id, .keep_all = TRUE)
+  }
+  ##
   if (return_data) {
     result <- dplyr::collect(result)
   }
