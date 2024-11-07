@@ -4,7 +4,12 @@
 \alias{read_corpus}
 \title{Read corpus from Parquet Dataset}
 \usage{
-read_corpus(corpus, return_data = FALSE, comp_mode = FALSE)
+read_corpus(
+  corpus,
+  return_data = FALSE,
+  comp_mode = FALSE,
+  duplicate_ids = TRUE
+)
 }
 \arguments{
 \item{corpus}{The directory of the Parquet files.}

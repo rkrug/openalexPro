@@ -1,3 +1,0 @@
-query_openalex <- function() {
-
-}

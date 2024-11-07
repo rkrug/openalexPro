@@ -13,15 +13,15 @@
 #' @examples
 #' \dontrun{
 #' # Convert all data sets in the default snapshot directory
-#' oa_snapshot_to_arrow()
+#' oa_snapshot_to_parquet()
 #'
 #' # Convert specific data sets in a custom snapshot directory
-#' oa_snapshot_to_arrow(snapshot_dir = "/path/to/snapshot", data_sets = c("data_set1", "data_set2"))
+#' oa_snapshot_to_parquet(snapshot_dir = "/path/to/snapshot", data_sets = c("data_set1", "data_set2"))
 #' }
 #'
 #' @export
 #' @md
-snapshot_to_arrow <- function(
+snapshot_to_parquet <- function(
     snapshot_dir = file.path("", "Volumes", "openalex", "openalex-snapshot"),
     arrow_dir = file.path("", "Volumes", "openalex", "arrow"),
     data_sets = NULL,
