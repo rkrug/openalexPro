@@ -64,9 +64,8 @@ if (!dir.exists(corpus)) {
     pro_request(
       verbose = TRUE,
     ) |>
-    json_to_parquet(
-      corpus = corpus,
-      delete_json = TRUE
+    source_to_parquet(
+      corpus = corpus
     )
 }
 

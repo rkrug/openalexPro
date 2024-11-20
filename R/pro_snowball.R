@@ -65,7 +65,7 @@ pro_snowball <- function(
       json_dir = file.path(snowball, "keypaper_json")
     )
 
-  keypaper_parquet <- json_to_parquet(
+  keypaper_parquet <- source_to_parquet(
     json_dir = keypaper_json,
     corpus = file.path(snowball, "keypaper.parquet"),
     partition = NULL

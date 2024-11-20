@@ -92,6 +92,7 @@ snapshot_to_parquet <- function(
     paste0(
       "COPY ( ",
       "   SELECT ",
+      "       SUBSTR(id, 23)::bigint // 10000  AS id_block, ",
       "       * ",
       "   FROM ",
       "       read_ndjson('", json_dir, "/*/*.gz', maximum_object_size=1000000000)",

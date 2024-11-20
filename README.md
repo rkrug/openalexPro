@@ -1,4 +1,5 @@
 # openalexPro README
+
 Rainer M Krug
 2024-10-16
 
@@ -69,7 +70,7 @@ In addition, as a link between json files, the parquet dataset, and the
 retrieval of works from the dataset, the `duckdb` package is used.
 [DuckDB](https://duckdb.org) ‘DuckDB is a fast in-process analytical
 database’ as described on their database and it integrates peferfectly
-with `dplyr` pipelines. The functions here are `json_to_parquet()`
+with `dplyr` pipelines. The functions here are `source_to_parquet()`
 
 In the same light of efficiency, the conversion of the abstracts from
 the inverted index format returned by OpenAlex as well as the creation
@@ -80,7 +81,7 @@ functions here are `get_abstract()` and `get_abbreviated_authors()`
 
 At the moment installation is opnly possible vi github:
 
-``` r
+```r
 #### If pak is not installed install it by running
 ## install.packages(pak)
 
@@ -97,7 +98,7 @@ To download a corpus as a number of json files in the directory
 `corpus_json` and convert it a parquet dataset in the directory `corpus`
 you can run
 
-``` r
+```r
 library(openalexPro)
 
 res <- oa_query(
@@ -108,7 +109,7 @@ res <- oa_query(
     verbose = TRUE,
     json_dir = "json_files"
   ) |>
-  json_to_parquet(
+  source_to_parquet(
     corpus = "corpus"
   )
 ```
@@ -120,7 +121,7 @@ If you do not need the json files, you can ommit the argument `json_dir`
 and a temporaty directory will be used and which will be deleted after
 the conversion:
 
-``` r
+```r
 res <- oa_query(
   title_and_abstract.search = "biodiversity AND conservation AND IPBES",
   entity = "works"
@@ -128,14 +129,13 @@ res <- oa_query(
   openalexPro::pro_request(
     verbose = TRUE
   ) |>
-  json_to_parquet(
-    corpus = "corpus",
-    delete_json = TRUE
+  source_to_parquet(
+    corpus = "corpus"
   )
 ```
 
-``` r
-json_to_parquet(
+```r
+source_to_parquet(
   json_dir = "json_files",
   corpus = "corpus.parquet",
   partition = NULL

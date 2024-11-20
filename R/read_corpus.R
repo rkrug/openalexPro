@@ -35,8 +35,9 @@ read_corpus <- function(
       )
   }
   ##
-  if (duplicate_ids) {
-    result <- result |> dplyr::distinct(id, .keep_all = TRUE)
+  if (!duplicate_ids) {
+    result <- result |>
+      dplyr::distinct(id, .keep_all = TRUE)
   }
   ##
   if (return_data) {
