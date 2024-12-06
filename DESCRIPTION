@@ -16,7 +16,8 @@ Imports:
     duckdb,
     httr,
     openalexR (>= 1.4.0),
-    RcppSimdJson
+    RcppSimdJson,
+    tictoc
 Suggests: 
     knitr,
     rmarkdown,

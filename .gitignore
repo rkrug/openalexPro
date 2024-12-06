@@ -45,3 +45,4 @@ corpus.parquet
 /snowball/
 
 /.quarto/
+inst/tca_corpus_complete.plantuml

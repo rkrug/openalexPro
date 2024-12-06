@@ -8,7 +8,8 @@ snapshot_to_parquet(
   snapshot_dir = file.path("", "Volumes", "openalex", "openalex-snapshot"),
   arrow_dir = file.path("", "Volumes", "openalex", "arrow"),
   data_sets = NULL,
-  overwrite = FALSE
+  overwrite = FALSE,
+  temp_directory = NULL
 )
 }
 \arguments{
@@ -19,6 +20,9 @@ snapshot_to_parquet(
 \item{data_sets}{A character vector specifying the data sets to process. Default is NULL, which processes all data sets.}
 
 \item{overwrite}{If \code{TRUE} the existing Arrow files will be overwritten. Default is \code{FALSE}.}
+
+\item{temp_directory}{location of the temporaty directory for duckdb. Initial runs indicate
+that 2TB should be safe. Default is \code{NULL}, use the system temporary directory.}
 }
 \description{
 This function converts the OA (openalex) snapshot data to Arrow format.
