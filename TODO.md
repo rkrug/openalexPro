@@ -4,3 +4,5 @@
 - [ ] Add Badgest to README https://github.com/rkrug/openalexPro/issues/3
 - [ ] re-rwrite `api_request()` to use `httr2` https://github.com/rkrug/openalexPro/issues/4
 - [ ] Add tests https://github.com/rkrug/openalexPro/issues/5
+
+- [ ] Add Abstract and Citation function based on the corpus from `pro_request_json_to_parquet()`

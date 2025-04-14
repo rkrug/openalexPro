@@ -13,6 +13,7 @@
 #' @param abstractes Logical. Indicating whether to extract abstract from inverted index into the field called `abstract`.
 #'   Default: `FALSE` which means no additional `abstract` field
 #' @param ids `data.frams` or `tibble` with `id` column which will be used to filter the works to be converted. Default: `NULL`, no filtering.
+#' @param partition The column which should be used to partition the table. Is only used if `ids` is `NULL`. Hive partitioning is used.
 #' @param verbose Logical indicating whether to show a verbose information. Defaults to `FALSE`
 #' @return The function does not return anything, but it creates a directory with
 #'   Apache Parquet files.
@@ -34,13 +35,15 @@
 #' }
 #' @export
 source_to_parquet <- function(
-    source_dir = NULL,
-    source_type = "pro_request",
-    corpus = tempfile(fileext = ".corpus"),
-    citations = FALSE,
-    abstracts = FALSE,
-    ids = NULL,
-    verbose = FALSE) {
+  source_dir = NULL,
+  source_type = "pro_request",
+  corpus = tempfile(fileext = ".corpus"),
+  citations = FALSE,
+  abstracts = FALSE,
+  ids = NULL,
+  partition = NULL,
+  verbose = FALSE
+) {
   ## Check if source_dir is specified
   if (is.null(source_dir)) {
     stop("No source_dir to convert from specified!")
@@ -60,14 +63,17 @@ source_to_parquet <- function(
 
   if (file.exists(corpus)) {
     if (verbose) {
-      message("Deleting and recreating `", corpus, "` to avoid inconsistencies.")
+      message(
+        "Deleting and recreating `",
+        corpus,
+        "` to avoid inconsistencies."
+      )
     }
     if (dir.exists(corpus)) {
       unlink(corpus, recursive = TRUE)
     }
     dir.create(corpus, recursive = TRUE)
   }
-
 
   ## Define set of json files
 
@@ -81,26 +87,30 @@ source_to_parquet <- function(
   ## Setup VIEWS
 
   ### Create `results` view
-  switch(source_type,
+  switch(
+    source_type,
     pro_request = {
       paste0(
         "INSTALL json; ",
         "LOAD json; ",
-        " CREATE VIEW results AS SELECT UNNEST(results, max_depth := 2) FROM read_json_auto('", source_dir, "/*.json');"
+        " CREATE VIEW results AS SELECT UNNEST(results, max_depth := 2) FROM read_json_auto('",
+        source_dir,
+        "/*.json');"
       ) |>
         paste0(collapse = "\n") |>
         DBI::dbExecute(conn = con)
     },
     snapshot = {
       paste0(
-        "CREATE VIEW results AS SELECT * FROM read_parquet('", source_dir, "/**/*.parquet');"
+        "CREATE VIEW results AS SELECT * FROM read_parquet('",
+        source_dir,
+        "/**/*.parquet');"
       ) |>
         paste0(collapse = "\n") |>
         DBI::dbExecute(conn = con)
     },
     stop("Unknown source_type! Unse `snapshot` or `pro_request`!")
   )
-
 
   ### create other needed vies based on results
   system.file("source_to_parquet.sql", package = "openalexPro") |>
@@ -120,11 +130,20 @@ source_to_parquet <- function(
       "       SUBSTR(id, 23)::bigint // 10000  AS id_block, ",
       "       *  ",
       "   FROM ",
-      "       ", from_view, " ",
+      "       ",
+      from_view,
+      " ",
       "   NATURAL JOIN ",
       "       ids",
-      ") TO '", corpus, "' ",
-      "(FORMAT PARQUET, COMPRESSION SNAPPY, PARTITION_BY 'id_block')"
+      ") TO '",
+      corpus,
+      "' ",
+      "(FORMAT PARQUET, COMPRESSION SNAPPY",
+      ifelse(
+        is.null(partition),
+        ")",
+        paste0(", PARTITION_BY '", partition, "')")
+      )
     ) |>
       DBI::dbExecute(conn = con)
   } else {
@@ -133,8 +152,12 @@ source_to_parquet <- function(
       "   SELECT ",
       "       * ",
       "   FROM ",
-      "       ", from_view, " ",
-      ") TO '", corpus, "' ",
+      "       ",
+      from_view,
+      " ",
+      ") TO '",
+      corpus,
+      "' ",
       "(FORMAT PARQUET, COMPRESSION SNAPPY",
       ifelse(
         is.null(partition),

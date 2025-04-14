@@ -11,6 +11,7 @@ source_to_parquet(
   citations = FALSE,
   abstracts = FALSE,
   ids = NULL,
+  partition = NULL,
   verbose = FALSE
 )
 }
@@ -29,6 +30,8 @@ source_to_parquet(
 (e.g. \code{Darwin & Newton (1903)}) in the works. Default: \code{FALSE} which means no \code{citation} field in}
 
 \item{ids}{\code{data.frams} or \code{tibble} with \code{id} column which will be used to filter the works to be converted. Default: \code{NULL}, no filtering.}
+
+\item{partition}{The column which should be used to partition the table. Is only used if \code{ids} is \code{NULL}. Hive partitioning is used.}
 
 \item{verbose}{Logical indicating whether to show a verbose information. Defaults to \code{FALSE}}
 

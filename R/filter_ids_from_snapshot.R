@@ -12,13 +12,13 @@
 #' @importFrom DBI dbConnect dbDisconnect dbExecute
 #' @importFrom duckdb duckdb
 #' @importFrom tictoc tic toc
-#' @importFrom dplyr split
 #'
 #' @export
 filter_ids_from_snapshot <- function(
-    corpus_dir,
-    ids,
-    arrow_dir) {
+  corpus_dir,
+  ids,
+  arrow_dir
+) {
   ###
 
   if (is.null(ids)) {
@@ -34,7 +34,11 @@ filter_ids_from_snapshot <- function(
 
   ###
 
-  con <- DBI::dbConnect(duckdb::duckdb(), dbdir = "~/tmp/temp.duckdb", read_only = FALSE)
+  con <- DBI::dbConnect(
+    duckdb::duckdb(),
+    dbdir = "~/tmp/temp.duckdb",
+    read_only = FALSE
+  )
 
   on.exit(
     DBI::dbDisconnect(con, shutdown = TRUE)
@@ -42,11 +46,21 @@ filter_ids_from_snapshot <- function(
 
   ###
 
-  message("OK. Let's go. This will take some time Grab a coffee, have lunch, go home...\nSee you tomorrow... ", toc(), "\n#####\n")
+  message(
+    "OK. Let's go. This will take some time Grab a coffee, have lunch, go home...\nSee you tomorrow... ",
+    toc(),
+    "\n#####\n"
+  )
   lapply(
     ids,
     function(x) {
-      message("  Extracting id_block ", x$id_block, " to parquet database in ", arrow_dir, " partitioned by id_blocks ...")
+      message(
+        "  Extracting id_block ",
+        x$id_block,
+        " to parquet database in ",
+        arrow_dir,
+        " partitioned by id_blocks ..."
+      )
       id_block_dir <- file.path(arrow_dir, paste0("id_block=", x$id_block))
       tic()
       ##
@@ -61,17 +75,25 @@ filter_ids_from_snapshot <- function(
         "   SELECT ",
         "       * ",
         "   FROM ",
-        "       read_parquet('", id_block_dir, "/**/*.parquet') ",
+        "       read_parquet('",
+        id_block_dir,
+        "/**/*.parquet') ",
         "   WHERE ",
         "       id IN (SELECT id FROM ids) ",
         "   ORDER BY id ",
-        ") TO '", arrow_dir, "' ",
+        ") TO '",
+        arrow_dir,
+        "' ",
         "(FORMAT PARQUET, COMPRESSION SNAPPY, PARTITION_BY 'id_block')"
       ) |>
         DBI::dbExecute(conn = con)
       message("    done after ", toc())
     }
   )
-  message("Nice to see you again. Did you have a nice rest? I was working for ", toc(), "\n#####\n")
+  message(
+    "Nice to see you again. Did you have a nice rest? I was working for ",
+    toc(),
+    "\n#####\n"
+  )
   return(arrow_dir)
 }
