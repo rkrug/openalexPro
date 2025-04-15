@@ -6,13 +6,9 @@
 \usage{
 pro_request_json_to_parquet(
   json_dir = NULL,
-  corpus = NULL,
+  corpus = tempfile(fileext = "_corpus"),
   overwrite = FALSE,
-  verbose = TRUE,
-  normalize_schemata = FALSE,
-  ROW_GROUP_SIZE = 10000,
-  ROW_GROUPS_PER_FILE = 1,
-  enrich_corpus = FALSE
+  verbose = TRUE
 )
 }
 \arguments{

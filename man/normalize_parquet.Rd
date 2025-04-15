@@ -6,7 +6,7 @@
 \usage{
 normalize_parquet(
   input_dir = NULL,
-  output_dir = NULL,
+  output_dir = tempfile(fileext = "_parquet"),
   overwrite = FALSE,
   ROW_GROUP_SIZE = 10000,
   ROW_GROUPS_PER_FILE = 1

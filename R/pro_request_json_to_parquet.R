@@ -38,13 +38,9 @@
 
 pro_request_json_to_parquet <- function(
   json_dir = NULL,
-  corpus = NULL,
+  corpus = tempfile(fileext = "_corpus"),
   overwrite = FALSE,
-  verbose = TRUE,
-  normalize_schemata = FALSE,
-  ROW_GROUP_SIZE = 10000,
-  ROW_GROUPS_PER_FILE = 1,
-  enrich_corpus = FALSE
+  verbose = TRUE
 ) {
   ## Check if json_dir is specified
   if (is.null(json_dir)) {
@@ -77,23 +73,10 @@ pro_request_json_to_parquet <- function(
 
   ## Create in memory DuckDB
   con <- DBI::dbConnect(duckdb::duckdb())
-  if (normalize_schemata) {
-    corpus_tmp <- tempfile()
-  } else {
-    corpus_tmp <- corpus
-  }
 
   on.exit(
     {
       try(DBI::dbDisconnect(con, shutdown = TRUE), silent = TRUE)
-      try(
-        {
-          if (normalize_schemata) {
-            unlink(corpus_tmp, recursive = TRUE, force = TRUE)
-          }
-        },
-        silent = TRUE
-      )
     }
   )
 
@@ -126,39 +109,13 @@ pro_request_json_to_parquet <- function(
       fn,
       "' ) ",
       ") TO '",
-      corpus_tmp,
+      corpus,
       "' ",
       "(FORMAT PARQUET, COMPRESSION SNAPPY, APPEND, PARTITION_BY 'page');"
     ) |>
       DBI::dbExecute(conn = con)
     ##
     # setTxtProgressBar(pb, i)
-  }
-
-  ## Normalizing Schemata
-  if (normalize_schemata) {
-    if (verbose) {
-      message("Normalizing Schemata")
-    }
-    corpus <- normalize_parquet(
-      input_dir = corpus_tmp,
-      output_dir = corpus,
-      overwrite = overwrite,
-      ROW_GROUP_SIZE = ROW_GROUP_SIZE,
-      ROW_GROUPS_PER_FILE = ROW_GROUPS_PER_FILE
-    )
-  }
-
-  ## Enrich parquet
-  if (enrich_corpus) {
-    if (verbose) {
-      message("Enriching Corpus")
-    }
-    enrich_corpus(
-      corpus = corpus,
-      corpus_enriched = corpus,
-      verbose = verbose
-    )
   }
 
   return(normalizePath(corpus))
