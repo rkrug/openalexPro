@@ -16,7 +16,7 @@
 #'   Controls file size and write frequency. Defaults to `1`
 #'   See: \url{https://duckdb.org/docs/sql/statements/copy#row_groups_per_file}
 #' @param enrich_corpus Determines if the function `enrich_parquets()` should be run. Defatults to `FALSE`
-#'
+#' @param delete_input Determines if the `json_dir` should be deleted afterwards. Defaults to `FALSE`.
 #' @return The function does not returns the directory with the corpus.
 #'
 #' @details The function uses DuckDB to read the JSON files and to create the
@@ -40,7 +40,8 @@ pro_request_json_to_parquet <- function(
   json_dir = NULL,
   corpus = tempfile(fileext = "_corpus"),
   overwrite = FALSE,
-  verbose = TRUE
+  verbose = TRUE,
+  delete_input = FALSE
 ) {
   ## Check if json_dir is specified
   if (is.null(json_dir)) {
@@ -116,6 +117,10 @@ pro_request_json_to_parquet <- function(
       DBI::dbExecute(conn = con)
     ##
     # setTxtProgressBar(pb, i)
+  }
+
+  if (delete_input) {
+    unlink(json_dir, recursive = TRUE, force = TRUE)
   }
 
   return(normalizePath(corpus))

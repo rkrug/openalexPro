@@ -11,6 +11,7 @@
 #' @param ROW_GROUPS_PER_FILE Only used when `normalize_schemata = TRUE`. Number of row groups to include in each output Parquet file.
 #'   Controls file size and write frequency. Defaults to `1`
 #'   See: \url{https://duckdb.org/docs/sql/statements/copy#row_groups_per_file}
+#' @param delete_input Determines if the `inputdir` should be deleted afterwards. Defaults to `FALSE`.
 #'
 #' @return The function does return the `outpout_dir`.
 #'
@@ -30,7 +31,8 @@ normalize_parquet <- function(
   output_dir = tempfile(fileext = "_parquet"),
   overwrite = FALSE,
   ROW_GROUP_SIZE = 10000,
-  ROW_GROUPS_PER_FILE = 1
+  ROW_GROUPS_PER_FILE = 1,
+  delete_input = FALSE
 ) {
   ## Check if json_dir is specified
   if (is.null(input_dir)) {
@@ -91,6 +93,10 @@ normalize_parquet <- function(
     output_dir
   ) |>
     DBI::dbExecute(conn = con)
+
+  if (delete_input) {
+    unlink(input_dir, recursive = TRUE, force = TRUE)
+  }
 
   return(normalizePath(output_dir))
 }

@@ -4,7 +4,12 @@
 \alias{enrich_corpus}
 \title{Convert JSON files to Apache Parquet files}
 \usage{
-enrich_corpus(corpus = NULL, corpus_enriched = NULL, verbose = FALSE)
+enrich_corpus(
+  corpus = NULL,
+  corpus_enriched = NULL,
+  verbose = FALSE,
+  delete_input = FALSE
+)
 }
 \arguments{
 \item{corpus}{The directory of JSON files returned from \code{pro_request(..., json_dir = "FOLDER")}.}
@@ -12,6 +17,8 @@ enrich_corpus(corpus = NULL, corpus_enriched = NULL, verbose = FALSE)
 \item{corpus_enriched}{parquet dataset; default: temporary directory.}
 
 \item{verbose}{Logical indicating whether to show a verbose information. Defaults to \code{FALSE}}
+
+\item{delete_input}{Determines if the \code{corpus} should be deleted afterwards. Defaults to \code{FALSE}.}
 }
 \value{
 The function does not return anything, but it creates a directory with

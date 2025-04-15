@@ -9,7 +9,8 @@ normalize_parquet(
   output_dir = tempfile(fileext = "_parquet"),
   overwrite = FALSE,
   ROW_GROUP_SIZE = 10000,
-  ROW_GROUPS_PER_FILE = 1
+  ROW_GROUPS_PER_FILE = 1,
+  delete_input = FALSE
 )
 }
 \arguments{
@@ -26,6 +27,8 @@ See: \url{https://duckdb.org/docs/sql/statements/copy#row_group_size}}
 \item{ROW_GROUPS_PER_FILE}{Only used when \code{normalize_schemata = TRUE}. Number of row groups to include in each output Parquet file.
 Controls file size and write frequency. Defaults to \code{1}
 See: \url{https://duckdb.org/docs/sql/statements/copy#row_groups_per_file}}
+
+\item{delete_input}{Determines if the \code{inputdir} should be deleted afterwards. Defaults to \code{FALSE}.}
 }
 \value{
 The function does return the \code{outpout_dir}.

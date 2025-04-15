@@ -8,6 +8,7 @@
 #' @param verbose Logical indicating whether to show a verbose information. Defaults to `FALSE`
 #' @return The function does not return anything, but it creates a directory with
 #'   Apache Parquet files.
+#' @param delete_input Determines if the `corpus` should be deleted afterwards. Defaults to `FALSE`.
 #'
 #' @details The function uses DuckDB to read the JSON files and to create the
 #'   Apache Parquet files. The function creates a DuckDB connection in memory and
@@ -29,7 +30,8 @@
 enrich_corpus <- function(
   corpus = NULL,
   corpus_enriched = NULL,
-  verbose = FALSE
+  verbose = FALSE,
+  delete_input = FALSE
 ) {
   ## Check if corpus is specified
   if (is.null(corpus)) {
@@ -110,5 +112,9 @@ enrich_corpus <- function(
       unlink(fn)
     }
   }
+  if (delete_input) {
+    unlink(corpus, recursive = TRUE, force = TRUE)
+  }
+
   return(normalizePath(corpus_enriched))
 }

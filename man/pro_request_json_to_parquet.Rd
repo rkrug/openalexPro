@@ -8,7 +8,8 @@ pro_request_json_to_parquet(
   json_dir = NULL,
   corpus = tempfile(fileext = "_corpus"),
   overwrite = FALSE,
-  verbose = TRUE
+  verbose = TRUE,
+  delete_input = FALSE
 )
 }
 \arguments{
@@ -17,6 +18,8 @@ pro_request_json_to_parquet(
 \item{corpus}{parquet dataset; default: temporary directory.}
 
 \item{verbose}{Logical indicating whether to show a verbose information. Defaults to \code{TRUE}}
+
+\item{delete_input}{Determines if the \code{json_dir} should be deleted afterwards. Defaults to \code{FALSE}.}
 
 \item{normalize_schemata}{Determines if the schemata should be normalized, i.e. If not,
 certain fields might not work, but for some app;licatons this is faster. Defasults to \code{FALSE}}
