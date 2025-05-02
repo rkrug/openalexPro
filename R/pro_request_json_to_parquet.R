@@ -119,25 +119,46 @@ pro_request_json_to_parquet <- function(
 
     try(
       {
-        paste0(
-          "COPY ( ",
-          "SELECT ",
-          pn,
-          " AS page, ",
-          "UNNEST(",
-          types,
-          ", max_depth := 2) ",
-          "FROM read_json_auto('",
-          fn,
-          "' ) ",
-          ") TO '",
-          corpus,
-          "' ",
-          "(FORMAT PARQUET, COMPRESSION SNAPPY, APPEND, PARTITION_BY 'page');"
-        ) |>
-          DBI::dbExecute(conn = con)
-        if (verbose) {
-          message("   Done")
+        if (types == "single") {
+          paste0(
+            "COPY ( ",
+            "SELECT ",
+            pn,
+            " AS page, ",
+            "*",
+            "FROM read_json_auto('",
+            fn,
+            "' ) ",
+            ") TO '",
+            corpus,
+            "' ",
+            "(FORMAT PARQUET, COMPRESSION SNAPPY, APPEND, PARTITION_BY 'page');"
+          ) |>
+            DBI::dbExecute(conn = con)
+          if (verbose) {
+            message("   Done")
+          }
+        } else {
+          paste0(
+            "COPY ( ",
+            "SELECT ",
+            pn,
+            " AS page, ",
+            "UNNEST(",
+            types,
+            ", max_depth := 2) ",
+            "FROM read_json_auto('",
+            fn,
+            "' ) ",
+            ") TO '",
+            corpus,
+            "' ",
+            "(FORMAT PARQUET, COMPRESSION SNAPPY, APPEND, PARTITION_BY 'page');"
+          ) |>
+            DBI::dbExecute(conn = con)
+          if (verbose) {
+            message("   Done")
+          }
         }
       },
       silent = !verbose

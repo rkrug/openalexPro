@@ -40,21 +40,25 @@
 #' )
 #' }
 pro_snowball <- function(
-    identifier = NULL,
-    snowball = tempfile(fileext = ".snowball"),
-    partition = NULL,
-    verbose = FALSE) {
+  identifier = NULL,
+  snowball = tempfile(fileext = ".snowball"),
+  partition = NULL,
+  verbose = FALSE
+) {
   snowball <- normalizePath(snowball, mustWork = FALSE)
 
   if (dir.exists(snowball)) {
     if (verbose) {
-      message("Deleting and recreating `", snowball, "` to avoid inconsistencies.")
+      message(
+        "Deleting and recreating `",
+        snowball,
+        "` to avoid inconsistencies."
+      )
     }
     unlink(snowball, recursive = TRUE)
     dir.create(snowball, recursive = TRUE)
   }
   # fetching keypapers -----------------------------------------------------
-
 
   keypaper_json <- oa_query(
     openalex = identifier,
@@ -76,12 +80,12 @@ pro_snowball <- function(
     return_data = TRUE
   )
 
-
   # fetching documents citing the target keypapers (incoming - to: keypaper) ----
 
-
   if (verbose) {
-    message("Collecting all documents citing the target keypapers (to = keypaper)...")
+    message(
+      "Collecting all documents citing the target keypapers (to = keypaper)..."
+    )
   }
   citing_json <- oa_query(
     cites = keypaper$id,
@@ -92,12 +96,12 @@ pro_snowball <- function(
       json_dir = file.path(snowball, "citing_json")
     )
 
-
-
   # fetching documents cited by the target keypapers (outgoing - from: keypaper )-----------------------
 
-
-  if (verbose) message("Collecting all documents cited by the target keypapers (from = keypaper)...")
+  if (verbose)
+    message(
+      "Collecting all documents cited by the target keypapers (from = keypaper)..."
+    )
   cited_json <- oa_query(
     cited_by = keypaper$id,
     entity = "works"
@@ -107,7 +111,6 @@ pro_snowball <- function(
       json_dir = file.path(snowball, "cited_json")
     )
 
-
   # Assemble nodes and edges -----------------------------------------------
 
   con <- DBI::dbConnect(duckdb::duckdb())
@@ -116,9 +119,7 @@ pro_snowball <- function(
     DBI::dbDisconnect(con, shutdown = TRUE)
   )
 
-
   # Create snowball using sql ---------------------------------------------
-
 
   system.file("pro_snowball.sql", package = "openalexPro") |>
     load_sql_file() |>
@@ -127,9 +128,7 @@ pro_snowball <- function(
     gsub(pattern = "%%CITING_JSON_DIR%%", replacement = citing_json) |>
     DBI::dbExecute(conn = con)
 
-
   # Create nodes.parquet ---------------------------------------------------
-
 
   paste0(
     "COPY ( ",
@@ -137,7 +136,9 @@ pro_snowball <- function(
     "       * ",
     "   FROM ",
     "       nodes",
-    ") TO '", file.path(snowball, "nodes.parquet"), "' ",
+    ") TO '",
+    file.path(snowball, "nodes.parquet"),
+    "' ",
     "(FORMAT PARQUET, COMPRESSION SNAPPY",
     ifelse(
       is.null(partition),
@@ -147,9 +148,7 @@ pro_snowball <- function(
   ) |>
     DBI::dbExecute(conn = con)
 
-
   # Create edges.parquet ---------------------------------------------------
-
 
   paste0(
     "COPY ( ",
@@ -157,7 +156,9 @@ pro_snowball <- function(
     "       * ",
     "   FROM ",
     "       edges",
-    ") TO '", file.path(snowball, "edges.parquet"), "' ",
+    ") TO '",
+    file.path(snowball, "edges.parquet"),
+    "' ",
     "(FORMAT PARQUET, COMPRESSION SNAPPY, PARTITION_BY (from_source, to_source))"
   ) |>
     DBI::dbExecute(conn = con)

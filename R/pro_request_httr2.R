@@ -1,6 +1,6 @@
 #' `openalexR::oa_request()` with additional argument
 #'
-#' This function adds one argument to `openalexR::oa_request()`, namely `json_dir`.
+#' This function adds one argument to `openalexR::oa_request()`, namely `output_dir`.
 #' When specified, all return values from OpenAlex will be saved as jaon files in
 #' that directory and the return value is the directory of the json files.
 #'
@@ -11,16 +11,16 @@
 #'   It is recommended to not increase it beyond 1000 due to server load and to use the snapshot instead.
 #'   If `NULL`, all pages will be downloaded.
 #'   Default: 1000.
-#' @param json_dir directory where the JSON files are saved. Default is a temporary directory. If `NULL`,
+#' @param output_dir directory where the JSON files are saved. Default is a temporary directory. If `NULL`,
 #'   the return value from call to `openalexR::oa_request()` with all the arguments is returned.
-#' @params overwrite Logical. If `TRUE`, `json_dir` will be deleted if it already exists.
+#' @param overwrite Logical. If `TRUE`, `output_dir` will be deleted if it already exists.
 #' @param mailto The email address of the user. See `openalexR::oa_email()`.
 #' @param api_key The API key of the user. See `openalexR::oa_apikey()`.
 #' @param verbose Logical indicating whether to show verbose messages.
 #' @param progress Logical default `TRUE` indicating whether to show a progress bar.
 #'
-#' @return If `json_dir` is `NULL`, the return value from call to `openalexR::oa_request()`,
-#'   otherwise the complete path to the expanded and normalized `json_dir`.
+#' @return If `output_dir` is `NULL`, the return value from call to `openalexR::oa_request()`,
+#'   otherwise the complete path to the expanded and normalized `output_dir`.
 #'
 #' @md
 #'
@@ -32,18 +32,18 @@
 pro_request_httr2 <- function(
   query_url,
   pages = 1000,
-  json_dir = tempfile(fileext = ".json_dir"),
+  output_dir = tempfile(),
   overwrite = FALSE,
   mailto = oa_email(),
   api_key = oa_apikey(),
   verbose = FALSE,
   progress = TRUE
 ) {
-  if (dir.exists(json_dir)) {
+  if (dir.exists(output_dir)) {
     if (!overwrite) {
       stop(
         "Directory ",
-        json_dir,
+        output_dir,
         " exists.\n",
         "Either specify `overwrite = TRUE` or delete it."
       )
@@ -51,15 +51,15 @@ pro_request_httr2 <- function(
     if (verbose) {
       message(
         "Deleting and recreating `",
-        json_dir,
+        output_dir,
         "` to avoid inconsistencies."
       )
     }
-    unlink(json_dir, recursive = TRUE)
+    unlink(output_dir, recursive = TRUE)
   }
-  dir.create(json_dir, recursive = TRUE)
+  dir.create(output_dir, recursive = TRUE)
 
-  json_dir <- normalizePath(json_dir)
+  output_dir <- normalizePath(output_dir)
 
   if (grepl("group_by=", query_url)) {
     page_prefix <- "group_by_page_"
@@ -84,61 +84,112 @@ pro_request_httr2 <- function(
   # Initialize results and page counter
   page <- 1
 
-  if (progress) {
-    data <- req |>
-      httr2::req_perform() |>
-      httr2::resp_body_json()
-    max_pages <- ceiling(data$meta$count / data$meta$per_page)
-    # Create a progress bar
-    pb <- txtProgressBar(min = 1, max = max_pages, style = 3)
+  resp <- req |>
+    httr2::req_perform()
+  data <- resp |>
+    httr2::resp_body_json()
+  if (is.null(data$meta)) {
+    single_record <- TRUE
+    page_prefix <- "single_"
+    progress <- FALSE
+  } else {
+    single_record <- FALSE
+    if (progress) {
+      max_pages <- ceiling(data$meta$count / data$meta$per_page)
+      # Create a progress bar
+      pb <- txtProgressBar(min = 0, max = max_pages, style = 3)
+    }
   }
 
-  # Pagination loop
-  repeat {
-    if (verbose) {
-      message("Downloading page ", page)
-      message("URL: ", req$url)
-    }
-
-    if (progress) {
-      setTxtProgressBar(pb, page) # Update progress bar
-    }
-
-    resp <- httr2::req_perform(req)
-
-    data <- httr2::resp_body_json(resp)
-
-    ## grouping returns at the moment a last page with no groups - this must not be saved!
-    if (data$meta$groups_count == 0) {
-      break
-    }
-
+  if (single_record) {
+    page <- 1
     resp |>
       httr2::resp_body_string() |>
       writeLines(
-        con = file.path(json_dir, paste0(page_prefix, page, ".json"))
+        con = file.path(output_dir, paste0(page_prefix, page, ".json"))
       )
+  } else {
+    # Pagination loop
+    repeat {
+      if (verbose) {
+        message("Downloading page ", page)
+        message("URL: ", req$url)
+      }
 
-    if (is.null(data$meta$next_cursor)) {
-      break
+      if (progress) {
+        setTxtProgressBar(pb, page) # Update progress bar
+      }
+
+      resp <- httr2::req_perform(req)
+
+      data <- httr2::resp_body_json(resp)
+
+      ## grouping returns at the moment a last page with no groups - this must not be saved!
+      if (isTRUE(data$meta$groups_count == 0)) {
+        break
+      }
+
+      resp |>
+        httr2::resp_body_string() |>
+        writeLines(
+          con = file.path(output_dir, paste0(page_prefix, page, ".json"))
+        )
+
+      if (is.null(data$meta$next_cursor)) {
+        break
+      }
+
+      # This is needed for groups as at the moment OpenAlex returns a final cursor page with no tresults
+      # if (isTRUE(data$meta$groups_count == 200)) {
+      #   break
+      # }
+
+      if (!is.null(pages)) {
+        if (page > pages) break # Remove this to fetch all pages
+      }
+
+      req <- req |>
+        httr2::req_url_query(cursor = data$meta$next_cursor)
+
+      page <- page + 1
     }
-
-    # This is needed for groups as at the moment OpenAlex returns a final cursor page with no tresults
-    # if (isTRUE(data$meta$groups_count == 200)) {
-    #   break
-    # }
-
-    if (!is.null(pages)) {
-      if (page > pages) break # Remove this to fetch all pages
-    }
-
-    req <- req |>
-      httr2::req_url_query(cursor = data$meta$next_cursor)
-
-    page <- page + 1
   }
-
   ###
 
-  return(json_dir)
+  return(output_dir)
 }
+
+# TODO
+# This is the error handling from openalexR::api_request()
+# Something like this needs to be included!!!
+#
+# if (httr::status_code(res) == 400) {
+#     stop("HTTP status 400 Request Line is too large")
+# }
+# if (httr::status_code(res) == 429) {
+#     message("HTTP status 429 Too Many Requests")
+#     return(empty_res)
+# }
+# if (httr::status_code(res) == 503) {
+#     mssg <- regmatches(m, regexpr("(?<=<title>).*?(?=<\\/title>)",
+#         m, perl = TRUE))
+#     message(mssg, ". Please try setting `per_page = 25` in your function call!")
+#     return(empty_res)
+# }
+# if (httr::status_code(res) == 200) {
+#     if (httr::http_type(res) != "application/json") {
+#         stop("API did not return json", call. = FALSE)
+#     }
+#     return(m)
+# }
+# if (httr::http_error(res)) {
+#     parsed <- jsonlite::fromJSON(m, simplifyVector = FALSE)
+#     stop(sprintf("OpenAlex API request failed [%s]\n%s\n<%s>",
+#         httr::status_code(res), parsed$error, parsed$message),
+#         call. = FALSE)
+# }
+# if (httr::status_code(res) != 429 & httr::status_code(res) !=
+#     200) {
+#     message("HTTP status ", httr::status_code(res))
+#     return(empty_res)
+# }

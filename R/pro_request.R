@@ -27,16 +27,17 @@
 #'
 #' @export
 #'
-pro_request <- function(
-    query_url,
-    per_page = 200,
-    paging = "cursor",
-    pages = NULL,
-    count_only = FALSE,
-    mailto = oa_email(),
-    api_key = oa_apikey(),
-    verbose = FALSE,
-    json_dir = tempfile(fileext = ".json_dir")) {
+pro_request_legacy <- function(
+  query_url,
+  per_page = 200,
+  paging = "cursor",
+  pages = NULL,
+  count_only = FALSE,
+  mailto = oa_email(),
+  api_key = oa_apikey(),
+  verbose = FALSE,
+  json_dir = tempfile(fileext = ".json_dir")
+) {
   if (is.null(json_dir)) {
     return(
       openalexR::oa_request(
@@ -54,10 +55,20 @@ pro_request <- function(
   #
   #
   #
+  warning(
+    "The function `pro_request` will be deperecated. Use `pro_request_legacy` instead or change to the new `pro_request` function."
+  )
+  warning(
+    "The function name will be used in one of the next versions for an updated version which has some changes and is not completely backward compatible."
+  )
 
   if (!is.null(json_dir)) {
     if (verbose) {
-      message("Deleting and recreating `", json_dir, "` to avoid inconsistencies.")
+      message(
+        "Deleting and recreating `",
+        json_dir,
+        "` to avoid inconsistencies."
+      )
     }
 
     if (dir.exists(json_dir)) {
@@ -65,7 +76,6 @@ pro_request <- function(
     }
     dir.create(json_dir, recursive = TRUE)
   }
-
 
   # https://httr.r-lib.org/articles/api-packages.html#set-a-user-agent
   ua <- httr::user_agent("https://github.com/ropensci/openalexR/")
@@ -133,7 +143,10 @@ pro_request <- function(
   } else {
     pages <- pages[pages <= n_pages]
     n_pages <- length(pages)
-    n_items <- min(n_items - per_page * (utils::tail(pages, 1) - n_pages), per_page * n_pages)
+    n_items <- min(
+      n_items - per_page * (utils::tail(pages, 1) - n_pages),
+      per_page * n_pages
+    )
     message("Using basic paging...")
     paging <- "page"
   }
@@ -147,8 +160,13 @@ pro_request <- function(
 
   if (verbose) {
     message(
-      "Getting ", n_pages, pg_plural, " of results",
-      " with a total of ", n_items, " records..."
+      "Getting ",
+      n_pages,
+      pg_plural,
+      " of results",
+      " with a total of ",
+      n_items,
+      " records..."
     )
     pb <- oa_progress(n = n_pages, text = "OpenAlex downloading")
   }
@@ -194,3 +212,5 @@ pro_request <- function(
   ##
   return(data)
 }
+
+pro_request <- pro_request_legacy
