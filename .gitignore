@@ -46,3 +46,4 @@ corpus.parquet
 
 /.quarto/
 inst/tca_corpus_complete.plantuml
+inst/doc

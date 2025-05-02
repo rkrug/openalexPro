@@ -72,6 +72,20 @@ pro_request_json_to_parquet <- function(
     full.names = TRUE
   )
 
+  types <- jsons |>
+    basename() |>
+    strsplit(split = "_") |>
+    sapply(FUN = '[[', 1) |>
+    unique()
+
+  if (length(types) > 1) {
+    stop("All JSON files must be of the same type!")
+  }
+
+  if (types == "group") {
+    types <- "group_by"
+  }
+
   ## Create in memory DuckDB
   con <- DBI::dbConnect(duckdb::duckdb())
 
@@ -98,24 +112,37 @@ pro_request_json_to_parquet <- function(
     }
 
     pn <- basename(fn) |>
-      gsub(pattern = ".json|page_", replacement = "")
+      strsplit(split = "_")
 
-    paste0(
-      "COPY ( ",
-      "SELECT ",
-      pn,
-      " AS page, ",
-      "UNNEST(results, max_depth := 2) ",
-      "FROM read_json_auto('",
-      fn,
-      "' ) ",
-      ") TO '",
-      corpus,
-      "' ",
-      "(FORMAT PARQUET, COMPRESSION SNAPPY, APPEND, PARTITION_BY 'page');"
-    ) |>
-      DBI::dbExecute(conn = con)
-    ##
+    pn <- pn[[1]][length(pn[[1]])] |>
+      gsub(pattern = ".json", replacement = "")
+
+    try(
+      {
+        paste0(
+          "COPY ( ",
+          "SELECT ",
+          pn,
+          " AS page, ",
+          "UNNEST(",
+          types,
+          ", max_depth := 2) ",
+          "FROM read_json_auto('",
+          fn,
+          "' ) ",
+          ") TO '",
+          corpus,
+          "' ",
+          "(FORMAT PARQUET, COMPRESSION SNAPPY, APPEND, PARTITION_BY 'page');"
+        ) |>
+          DBI::dbExecute(conn = con)
+        if (verbose) {
+          message("   Done")
+        }
+      },
+      silent = !verbose
+    )
+
     # setTxtProgressBar(pb, i)
   }
 
