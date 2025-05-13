@@ -4,22 +4,24 @@
 \alias{read_snowball}
 \title{Read snowball from Parquet Dataset}
 \usage{
-read_snowball(snowball, return_data = FALSE, comp_mode = FALSE)
+read_snowball(
+  snowball = NULL,
+  edge_type = c("core", "extended"),
+  return_data = FALSE
+)
 }
 \arguments{
 \item{snowball}{The directory of the Parquet files as poppulater by \code{pro_snowball()}.}
 
-\item{return_data}{Logical indicating whether to return Arrow Datasets (\code{FALSE}, default)
-or \code{tibble}s.}
+\item{edge_type}{description}
 
-\item{comp_mode}{Compatibility mode with \code{openalexR::oa_snowball()}. If \code{TRUE}, the
-format of the returned values is identical to the return value from \code{openalexR::oa_snowball()},
-if \code{FALSE}, the nodes are in the format as downloaded from \code{openalexRro::pro_snowball()}. \verb{edges contains all edges from the snowball, including citations between the identified paper as well as citations of papers not included in }nodes\code{. }edges\verb{also contains two additional columns, namely}source_from\code{and}source_to\verb{, indicating if the id in the }from`` or \code{to} respectively are from a
-`"keypaper"`, `"nodes"` or `"oa"`, i.e. not in nodes.
-Defaults to `FALSE`.}
+\item{return_data}{Logical indicating whether to return an
+\code{ArrowObject} representing the corpus (default) or a
+\code{tibble} containing the whole corpus shou,d be returned.}
 }
 \value{
-A list containing two elements: nodes and edges, which are either Arrow Datasets or \code{tibble}s.
+A list containing two elements: nodes and edges, which are either
+\code{ArrowObject} representing the corpus or \code{tibble}s containing the data.
 }
 \description{
 This function reads a snowball from Apache Parquet format and returns a list containing

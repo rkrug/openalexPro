@@ -20,18 +20,3 @@ oa_email <- openalexR::oa_email
 #' @export
 #' @importFrom openalexR oa_query
 oa_query <- openalexR::oa_query
-
-
-# Internal functions -----------------------------------------------------
-
-get_next_page <- openalexR:::get_next_page
-
-isValidEmail <- openalexR:::isValidEmail
-
-oa_progress <- openalexR:::oa_progress
-
-shorten_oaid <- openalexR:::shorten_oaid
-
-truncated_authors <- openalexR:::truncated_authors
-
-oa_print <- openalexR:::oa_print

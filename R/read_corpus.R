@@ -1,16 +1,15 @@
 #' Read corpus from Parquet Dataset
 #'
-#' This function reads a corpus in Apache Parquet format and returns an Arrow
-#' Dataset or a `tibble`.
+#' This function reads a corpus in Apache Parquet format and returns an
+#' `ArrowObject` representing the corpus which can be fed into a `dplyr` pipeline
+#' or a `tibble` which contains all the data.
 #'
 #' @param corpus The directory of the Parquet files.
-#' @param return_data Logical indicating whether to return an Arrow Dataset
-#'   (default) or a `tibble`.
-#' @param comp_mode Compatibility mode with `openalexR` return values from  `openalexR::fetch( output = "tibble")` (default: `FALSE`).
-#'   If `TRUE,`, the format of the returned values is identical to `openalexR::fetch( output = "tibble")`,
-#'   if `FALSE`, the format may be functionally identical, but not structurally.
+#' @param return_data Logical indicating whether to return an
+#'   `ArrowObject` representing the corpus (default) or a
+#'   `tibble` containing the whole corpus shou,d be returned.
 #'
-#' @return An Arrow Dataset or a `tibble`.
+#' @return An `ArrowObject` representing the corpus or a `tibble`.
 #'
 #' @md
 #'
@@ -19,26 +18,10 @@
 #'
 #' @export
 read_corpus <- function(
-    corpus,
-    return_data = FALSE,
-    comp_mode = FALSE,
-    duplicate_ids = TRUE) {
+  corpus,
+  return_data = FALSE
+) {
   result <- arrow::open_dataset(corpus)
-  if (comp_mode) {
-    result <- result |>
-      dplyr::mutate(
-        citation = NULL,
-        abstract_inverted_index = NULL,
-      ) |>
-      dplyr::rename(
-        author = authorships
-      )
-  }
-  ##
-  if (!duplicate_ids) {
-    result <- result |>
-      dplyr::distinct(id, .keep_all = TRUE)
-  }
   ##
   if (return_data) {
     result <- dplyr::collect(result)
@@ -46,9 +29,3 @@ read_corpus <- function(
   ##
   return(result)
 }
-
-globalVariables(
-  c(
-    "authorships"
-  )
-)

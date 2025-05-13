@@ -1,19 +1,20 @@
 #' Normalize parquet files
 #'
 #' The function takes a directory of parquet files and normalizes the schemata.
+#' **NB: All partitioning in the input parquet dataset will be lost!**
 #'
 #' @param input_dir The directory with the parquet files or a parquet dataset.
 #' @param output_dir parquet dataset with the normalized schemata. Non partitioned, but split into several files.
 #' @param overwrite Determines if the uputput parquet database shlud be overwritten if it exists. Defauls to `FALSE`.
-#' @param ROW_GROUP_SIZE Only used when `normalize_schemata = TRUE`. Maximum number of rows per row group. Smaller sizes reduce memory
+#' @param ROW_GROUP_SIZE Maximum number of rows per row group. Smaller sizes reduce memory
 #'   usage, larger sizes improve compression. Defaults to `10000`.
-#'   See: \url{https://duckdb.org/docs/sql/statements/copy#row_group_size}
-#' @param ROW_GROUPS_PER_FILE Only used when `normalize_schemata = TRUE`. Number of row groups to include in each output Parquet file.
+#'   See: \url{https://duckdb.org/docs/sql/statements/copy#row_group_size} for details.
+#' @param ROW_GROUPS_PER_FILE Number of row groups to include in each output Parquet file.
 #'   Controls file size and write frequency. Defaults to `1`
-#'   See: \url{https://duckdb.org/docs/sql/statements/copy#row_groups_per_file}
+#'   See: \url{https://duckdb.org/docs/sql/statements/copy#row_groups_per_file} for details.
 #' @param delete_input Determines if the `inputdir` should be deleted afterwards. Defaults to `FALSE`.
 #'
-#' @return The function does return the `outpout_dir`.
+#' @return The function does return the `output_dir`.
 #'
 #' @details The function uses DuckDB to normalize the schemata. The function creates a DuckDB
 #'   connection in memory and reads the parquet files into DuckDB when needed and re-writes
@@ -43,6 +44,13 @@ normalize_parquet <- function(
   if (is.null(output_dir)) {
     stop("No output_dir specified!")
   }
+
+  ## Check if input_dir is different from output_dir
+  if (input_dir == output_dir) {
+    stop("input_dir and output_dir cannot be the same!")
+  }
+
+  ## Prepare output dir
   if (file.exists(output_dir)) {
     if (!(overwrite)) {
       stop(
@@ -55,13 +63,6 @@ normalize_parquet <- function(
       unlink(output_dir, recursive = TRUE, force = TRUE)
     }
   }
-
-  ## Read names of json files
-  jsons <- list.files(
-    input_dir,
-    pattern = "*.json$",
-    full.names = TRUE
-  )
 
   ## Create in memory DuckDB
   con <- DBI::dbConnect(duckdb::duckdb())
