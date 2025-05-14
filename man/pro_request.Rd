@@ -7,7 +7,7 @@
 pro_request(
   query_url,
   pages = 1000,
-  output_dir = tempfile(),
+  output = NULL,
   format = "json",
   overwrite = FALSE,
   mailto = oa_email(),
@@ -24,13 +24,13 @@ It is recommended to not increase it beyond 1000 due to server load and to use t
 If \code{NULL}, all pages will be downloaded.
 Default: 1000.}
 
-\item{output_dir}{directory where the JSON files are saved. Default is a temporary directory. If \code{NULL},
+\item{output}{directory where the JSON files are saved. Default is a temporary directory. If \code{NULL},
 the return value from call to \code{openalexR::oa_request()} with all the arguments is returned}
 
 \item{format}{Format of the output files. At the moment, the following ones are supported:
 - 'json': (default) saves the complete \code{json} response including metadata}
 
-\item{overwrite}{Logical. If \code{TRUE}, \code{output_dir} will be deleted if it already exists.}
+\item{overwrite}{Logical. If \code{TRUE}, \code{output} will be deleted if it already exists.}
 
 \item{mailto}{The email address of the user. See \code{openalexR::oa_email()}.}
 
@@ -41,11 +41,11 @@ the return value from call to \code{openalexR::oa_request()} with all the argume
 \item{progress}{Logical default \code{TRUE} indicating whether to show a progress bar.}
 }
 \value{
-If \code{output_dir} is \code{NULL}, the return value from call to \code{openalexR::oa_request()},
-otherwise the complete path to the expanded and normalized \code{output_dir}.
+If \code{output} is \code{NULL}, the return value from call to \code{openalexR::oa_request()},
+otherwise the complete path to the expanded and normalized \code{output}.
 }
 \description{
-This function adds one argument to \code{openalexR::oa_request()}, namely \code{output_dir}.
+This function adds one argument to \code{openalexR::oa_request()}, namely \code{output}.
 When specified, all return values from OpenAlex will be saved as jaon files in
 that directory and the return value is the directory of the json files.
 }

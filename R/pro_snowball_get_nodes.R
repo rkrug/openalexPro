@@ -1,7 +1,7 @@
 #' A function to get the nodes for a snowball search
 #' @param identifier Character vector of openalex identifiers.
 #' @param doi Character vector of dois.
-#' @param output_dir parquet dataset; default: temporary directory.
+#' @param output parquet dataset; default: temporary directory.
 #' @param verbose Logical indicating whether to show a verbose information. Defaults to `FALSE`
 #'
 #' @return Path to the nodes parquet dataset
@@ -36,57 +36,47 @@
 pro_snowball_get_nodes <- function(
   identifier = NULL,
   doi = NULL,
-  output_dir = tempfile(fileext = ".snowball"),
+  output = tempfile(fileext = ".snowball"),
   verbose = FALSE
 ) {
   if (!xor(is.null(identifier), is.null(doi))) {
     stop("Either `identifier` or `doi` needs to be specified!")
   }
 
-  output_dir <- normalizePath(output_dir, mustWork = FALSE)
-  nodes <- file.path(output_dir, "nodes")
+  output <- normalizePath(output, mustWork = FALSE)
 
-  if (dir.exists(nodes)) {
+  if (dir.exists(output)) {
     if (verbose) {
       message(
         "Deleting and recreating `",
-        nodes,
+        output,
         "` to avoid inconsistencies."
       )
     }
-    unlink(nodes, recursive = TRUE)
-    dir.create(nodes, recursive = TRUE)
+    unlink(output, recursive = TRUE)
   }
+  dir.create(output, recursive = TRUE)
 
-  # Helper functions -------------------------------------------------------
+  # Create and setup in memory DuckDB --------------------------------------
 
-  add_node_columns <- function(
-    ds_path,
-    oa_input,
-    relation,
-    nodes_dir = file.path(output_dir, "nodes")
-  ) {
-    open_dataset(ds_path) |>
-      dplyr::mutate(
-        oa_input = oa_input,
-        relation = relation
-      ) |>
-      arrow::write_dataset(
-        path = nodes_dir,
-        format = "parquet",
-        partitioning = "relation"
-      )
-    return(ds_path)
-  }
+  con <- DBI::dbConnect(duckdb::duckdb())
+
+  on.exit(
+    try(DBI::dbDisconnect(con, shutdown = TRUE), silent = TRUE),
+    add = TRUE
+  )
+  paste0(
+    "INSTALL json; LOAD json; "
+  ) |>
+    DBI::dbExecute(conn = con)
 
   # fetching keypapers -----------------------------------------------------
-  nodes_nn <- file.path(output_dir, "nodes_nn")
 
   if (verbose) {
     message("Collecting keypapers...")
   }
 
-  keypaper_parquet <- ifelse(
+  ifelse(
     !is.null(identifier),
     oa_query(
       openalex = identifier,
@@ -98,26 +88,41 @@ pro_snowball_get_nodes <- function(
     )
   ) |>
     pro_request(
+      output = file.path(output, "keypaper_json"),
       verbose = verbose,
-      output_dir = file.path(output_dir, "keypaper_json")
+      progress = verbose
     ) |>
-    pro_request_to_parquet(
-      output_dir = file.path(output_dir, "keypaper_parquet")
+    pro_request_jsonl(
+      output = file.path(output, "keypaper_jsonl"),
+      add_columns = list(
+        oa_input = TRUE,
+        relation = "keypaper"
+      ),
+      verbose = verbose
     ) |>
-    add_node_columns(
-      oa_input = TRUE,
-      relation = "keypaper",
-      nodes = nodes_nn
+    pro_request_jsonl_parquet(
+      output = file.path(output, "keypaper_parquet"),
+      add_columns = list(
+        oa_input = FALSE,
+        relation = "citing"
+      ),
+      verbose = verbose
     )
 
-  keypaper <- read_corpus(
-    corpus = keypaper_parquet,
-    return_data = TRUE
-  ) |>
-    dplyr::select(
+  # Getting keypaper ids as returned by OpenAlex ---------------------------
+
+  keypaper_ids <- sprintf(
+    "
+    SELECT
       id
-    ) |>
-    dplyr::collect()
+    FROM 
+      read_json_auto( '%s/*.json' )
+    ",
+    file.path(output, "keypaper_jsonl")
+  ) |>
+    DBI::dbGetQuery(conn = con) |>
+    unlist() |>
+    as.vector()
 
   # fetching documents citing the target keypapers (incoming - to: keypaper) ----
 
@@ -127,21 +132,30 @@ pro_snowball_get_nodes <- function(
     )
   }
 
-  citing_parquet <- oa_query(
-    cites = keypaper$id,
+  oa_query(
+    cites = keypaper_ids,
     entity = "works"
   ) |>
     pro_request(
+      output = file.path(output, "citing_json"),
       verbose = verbose,
-      output_dir = file.path(output_dir, "citing_json")
+      progress = verbose
     ) |>
-    pro_request_to_parquet(
-      output_dir = file.path(output_dir, "citing_parquet")
+    pro_request_jsonl(
+      output = file.path(output, "citing_jsonl"),
+      add_columns = list(
+        oa_input = FALSE,
+        relation = "citing"
+      ),
+      verbose = verbose
     ) |>
-    add_node_columns(
-      oa_input = FALSE,
-      relation = "citing",
-      nodes = nodes_nn
+    pro_request_jsonl_parquet(
+      output = file.path(output, "citing_parquet"),
+      add_columns = list(
+        oa_input = FALSE,
+        relation = "citing"
+      ),
+      verbose = verbose
     )
 
   # fetching documents cited by the keypapers (outgoing - from: keypaper )-----------------------
@@ -152,31 +166,55 @@ pro_snowball_get_nodes <- function(
     )
 
   cited_parquet <- oa_query(
-    cited_by = keypaper$id,
+    cited_by = keypaper_ids,
     entity = "works"
   ) |>
     pro_request(
+      output = file.path(output, "cited_json"),
       verbose = verbose,
-      output_dir = file.path(output_dir, "cited_json")
+      progress = verbose
     ) |>
-    pro_request_to_parquet(
-      output_dir = file.path(output_dir, "cited_parquet")
+    pro_request_jsonl(
+      output = file.path(output, "cited_jsonl"),
+      add_columns = list(
+        oa_input = FALSE,
+        relation = "cited"
+      ),
+      verbose = verbose
     ) |>
-    add_node_columns(
-      oa_input = FALSE,
-      relation = "cited",
-      nodes = nodes_nn
+    pro_request_jsonl_parquet(
+      output = file.path(output, "cited_parquet"),
+      add_columns = list(
+        oa_input = FALSE,
+        relation = "citing"
+      ),
+      verbose = verbose
     )
 
-  # Normalize nodes --------------------------------------------------------
+  # Combine individualparquet databases to nodes_parquet -----------------------------------
 
-  normalize_parquet(
-    input_dir = nodes_nn,
-    output_dir = nodes,
-    delete_input = FALSE
-  )
+  sprintf(
+    "
+      COPY (
+        SELECT 
+          *
+        FROM 
+        read_parquet(
+          ['%s', '%s','%s'],
+          union_by_name = true
+        )
+      ) TO
+        '%s'
+        (FORMAT PARQUET, COMPRESSION SNAPPY, APPEND, PARTITION_BY 'relation')
+      ",
+    file.path(output, "keypaper_parquet", "**", "*.parquet"),
+    file.path(output, "cited_parquet", "**", "*.parquet"),
+    file.path(output, "citing_parquet", "**", "*.parquet"),
+    file.path(output, "nodes")
+  ) |>
+    DBI::dbExecute(conn = con)
 
-  # Return path to snowball ------------------------------------------------
+  # Return path to nodes ------------------------------------------------
 
-  return(normalizePath(nodes))
+  return(normalizePath(file.path(output, "nodes")))
 }

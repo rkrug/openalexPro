@@ -2,8 +2,7 @@
 #'
 #' @param identifier Character vector of openalex identifiers.
 #' @param doi Character vector of dois.
-#' @param output_dir parquet dataset; default: temporary directory.
-#' @param partition The column which should be used to partition the datasets usoing hive partitioning.
+#' @param output parquet dataset; default: temporary directory.
 #' @param verbose Logical indicating whether to show a verbose information. Defaults to `FALSE`
 #'
 #' @return A list containing 2 elements:
@@ -43,13 +42,12 @@
 #' }
 pro_snowball_extract_edges <- function(
   nodes = NULL,
-  output_dir = tempfile(fileext = ".snowball"),
-  partition = NULL,
+  output = tempfile(fileext = ".snowball"),
   verbose = FALSE
 ) {
-  output_dir <- normalizePath(output_dir, mustWork = FALSE)
+  output <- normalizePath(output, mustWork = FALSE)
 
-  edges <- file.path(output_dir, "edges")
+  edges <- file.path(output, "edges")
 
   if (file.exists(edges)) {
     if (verbose) {
@@ -79,6 +77,9 @@ pro_snowball_extract_edges <- function(
 
   system.file("extract_edges.sql", package = "openalexPro") |>
     load_sql_file() |>
+    sprintf(
+      nodes
+    ) |>
     DBI::dbExecute(conn = con)
 
   # Create edges ---------------------------------------------------
@@ -98,5 +99,5 @@ pro_snowball_extract_edges <- function(
 
   # Return path to snowball ------------------------------------------------
 
-  return(normalizePath(output_dir))
+  return(normalizePath(output))
 }

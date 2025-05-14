@@ -495,3 +495,348 @@ pro_request_json_to_parquet_legacy <- function(
 
   return(normalizePath(corpus))
 }
+
+
+#' Convert a folder of OpenAlex JSON files to partitioned Parquet
+#'
+#' This function converts all `results_page_*.json` files in a folder to a single
+#' partitioned Parquet dataset, with one partition per `page`.
+#'
+#' @param input_dir Folder containing JSON files (e.g., results_page_1.json)
+#' @param output_dir Output directory for partitioned Parquet dataset
+#' @param jq_path Path to jq binary (default: \"jq\")
+#' @return Invisibly returns the output directory path
+#' @export
+openalex_json_to_parquet <- function(
+  input_dir,
+  output_dir,
+  jq_path = "jq"
+) {
+  if (!dir.exists(output_dir)) {
+    dir.create(output_dir, recursive = TRUE)
+  }
+
+  files <- list.files(
+    input_dir,
+    pattern = "^results_page_[0-9]+\\.json$",
+    full.names = TRUE
+  )
+  if (length(files) == 0) stop("No matching JSON files found in: ", input_dir)
+
+  for (f in files) {
+    page_match <- regexpr("[0-9]+", basename(f))
+    page <- as.integer(regmatches(basename(f), page_match))
+    if (is.na(page)) next
+
+    message("Processing page ", page, " (", basename(f), ")")
+
+    jsonl <- tempfile(fileext = ".jsonl")
+    jq_execute(f, jsonl, jq_path = jq_path, page = page)
+
+    tab <- arrow::read_json_arrow(jsonl, as_data_frame = FALSE)
+    arrow::write_dataset(
+      tab,
+      path = output_dir,
+      format = "parquet",
+      partitioning = "page"
+    )
+  }
+
+  invisible(output_dir)
+}
+
+
+#' Convert JSON files to Apache Parquet files
+#'
+#' The function takes a directory of JSON files as written from a call to `pro_request(..., source_dir = "FOLDER")`
+#'  and converts it to a Apache Parquet dataset.
+#'
+#' @param source_dir The directory of JSON files returned from `pro_request(..., json_dir = "FOLDER")`.
+#' @param source_type The type of source files. Possible  values are:
+#'    - **pro_request**: The directory of JSON files returned from `pro_request(..., json_dir = "FOLDER")`
+#'    - **snapshot**: The directory of the in parquet converted works in a snapshot.
+#' @param corpus parquet dataset; default: temporary directory.
+#' @param citations Logical. Indicating whether to include additional `citation` field
+#'   (e.g. `Darwin & Newton (1903)`) in the works. Default: `FALSE` which means no `citation` field in
+#' @param abstractes Logical. Indicating whether to extract abstract from inverted index into the field called `abstract`.
+#'   Default: `FALSE` which means no additional `abstract` field
+#' @param ids `data.frams` or `tibble` with `id` column which will be used to filter the works to be converted. Default: `NULL`, no filtering.
+#' @param partition The column which should be used to partition the table. Is only used if `ids` is `NULL`. Hive partitioning is used.
+#' @param verbose Logical indicating whether to show a verbose information. Defaults to `FALSE`
+#' @return The function does not return anything, but it creates a directory with
+#'   Apache Parquet files.
+#'
+#' @details The function uses DuckDB to read the JSON files and to create the
+#'   Apache Parquet files. The function creates a DuckDB connection in memory and
+#'   readsds the JSON files into DuckDB when needed. Then it creates a SQL query to convert the
+#'   JSON files to Apache Parquet files and to copy the result to the specified
+#'   directory.
+#'
+#' @importFrom duckdb duckdb
+#' @importFrom DBI dbConnect dbDisconnect dbExecute
+#'
+#' @md
+#'
+#' @examples
+#' \dontrun{
+#' source_to_parquet(source_dir = "json", source_type = "snapshot", corpus = "arrow")
+#' }
+#' @export
+source_to_parquet <- function(
+  source_dir = NULL,
+  source_type = "pro_request",
+  corpus = tempfile(fileext = ".corpus"),
+  citations = FALSE,
+  abstracts = FALSE,
+  ids = NULL,
+  partition = NULL,
+  verbose = FALSE
+) {
+  ## Check if source_dir is specified
+  if (is.null(source_dir)) {
+    stop("No source_dir to convert from specified!")
+  }
+
+  ##
+  if (citations & !abstracts) {
+    from_view <- "results_with_citation"
+  } else if (!citations & abstracts) {
+    from_view <- "results_with_abstracts"
+  } else if (citations & abstracts) {
+    from_view <- "results_with_abstracts_citation"
+  } else {
+    from_view <- "results"
+  }
+  ##
+
+  if (file.exists(corpus)) {
+    if (verbose) {
+      message(
+        "Deleting and recreating `",
+        corpus,
+        "` to avoid inconsistencies."
+      )
+    }
+    if (dir.exists(corpus)) {
+      unlink(corpus, recursive = TRUE)
+    }
+    dir.create(corpus, recursive = TRUE)
+  }
+
+  ## Define set of json files
+
+  ## Create in memory DuckDB
+  con <- DBI::dbConnect(duckdb::duckdb())
+
+  on.exit(
+    DBI::dbDisconnect(con, shutdown = TRUE)
+  )
+
+  ## Setup VIEWS
+
+  ### Create `results` view
+  switch(
+    source_type,
+    pro_request = {
+      paste0(
+        "INSTALL json; ",
+        "LOAD json; ",
+        " CREATE VIEW results AS SELECT UNNEST(results, max_depth := 2) FROM read_json_auto('",
+        source_dir,
+        "/*.json');"
+      ) |>
+        paste0(collapse = "\n") |>
+        DBI::dbExecute(conn = con)
+    },
+    snapshot = {
+      paste0(
+        "CREATE VIEW results AS SELECT * FROM read_parquet('",
+        source_dir,
+        "/**/*.parquet');"
+      ) |>
+        paste0(collapse = "\n") |>
+        DBI::dbExecute(conn = con)
+    },
+    stop("Unknown source_type! Unse `snapshot` or `pro_request`!")
+  )
+
+  ### create other needed vies based on results
+  system.file("source_to_parquet.sql", package = "openalexPro") |>
+    load_sql_file() |>
+    DBI::dbExecute(conn = con)
+
+  if (!is.null(ids)) {
+    DBI::dbWriteTable(
+      conn = con,
+      name = "ids",
+      value = ids |>
+        dplyr::select(id)
+    )
+    paste0(
+      "COPY ( ",
+      "   SELECT ",
+      "       SUBSTR(id, 23)::bigint // 10000  AS id_block, ",
+      "       *  ",
+      "   FROM ",
+      "       ",
+      from_view,
+      " ",
+      "   NATURAL JOIN ",
+      "       ids",
+      ") TO '",
+      corpus,
+      "' ",
+      "(FORMAT PARQUET, COMPRESSION SNAPPY",
+      ifelse(
+        is.null(partition),
+        ")",
+        paste0(", PARTITION_BY '", partition, "')")
+      )
+    ) |>
+      DBI::dbExecute(conn = con)
+  } else {
+    paste0(
+      "COPY ( ",
+      "   SELECT ",
+      "       * ",
+      "   FROM ",
+      "       ",
+      from_view,
+      " ",
+      ") TO '",
+      corpus,
+      "' ",
+      "(FORMAT PARQUET, COMPRESSION SNAPPY",
+      ifelse(
+        is.null(partition),
+        ")",
+        paste0(", PARTITION_BY '", partition, "')")
+      )
+    ) |>
+      DBI::dbExecute(conn = con)
+  }
+
+  return(normalizePath(corpus))
+}
+
+
+#' Convert JSON files to Apache Parquet files
+#'
+#' The function takes a directory of JSON files as written from a call to `pro_request(..., corpus = "FOLDER")`
+#' and converts it to a Apache Parquet dataset partitiond by the page.
+#'
+#' @param corpus The directory of JSON files returned from `pro_request(..., json_dir = "FOLDER")`.
+#' @param corpus_enriched parquet dataset; default: temporary directory.
+#' @param verbose Logical indicating whether to show a verbose information. Defaults to `FALSE`
+#' @return The function does not return anything, but it creates a directory with
+#'   Apache Parquet files.
+#' @param delete_input Determines if the `corpus` should be deleted afterwards. Defaults to `FALSE`.
+#'
+#' @details The function uses DuckDB to read the JSON files and to create the
+#'   Apache Parquet files. The function creates a DuckDB connection in memory and
+#'   readsds the JSON files into DuckDB when needed. Then it creates a SQL query to convert the
+#'   JSON files to Apache Parquet files and to copy the result to the specified
+#'   directory.
+#'
+#' @importFrom duckdb duckdb
+#' @importFrom DBI dbConnect dbDisconnect dbExecute
+#'
+#' @md
+#'
+#' @examples
+#' \dontrun{
+#' source_to_parquet(corpus = "corpus", corpus_enriched = "corpus_enriched")
+#' }
+#' @export
+
+enrich_corpus <- function(
+  corpus = NULL,
+  corpus_enriched = NULL,
+  verbose = FALSE,
+  delete_input = FALSE
+) {
+  ## Check if corpus is specified
+  if (is.null(corpus)) {
+    stop("No corpus to enrich specified!")
+  }
+
+  if (is.null(corpus_enriched)) {
+    corpus_enriched <- corpus
+    if (verbose) {
+      message(
+        "No enriched corpus specified, replacing in corpus ",
+        corpus_enriched
+      )
+    }
+  }
+
+  ## Define set of parquet files
+  parquets <- list.files(
+    corpus,
+    pattern = "*.parquet$",
+    recursive = TRUE,
+    full.names = TRUE
+  )
+
+  ## Create in memory DuckDB
+  con <- DBI::dbConnect(duckdb::duckdb())
+
+  on.exit(
+    DBI::dbDisconnect(con, shutdown = TRUE)
+  )
+
+  # paste0(
+  #   "INSTALL json; LOAD json; "
+  # ) |>
+  #   DBI::dbExecute(conn = con)
+
+  for (i in seq_along(parquets)) {
+    fn <- parquets[i]
+    fn_out <- file.path(
+      corpus_enriched,
+      gsub(pattern = ".parquet$", replace = "_enr.parquet", basename(fn))
+    )
+
+    if (verbose) {
+      message("Converting ", i, " of ", length(parquets), " : ", fn)
+    }
+
+    pn <- basename(fn) |>
+      gsub(pattern = ".json|page_", replacement = "")
+
+    paste0(
+      "COPY ( ",
+      "  SELECT",
+      "      *,",
+      ## Expand abstract",
+      "      list_aggregate(",
+      "          map_keys(abstract_inverted_index),",
+      "         'string_agg',",
+      "          ' '",
+      "      ) as abstract,",
+      ## Create short citations",
+      "      CASE",
+      "          WHEN len(authorships) = 1 THEN authorships [1].author.display_name || ' (' || publication_year || ')'",
+      "          WHEN len(authorships) = 2 THEN authorships [1].author.display_name || ' & ' || authorships [2].author.display_name || ' (' || publication_year || ')'",
+      "          WHEN len(authorships) > 2 THEN authorships [1].author.display_name || ' et al.' || ' (' || publication_year || ')'",
+      "      END AS citation",
+      "  FROM read_parquet('",
+      fn,
+      "')",
+      ") TO '",
+      fn_out,
+      "' ",
+      "(FORMAT PARQUET, COMPRESSION SNAPPY, APPEND);"
+    ) |>
+      DBI::dbExecute(conn = con)
+
+    if (corpus == corpus_enriched) {
+      unlink(fn)
+    }
+  }
+  if (delete_input) {
+    unlink(corpus, recursive = TRUE, force = TRUE)
+  }
+
+  return(normalizePath(corpus_enriched))
+}

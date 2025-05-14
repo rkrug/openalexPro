@@ -8,8 +8,7 @@ and convert the result to a tibble/data frame.}
 pro_snowball(
   identifier = NULL,
   doi = NULL,
-  output_dir = tempfile(fileext = ".snowball"),
-  partition = NULL,
+  output = tempfile(fileext = ".snowball"),
   verbose = FALSE
 )
 }
@@ -18,11 +17,11 @@ pro_snowball(
 
 \item{doi}{Character vector of dois.}
 
-\item{output_dir}{parquet dataset; default: temporary directory.}
-
-\item{partition}{The column which should be used to partition the datasets usoing hive partitioning.}
+\item{output}{parquet dataset; default: temporary directory.}
 
 \item{verbose}{Logical indicating whether to show a verbose information. Defaults to \code{FALSE}}
+
+\item{partition}{The column which should be used to partition the datasets usoing hive partitioning.}
 }
 \value{
 A list containing 2 elements:

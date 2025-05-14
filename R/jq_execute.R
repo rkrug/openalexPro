@@ -8,6 +8,8 @@
 #'
 #' @param input_json Path to the input JSON file
 #' @param output_jsonl Path to the output .jsonl file
+#' @param add_columns List of additional fields to be added to the output. They nave to be provided as a
+#'   named list, e./g. `list(column_1 = "value_1", column_2 = 2)`. Only Scalar values are supported.
 #' @param jq_path Path to the jq executable (default: "jq")
 #' @param jq_filter Optional custom jq filter string. If NULL, the default filter is used.
 #' @param page Optional integer to be added as a "page" field in each output record
@@ -21,10 +23,11 @@
 jq_execute <- function(
   input_json,
   output_jsonl,
+  add_columns = list(),
   jq_path = "jq",
   jq_filter = NULL,
   page = NULL,
-  type = c("results", "single")
+  type = c("results", "single", "group_by")
 ) {
   type <- match.arg(type)
   jq_check(jq_path)
@@ -32,17 +35,16 @@ jq_execute <- function(
   if (is.null(jq_filter)) {
     root <- switch(
       type,
-      "results" = ".results[]",
-      "group_by" = ".group_by[]",
-      ".[]"
+      "results" = ".results[] | ",
+      "group_by" = ".group_by[] | ",
+      "single" = "",
+      stop("Not supported type!")
     )
 
     jq_filter <- paste0(
-      '
-      ',
       root,
       '
-      | (
+        (
           if .abstract_inverted_index == null then
             .
           else
@@ -64,15 +66,27 @@ jq_execute <- function(
       | . + {
           citation:
             (if (.authorships | length) == 1 then
-              .authorships[0].author.display_name + " (" + (.publication_year|tostring) + ")"
-            elif (.authorships | length) == 2 then
-              .authorships[0].author.display_name + " & " + .authorships[1].author.display_name + " (" + (.publication_year|tostring) + ")"
-            elif (.authorships | length) > 2 then
-              .authorships[0].author.display_name + " et al. (" + (.publication_year|tostring) + ")"
-            else null end)
-        }
+               .authorships[0].author.display_name + " (" + (.publication_year|tostring) + ")"
+             elif (.authorships | length) == 2 then
+               .authorships[0].author.display_name + " & " + .authorships[1].author.display_name + " (" + (.publication_year|tostring) + ")"
+             elif (.authorships | length) > 2 then
+               .authorships[0].author.display_name + " et al. (" + (.publication_year|tostring) + ")"
+             else null end)
+        ',
+      # Insert comma-separated additional fields at top level, not inside citation!
+      if (length(add_columns)) {
+        paste0(
+          ", ",
+          paste(
+            sprintf('%s: "%s"', names(add_columns), add_columns),
+            collapse = ", "
+          )
+        )
+      } else "",
+      '
+      }
       | del(.abstract_inverted_index)
-    '
+      '
     )
   }
 

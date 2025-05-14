@@ -29,26 +29,30 @@
 
 normalize_parquet <- function(
   input_dir = NULL,
-  output_dir = tempfile(fileext = "_parquet"),
+  output_dir = NULL,
   overwrite = FALSE,
   ROW_GROUP_SIZE = 10000,
   ROW_GROUPS_PER_FILE = 1,
   delete_input = FALSE
 ) {
-  ## Check if json_dir is specified
+  # Argument Checks --------------------------------------------------------
+
+  ## Check if input_dir is specified
   if (is.null(input_dir)) {
-    stop("No input_dir specified!")
+    stop("No `input_dir` specified!")
   }
 
   ## Check if output_dir is specified
   if (is.null(output_dir)) {
-    stop("No output_dir specified!")
+    stop("No `output_dir` specified!")
   }
 
   ## Check if input_dir is different from output_dir
   if (input_dir == output_dir) {
     stop("input_dir and output_dir cannot be the same!")
   }
+
+  # Preparations -----------------------------------------------------------
 
   ## Prepare output dir
   if (file.exists(output_dir)) {
@@ -67,12 +71,11 @@ normalize_parquet <- function(
   ## Create in memory DuckDB
   con <- DBI::dbConnect(duckdb::duckdb())
   on.exit(
-    {
-      try(DBI::dbDisconnect(con, shutdown = TRUE), silent = TRUE)
-    }
+    try(DBI::dbDisconnect(con, shutdown = TRUE), silent = TRUE),
+    add = TRUE
   )
 
-  ## Normalizing Schemata
+  # Normalizing Schemata ---------------------------------------------------
 
   sprintf(
     "

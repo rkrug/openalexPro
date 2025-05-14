@@ -7,7 +7,7 @@
 pro_snowball_get_nodes(
   identifier = NULL,
   doi = NULL,
-  output_dir = tempfile(fileext = ".snowball"),
+  output = tempfile(fileext = ".snowball"),
   verbose = FALSE
 )
 }
@@ -16,7 +16,7 @@ pro_snowball_get_nodes(
 
 \item{doi}{Character vector of dois.}
 
-\item{output_dir}{parquet dataset; default: temporary directory.}
+\item{output}{parquet dataset; default: temporary directory.}
 
 \item{verbose}{Logical indicating whether to show a verbose information. Defaults to \code{FALSE}}
 }

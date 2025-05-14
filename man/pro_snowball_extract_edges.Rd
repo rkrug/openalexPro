@@ -6,15 +6,12 @@
 \usage{
 pro_snowball_extract_edges(
   nodes = NULL,
-  output_dir = tempfile(fileext = ".snowball"),
-  partition = NULL,
+  output = tempfile(fileext = ".snowball"),
   verbose = FALSE
 )
 }
 \arguments{
-\item{output_dir}{parquet dataset; default: temporary directory.}
-
-\item{partition}{The column which should be used to partition the datasets usoing hive partitioning.}
+\item{output}{parquet dataset; default: temporary directory.}
 
 \item{verbose}{Logical indicating whether to show a verbose information. Defaults to \code{FALSE}}
 

@@ -2,7 +2,7 @@
 #' and convert the result to a tibble/data frame.
 #' @param identifier Character vector of openalex identifiers.
 #' @param doi Character vector of dois.
-#' @param output_dir parquet dataset; default: temporary directory.
+#' @param output parquet dataset; default: temporary directory.
 #' @param partition The column which should be used to partition the datasets usoing hive partitioning.
 #' @param verbose Logical indicating whether to show a verbose information. Defaults to `FALSE`
 #'
@@ -44,43 +44,40 @@
 pro_snowball <- function(
   identifier = NULL,
   doi = NULL,
-  output_dir = tempfile(fileext = ".snowball"),
-  partition = NULL,
+  output = tempfile(fileext = ".snowball"),
   verbose = FALSE
 ) {
   if (!xor(is.null(identifier), is.null(doi))) {
     stop("Either `identifier` or `doi` needs to be specified!")
   }
 
-  output_dir <- normalizePath(output_dir, mustWork = FALSE)
+  output <- normalizePath(output, mustWork = FALSE)
 
-  if (dir.exists(output_dir)) {
+  if (dir.exists(output)) {
     if (verbose) {
       message(
         "Deleting and recreating `",
-        output_dir,
+        output,
         "` to avoid inconsistencies."
       )
     }
-    unlink(output_dir, recursive = TRUE)
-    dir.create(output_dir, recursive = TRUE)
+    unlink(output, recursive = TRUE)
+    dir.create(output, recursive = TRUE)
   }
 
   pro_snowball_get_nodes(
     identifier = identifier,
     doi = doi,
-    output_dir = output_dir,
-    partition = partition,
+    output = output,
     verbose = verbose
   ) |>
     pro_snowball_extract_edges(
-      output_dir = output_dir,
-      partition = partition,
+      output = output,
       verbose = verbose
     ) |>
     invisible()
 
   # Return path to snowball ------------------------------------------------
 
-  return(normalizePath(output_dir))
+  return(normalizePath(output))
 }

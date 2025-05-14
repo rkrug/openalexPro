@@ -1,6 +1,6 @@
 #' `openalexR::oa_request()` with additional argument
 #'
-#' This function adds one argument to `openalexR::oa_request()`, namely `output_dir`.
+#' This function adds one argument to `openalexR::oa_request()`, namely `output`.
 #' When specified, all return values from OpenAlex will be saved as jaon files in
 #' that directory and the return value is the directory of the json files.
 #'
@@ -11,18 +11,18 @@
 #'   It is recommended to not increase it beyond 1000 due to server load and to use the snapshot instead.
 #'   If `NULL`, all pages will be downloaded.
 #'   Default: 1000.
-#' @param output_dir directory where the JSON files are saved. Default is a temporary directory. If `NULL`,
+#' @param output directory where the JSON files are saved. Default is a temporary directory. If `NULL`,
 #'   the return value from call to `openalexR::oa_request()` with all the arguments is returned
 #' @param format Format of the output files. At the moment, the following ones are supported:
 #'       - 'json': (default) saves the complete `json` response including metadata
-#' @param overwrite Logical. If `TRUE`, `output_dir` will be deleted if it already exists.
+#' @param overwrite Logical. If `TRUE`, `output` will be deleted if it already exists.
 #' @param mailto The email address of the user. See `openalexR::oa_email()`.
 #' @param api_key The API key of the user. See `openalexR::oa_apikey()`.
 #' @param verbose Logical indicating whether to show verbose messages.
 #' @param progress Logical default `TRUE` indicating whether to show a progress bar.
 #'
-#' @return If `output_dir` is `NULL`, the return value from call to `openalexR::oa_request()`,
-#'   otherwise the complete path to the expanded and normalized `output_dir`.
+#' @return If `output` is `NULL`, the return value from call to `openalexR::oa_request()`,
+#'   otherwise the complete path to the expanded and normalized `output`.
 #'
 #' @md
 #'
@@ -34,7 +34,7 @@
 pro_request <- function(
   query_url,
   pages = 1000,
-  output_dir = tempfile(),
+  output = NULL,
   format = "json",
   overwrite = FALSE,
   mailto = oa_email(),
@@ -42,11 +42,17 @@ pro_request <- function(
   verbose = FALSE,
   progress = TRUE
 ) {
-  if (dir.exists(output_dir)) {
+  # Argument Checks --------------------------------------------------------
+
+  if (is.null(output)) {
+    stop("No `output` output specified!")
+  }
+
+  if (dir.exists(output)) {
     if (!overwrite) {
       stop(
         "Directory ",
-        output_dir,
+        output,
         " exists.\n",
         "Either specify `overwrite = TRUE` or delete it."
       )
@@ -54,15 +60,18 @@ pro_request <- function(
     if (verbose) {
       message(
         "Deleting and recreating `",
-        output_dir,
+        output,
         "` to avoid inconsistencies."
       )
     }
-    unlink(output_dir, recursive = TRUE)
+    unlink(output, recursive = TRUE)
   }
-  dir.create(output_dir, recursive = TRUE)
 
-  output_dir <- normalizePath(output_dir)
+  # Preparations -----------------------------------------------------------
+
+  dir.create(output, recursive = TRUE)
+
+  output <- normalizePath(output)
 
   if (grepl("group_by=", query_url)) {
     page_prefix <- "group_by_page_"
@@ -112,7 +121,7 @@ pro_request <- function(
         resp |>
           httr2::resp_body_string() |>
           writeLines(
-            con = file.path(output_dir, paste0(page_prefix, page, ".json"))
+            con = file.path(output, paste0(page_prefix, page, ".json"))
           )
       },
       "parquet" = {
@@ -146,7 +155,7 @@ pro_request <- function(
           resp |>
             httr2::resp_body_string() |>
             writeLines(
-              con = file.path(output_dir, paste0(page_prefix, page, ".json"))
+              con = file.path(output, paste0(page_prefix, page, ".json"))
             )
         },
         "parquet" = {
@@ -176,7 +185,7 @@ pro_request <- function(
   }
   ###
 
-  return(output_dir)
+  return(output)
 }
 
 # TODO

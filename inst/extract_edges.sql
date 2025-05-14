@@ -1,7 +1,7 @@
 -- nodes view containing all nodes
 CREATE VIEW nodes AS
 SELECT *
-FROM read_parquet('snowball/nodes/*.parquet');
+FROM read_parquet('%s/**/*.parquet');
 --
 -- nodes cited by the keypapers (outgoing - from: keypaper )
 --

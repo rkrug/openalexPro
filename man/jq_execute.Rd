@@ -7,16 +7,20 @@
 jq_execute(
   input_json,
   output_jsonl,
+  add_columns = list(),
   jq_path = "jq",
   jq_filter = NULL,
   page = NULL,
-  type = c("results", "single")
+  type = c("results", "single", "group_by")
 )
 }
 \arguments{
 \item{input_json}{Path to the input JSON file}
 
 \item{output_jsonl}{Path to the output .jsonl file}
+
+\item{add_columns}{List of additional fields to be added to the output. They nave to be provided as a
+named list, e./g. `list(column_1 = "value_1", column_2 = 2)`. Only Scalar values are supported.}
 
 \item{jq_path}{Path to the jq executable (default: "jq")}
 
