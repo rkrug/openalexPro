@@ -4,7 +4,7 @@
       x <- read_corpus(output_parquet, return_data = FALSE)
       nrow(x)
     Output
-      [1] 8
+      [1] 2
     Code
       sort(names(x))
     Output

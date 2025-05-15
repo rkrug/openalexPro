@@ -14,7 +14,8 @@ unlink(output_parquet, recursive = TRUE, force = TRUE)
 test_that("pro_request search `biodiversity AND toast`", {
   # Define the API request
   output_json <- oa_query(
-    title_and_abstract.search = "biodiversity AND toast"
+    title_and_abstract.search = "biodiversity AND toast",
+    to_publication_date = "2010-01-01"
   ) |>
     pro_request(
       pages = 1,

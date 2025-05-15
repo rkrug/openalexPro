@@ -15,6 +15,7 @@ test_that("pro_request `biodiversity` and group by type`", {
   # Define the API request
   output_json <- oa_query(
     title_and_abstract.search = "biodiversity",
+    to_publication_date = "2010-01-01",
     group_by = "type"
   ) |>
     pro_request(
