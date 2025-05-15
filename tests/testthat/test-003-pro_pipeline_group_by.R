@@ -66,17 +66,45 @@ test_that("pro_request_jsonl_parquet `biodiversity` and group by type", {
     length(list.files(output_parquet, recursive = TRUE)) >= 1
   )
 
-  x <- read_corpus(
+  # Get search results from openalexR::oa_fetch(output = "tibble") for comparison
+
+  results_openalexR <- openalexR::oa_fetch(
+    title_and_abstract.search = "biodiversity",
+    to_publication_date = "2010-01-01",
+    group_by = "type",
+    output = "tibble",
+    verbose = FALSE
+  ) |>
+    dplyr::arrange(key)
+
+  results_openalexPro <- read_corpus(
     corpus = output_parquet,
     return_data = FALSE
   )
 
   # Check that the output file contains the expected data structure
   expect_snapshot({
-    nrow(x)
-    names(x) |>
+    nrow(results_openalexPro)
+    names(results_openalexPro) |>
       sort()
+
+    results_openalexPro <- results_openalexPro |>
+      dplyr::mutate(
+        citation = NULL,
+        page = NULL
+      ) |>
+      dplyr::arrange(key) |>
+      dplyr::collect()
+
+    print(results_openalexR)
+
+    print(results_openalexPro)
   })
+
+  expect_identical(
+    results_openalexR,
+    as.data.frame(results_openalexPro)
+  )
 })
 
 unlink(output_json, recursive = TRUE, force = TRUE)

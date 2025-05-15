@@ -1,7 +1,8 @@
 library(testthat)
+suppressPackageStartupMessages(library(openalexR))
 # library(httptest)
 
-# Normal Search `biodiversity AND toast`----------------------------------------------------------
+# Normal Search `biodiversity AND finance`----------------------------------------------------------
 
 output_json <- file.path(tempdir(), "single_work")
 output_jsonl <- file.path(tempdir(), "single_work_jsonl")
@@ -11,10 +12,10 @@ unlink(output_json, recursive = TRUE, force = TRUE)
 unlink(output_jsonl, recursive = TRUE, force = TRUE)
 unlink(output_parquet, recursive = TRUE, force = TRUE)
 
-test_that("pro_request search `biodiversity AND toast`", {
+test_that("pro_request search `biodiversity AND fiance`", {
   # Define the API request
   output_json <- oa_query(
-    title_and_abstract.search = "biodiversity AND toast",
+    title_and_abstract.search = "biodiversity AND finance",
     to_publication_date = "2010-01-01"
   ) |>
     pro_request(
@@ -32,7 +33,7 @@ test_that("pro_request search `biodiversity AND toast`", {
   )
 })
 
-test_that("pro_request_jsonl search `biodiversity AND toast`", {
+test_that("pro_request_jsonl search `biodiversity AND finance`", {
   # Convert to parquet
   output_jsonl <- output_json |>
     pro_request_jsonl(
@@ -48,7 +49,7 @@ test_that("pro_request_jsonl search `biodiversity AND toast`", {
   )
 })
 
-test_that("pro_request_jsonl_parquet search `biodiversity AND toast`", {
+test_that("pro_request_jsonl_parquet search `biodiversity AND finance`", {
   # Convert to parquet
   output_parquet <- output_jsonl |>
     pro_request_jsonl_parquet(
@@ -61,18 +62,42 @@ test_that("pro_request_jsonl_parquet search `biodiversity AND toast`", {
     length(list.files(output_parquet, "*.parquet", recursive = TRUE)) >= 1
   )
 
+  # Get search results from openalexR::oa_fetch(output = "tibble") for comparison
+
+  results_openalexR <- openalexR::oa_fetch(
+    title_and_abstract.search = "biodiversity AND finance",
+    to_publication_date = "2010-01-01",
+    output = "tibble",
+    verbose = FALSE
+  )
+
   # Check that the output file contains the expected data structure
   expect_snapshot({
-    x <- read_corpus(
+    results_openalexPro <- read_corpus(
       output_parquet,
       return_data = FALSE
     )
-    nrow(x)
-    names(x) |>
+    nrow(results_openalexPro)
+    names(results_openalexPro) |>
       sort()
+
+    results_openalexPro <- results_openalexPro |>
+      dplyr::select(id) |>
+      dplyr::collect()
+
+    data.frame(
+      openalexR = (results_openalexR$id |>
+        sort()),
+      openalexPro = (results_openalexPro$id |>
+        sort())
+    ) |>
+      print()
   })
 
-  #   # Check that the output file contains the expected data
+  expect_true(
+    setequal(results_openalexR$id, results_openalexPro$id)
+  )
+
   #   # expect_snapshot_file(file.path(output_json, "results_page_1.json"))
 })
 

@@ -19,8 +19,9 @@
 #' @export
 read_snowball <- function(
   snowball = NULL,
-  edge_type = c("core", "extended"),
-  return_data = FALSE
+  edge_type = c("core", "extended", "outside"),
+  return_data = FALSE,
+  shorten_ids = TRUE
 ) {
   if (is.null(snowball)) {
     stop("Directory `snowball` missing!")
@@ -36,14 +37,27 @@ read_snowball <- function(
     corpus = file.path(snowball, "nodes"),
     return_data = FALSE
   )
+  if (shorten_ids) {
+    nodes <- nodes |>
+      dplyr::mutate(
+        id = gsub("^https://openalex.org/", "", id)
+      )
+  }
 
   edges <- read_corpus(
     corpus = file.path(snowball, "edges"),
     return_data = FALSE
   ) |>
     dplyr::filter(
-      edge_type == edge_type
+      edge_type == .env$edge_type
     )
+  if (shorten_ids) {
+    edges <- edges |>
+      dplyr::mutate(
+        from = gsub("^https://openalex.org/", "", from),
+        to = gsub("^https://openalex.org/", "", to)
+      )
+  }
 
   if (return_data) {
     nodes <- dplyr::collect(nodes)

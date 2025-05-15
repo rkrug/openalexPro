@@ -197,7 +197,7 @@ pro_snowball_get_nodes <- function(
     "
       COPY (
         SELECT 
-          *
+          * REPLACE (CAST(oa_input AS BOOLEAN) AS oa_input)
         FROM 
         read_parquet(
           ['%s', '%s','%s'],
