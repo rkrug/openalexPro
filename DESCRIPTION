@@ -13,16 +13,23 @@ Imports:
     arrow,
     DBI,
     dplyr,
+    DT,
     duckdb,
-    httr,
+    ggplot2,
+    ggraph,
+    httr2,
     openalexR (>= 1.4.0),
     RcppSimdJson,
+    rlang,
+    tibble,
     sys,
-    tictoc
+    tictoc,
+    tidygraph
 Suggests: 
     knitr,
     rmarkdown,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    quarto
 SystemRequirements: jq (https://stedolan.github.io/jq/)Config/testthat/edition: 3
 Encoding: UTF-8
 RoxygenNote: 7.3.2

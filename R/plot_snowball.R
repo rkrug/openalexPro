@@ -13,7 +13,6 @@
 #' @importFrom ggraph ggraph geom_edge_link geom_node_point geom_node_label theme_graph scale_edge_width
 #' @importFrom ggplot2 aes after_stat scale_size scale_fill_manual theme element_rect guides ggtitle ggsave guide_legend
 #' @importFrom rlang sym
-#' @autoglobal
 #'
 #' @examples
 #' \dontrun{

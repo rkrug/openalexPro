@@ -42,1373 +42,419 @@
     Code
       nrow(results_openalexPro$edges)
     Output
-      [1] 1295
+      [1] 45
     Code
       sort(names(results_openalexPro$edges))
     Output
       [1] "edge_type" "from"      "to"       
     Code
+      read_snowball(file.path(output_dir), return_data = TRUE, shorten_ids = TRUE,
+      edge_type = "core")
+    Output
+      $nodes
+      # A tibble: 46 x 55
+         id    doi   title display_name publication_year publication_date ids$openalex
+         <chr> <chr> <chr> <chr>                   <int> <date>           <chr>       
+       1 W304~ http~ Meas~ Measuring p~             2020 2020-01-01       https://ope~
+       2 W304~ http~ Tren~ Trends of P~             2020 2020-08-01       https://ope~
+       3 W150~ <NA>  Corp~ Corpora for~             2010 2010-05-17       https://ope~
+       4 W151~ http~ Part~ Partridge: ~             2013 2013-01-01       https://ope~
+       5 W152~ <NA>  Text~ TextRank: B~             2004 2004-07-01       https://ope~
+       6 W157~ http~ Altm~ Altmetrics:~             2013 2013-01-01       https://ope~
+       7 W185~ <NA>  The ~ The PageRan~             1999 1999-11-11       https://ope~
+       8 W190~ http~ What~ What Teache~             2015 2015-09-11       https://ope~
+       9 W199~ http~ The ~ The open ac~             2015 2015-03-11       https://ope~
+      10 W205~ <NA>  Argu~ Argumentati~             1999 1999-01-01       https://ope~
+      # i 36 more rows
+      # i 52 more variables: ids$doi <chr>, $mag <chr>, $pmid <chr>, $pmcid <chr>,
+      #   language <chr>, primary_location <tibble[,9]>, type <chr>,
+      #   type_crossref <chr>, indexed_in <list<character>>,
+      #   open_access <tibble[,4]>,
+      #   authorships <list<
+        tbl_df<
+          author_position        : character
+          author                 : 
+            tbl_df<
+              id          : character
+              display_name: character
+              orcid       : character
+            >
+          institutions           : 
+            list<
+              tbl_df<
+                id          : character
+                display_name: character
+                ror         : character
+                country_code: character
+                type        : character
+                lineage     : list<character>
+              >
+            >
+          countries              : list<character>
+          is_corresponding       : logical
+          raw_author_name        : character
+          raw_affiliation_strings: list<character>
+          affiliations           : 
+            list<
+              tbl_df<
+                raw_affiliation_string: character
+                institution_ids       : list<character>
+              >
+            >
+        >
+      >>,
+      #   institution_assertions <list<character>>, ...
+      
+      $edges
+      # A tibble: 45 x 3
+         from        to          edge_type
+         <chr>       <chr>       <chr>    
+       1 W3045921891 W1500530942 core     
+       2 W3045921891 W1516819724 core     
+       3 W3045921891 W1525595230 core     
+       4 W3045921891 W1572136682 core     
+       5 W3045921891 W1854214752 core     
+       6 W3045921891 W1909800943 core     
+       7 W3045921891 W205532704  core     
+       8 W3045921891 W2091406001 core     
+       9 W3045921891 W2096537696 core     
+      10 W3045921891 W2153579005 core     
+      # i 35 more rows
+      
+    Code
+      read_snowball(file.path(output_dir), return_data = TRUE, shorten_ids = TRUE,
+      edge_type = "extended")
+    Output
+      $nodes
+      # A tibble: 46 x 55
+         id    doi   title display_name publication_year publication_date ids$openalex
+         <chr> <chr> <chr> <chr>                   <int> <date>           <chr>       
+       1 W304~ http~ Meas~ Measuring p~             2020 2020-01-01       https://ope~
+       2 W304~ http~ Tren~ Trends of P~             2020 2020-08-01       https://ope~
+       3 W150~ <NA>  Corp~ Corpora for~             2010 2010-05-17       https://ope~
+       4 W151~ http~ Part~ Partridge: ~             2013 2013-01-01       https://ope~
+       5 W152~ <NA>  Text~ TextRank: B~             2004 2004-07-01       https://ope~
+       6 W157~ http~ Altm~ Altmetrics:~             2013 2013-01-01       https://ope~
+       7 W185~ <NA>  The ~ The PageRan~             1999 1999-11-11       https://ope~
+       8 W190~ http~ What~ What Teache~             2015 2015-09-11       https://ope~
+       9 W199~ http~ The ~ The open ac~             2015 2015-03-11       https://ope~
+      10 W205~ <NA>  Argu~ Argumentati~             1999 1999-01-01       https://ope~
+      # i 36 more rows
+      # i 52 more variables: ids$doi <chr>, $mag <chr>, $pmid <chr>, $pmcid <chr>,
+      #   language <chr>, primary_location <tibble[,9]>, type <chr>,
+      #   type_crossref <chr>, indexed_in <list<character>>,
+      #   open_access <tibble[,4]>,
+      #   authorships <list<
+        tbl_df<
+          author_position        : character
+          author                 : 
+            tbl_df<
+              id          : character
+              display_name: character
+              orcid       : character
+            >
+          institutions           : 
+            list<
+              tbl_df<
+                id          : character
+                display_name: character
+                ror         : character
+                country_code: character
+                type        : character
+                lineage     : list<character>
+              >
+            >
+          countries              : list<character>
+          is_corresponding       : logical
+          raw_author_name        : character
+          raw_affiliation_strings: list<character>
+          affiliations           : 
+            list<
+              tbl_df<
+                raw_affiliation_string: character
+                institution_ids       : list<character>
+              >
+            >
+        >
+      >>,
+      #   institution_assertions <list<character>>, ...
+      
+      $edges
+      # A tibble: 36 x 3
+         from        to          edge_type
+         <chr>       <chr>       <chr>    
+       1 W1516819724 W2096537696 extended 
+       2 W1996515099 W1572136682 extended 
+       3 W2096537696 W205532704  extended 
+       4 W2096537696 W2442495973 extended 
+       5 W2096537696 W618607536  extended 
+       6 W2250539671 W2153579005 extended 
+       7 W2251249502 W2153579005 extended 
+       8 W2251249502 W2251861449 extended 
+       9 W2251869843 W2251861449 extended 
+      10 W2252212014 W1500530942 extended 
+      # i 26 more rows
+      
+    Code
+      read_snowball(file.path(output_dir), return_data = TRUE, shorten_ids = TRUE,
+      edge_type = c("extended", "core"))
+    Output
+      $nodes
+      # A tibble: 46 x 55
+         id    doi   title display_name publication_year publication_date ids$openalex
+         <chr> <chr> <chr> <chr>                   <int> <date>           <chr>       
+       1 W304~ http~ Meas~ Measuring p~             2020 2020-01-01       https://ope~
+       2 W304~ http~ Tren~ Trends of P~             2020 2020-08-01       https://ope~
+       3 W150~ <NA>  Corp~ Corpora for~             2010 2010-05-17       https://ope~
+       4 W151~ http~ Part~ Partridge: ~             2013 2013-01-01       https://ope~
+       5 W152~ <NA>  Text~ TextRank: B~             2004 2004-07-01       https://ope~
+       6 W157~ http~ Altm~ Altmetrics:~             2013 2013-01-01       https://ope~
+       7 W185~ <NA>  The ~ The PageRan~             1999 1999-11-11       https://ope~
+       8 W190~ http~ What~ What Teache~             2015 2015-09-11       https://ope~
+       9 W199~ http~ The ~ The open ac~             2015 2015-03-11       https://ope~
+      10 W205~ <NA>  Argu~ Argumentati~             1999 1999-01-01       https://ope~
+      # i 36 more rows
+      # i 52 more variables: ids$doi <chr>, $mag <chr>, $pmid <chr>, $pmcid <chr>,
+      #   language <chr>, primary_location <tibble[,9]>, type <chr>,
+      #   type_crossref <chr>, indexed_in <list<character>>,
+      #   open_access <tibble[,4]>,
+      #   authorships <list<
+        tbl_df<
+          author_position        : character
+          author                 : 
+            tbl_df<
+              id          : character
+              display_name: character
+              orcid       : character
+            >
+          institutions           : 
+            list<
+              tbl_df<
+                id          : character
+                display_name: character
+                ror         : character
+                country_code: character
+                type        : character
+                lineage     : list<character>
+              >
+            >
+          countries              : list<character>
+          is_corresponding       : logical
+          raw_author_name        : character
+          raw_affiliation_strings: list<character>
+          affiliations           : 
+            list<
+              tbl_df<
+                raw_affiliation_string: character
+                institution_ids       : list<character>
+              >
+            >
+        >
+      >>,
+      #   institution_assertions <list<character>>, ...
+      
+      $edges
+      # A tibble: 81 x 3
+         from        to          edge_type
+         <chr>       <chr>       <chr>    
+       1 W1516819724 W2096537696 extended 
+       2 W1996515099 W1572136682 extended 
+       3 W2096537696 W205532704  extended 
+       4 W2096537696 W2442495973 extended 
+       5 W2096537696 W618607536  extended 
+       6 W2250539671 W2153579005 extended 
+       7 W2251249502 W2153579005 extended 
+       8 W2251249502 W2251861449 extended 
+       9 W2251869843 W2251861449 extended 
+      10 W2252212014 W1500530942 extended 
+      # i 71 more rows
+      
+    Code
+      read_snowball(file.path(output_dir), return_data = TRUE, shorten_ids = TRUE,
+      edge_type = "outside")
+    Output
+      $nodes
+      # A tibble: 46 x 55
+         id    doi   title display_name publication_year publication_date ids$openalex
+         <chr> <chr> <chr> <chr>                   <int> <date>           <chr>       
+       1 W304~ http~ Meas~ Measuring p~             2020 2020-01-01       https://ope~
+       2 W304~ http~ Tren~ Trends of P~             2020 2020-08-01       https://ope~
+       3 W150~ <NA>  Corp~ Corpora for~             2010 2010-05-17       https://ope~
+       4 W151~ http~ Part~ Partridge: ~             2013 2013-01-01       https://ope~
+       5 W152~ <NA>  Text~ TextRank: B~             2004 2004-07-01       https://ope~
+       6 W157~ http~ Altm~ Altmetrics:~             2013 2013-01-01       https://ope~
+       7 W185~ <NA>  The ~ The PageRan~             1999 1999-11-11       https://ope~
+       8 W190~ http~ What~ What Teache~             2015 2015-09-11       https://ope~
+       9 W199~ http~ The ~ The open ac~             2015 2015-03-11       https://ope~
+      10 W205~ <NA>  Argu~ Argumentati~             1999 1999-01-01       https://ope~
+      # i 36 more rows
+      # i 52 more variables: ids$doi <chr>, $mag <chr>, $pmid <chr>, $pmcid <chr>,
+      #   language <chr>, primary_location <tibble[,9]>, type <chr>,
+      #   type_crossref <chr>, indexed_in <list<character>>,
+      #   open_access <tibble[,4]>,
+      #   authorships <list<
+        tbl_df<
+          author_position        : character
+          author                 : 
+            tbl_df<
+              id          : character
+              display_name: character
+              orcid       : character
+            >
+          institutions           : 
+            list<
+              tbl_df<
+                id          : character
+                display_name: character
+                ror         : character
+                country_code: character
+                type        : character
+                lineage     : list<character>
+              >
+            >
+          countries              : list<character>
+          is_corresponding       : logical
+          raw_author_name        : character
+          raw_affiliation_strings: list<character>
+          affiliations           : 
+            list<
+              tbl_df<
+                raw_affiliation_string: character
+                institution_ids       : list<character>
+              >
+            >
+        >
+      >>,
+      #   institution_assertions <list<character>>, ...
+      
+      $edges
+      # A tibble: 1,214 x 3
+         from        to          edge_type
+         <chr>       <chr>       <chr>    
+       1 W1500530942 W1516240602 outside  
+       2 W1500530942 W1975879668 outside  
+       3 W1500530942 W1979773093 outside  
+       4 W1500530942 W1982464493 outside  
+       5 W1500530942 W2002664886 outside  
+       6 W1500530942 W2006802446 outside  
+       7 W1500530942 W2027943492 outside  
+       8 W1500530942 W2050355460 outside  
+       9 W1500530942 W2053154970 outside  
+      10 W1500530942 W2070285512 outside  
+      # i 1,204 more rows
+      
+    Code
       print(dplyr::collect(dplyr::arrange(dplyr::select(results_openalexPro$nodes, id,
       oa_input, relation), oa_input, relation)), n = Inf)
     Output
       # A tibble: 46 x 3
-         id                               oa_input relation
-         <chr>                            <lgl>    <chr>   
-       1 https://openalex.org/W2250539671 FALSE    cited   
-       2 https://openalex.org/W2963341956 FALSE    cited   
-       3 https://openalex.org/W2153579005 FALSE    cited   
-       4 https://openalex.org/W1854214752 FALSE    cited   
-       5 https://openalex.org/W2962739339 FALSE    cited   
-       6 https://openalex.org/W2525778437 FALSE    cited   
-       7 https://openalex.org/W2166481425 FALSE    cited   
-       8 https://openalex.org/W1525595230 FALSE    cited   
-       9 https://openalex.org/W3101913037 FALSE    cited   
-      10 https://openalex.org/W2741809807 FALSE    cited   
-      11 https://openalex.org/W2963118869 FALSE    cited   
-      12 https://openalex.org/W2251861449 FALSE    cited   
-      13 https://openalex.org/W2442495973 FALSE    cited   
-      14 https://openalex.org/W2091406001 FALSE    cited   
-      15 https://openalex.org/W1572136682 FALSE    cited   
-      16 https://openalex.org/W2251869843 FALSE    cited   
-      17 https://openalex.org/W1909800943 FALSE    cited   
-      18 https://openalex.org/W1996515099 FALSE    cited   
-      19 https://openalex.org/W2963090765 FALSE    cited   
-      20 https://openalex.org/W205532704  FALSE    cited   
-      21 https://openalex.org/W2096537696 FALSE    cited   
-      22 https://openalex.org/W2593028313 FALSE    cited   
-      23 https://openalex.org/W2577479404 FALSE    cited   
-      24 https://openalex.org/W2807650837 FALSE    cited   
-      25 https://openalex.org/W2849933844 FALSE    cited   
-      26 https://openalex.org/W2911997761 FALSE    cited   
-      27 https://openalex.org/W1500530942 FALSE    cited   
-      28 https://openalex.org/W618607536  FALSE    cited   
-      29 https://openalex.org/W2251249502 FALSE    cited   
-      30 https://openalex.org/W2891066092 FALSE    cited   
-      31 https://openalex.org/W2896826974 FALSE    cited   
-      32 https://openalex.org/W2938946739 FALSE    cited   
-      33 https://openalex.org/W296960487  FALSE    cited   
-      34 https://openalex.org/W2766528118 FALSE    cited   
-      35 https://openalex.org/W2810053269 FALSE    cited   
-      36 https://openalex.org/W2252212014 FALSE    cited   
-      37 https://openalex.org/W2936368166 FALSE    cited   
-      38 https://openalex.org/W91322025   FALSE    cited   
-      39 https://openalex.org/W2462443510 FALSE    cited   
-      40 https://openalex.org/W2965202507 FALSE    cited   
-      41 https://openalex.org/W1516819724 FALSE    cited   
-      42 https://openalex.org/W4311043552 FALSE    citing  
-      43 https://openalex.org/W4293919086 FALSE    citing  
-      44 https://openalex.org/W4387316167 FALSE    citing  
-      45 https://openalex.org/W3046863325 TRUE     keypaper
-      46 https://openalex.org/W3045921891 TRUE     keypaper
+         id          oa_input relation
+         <chr>       <lgl>    <chr>   
+       1 W1500530942 FALSE    cited   
+       2 W1516819724 FALSE    cited   
+       3 W1525595230 FALSE    cited   
+       4 W1572136682 FALSE    cited   
+       5 W1854214752 FALSE    cited   
+       6 W1909800943 FALSE    cited   
+       7 W1996515099 FALSE    cited   
+       8 W205532704  FALSE    cited   
+       9 W2091406001 FALSE    cited   
+      10 W2096537696 FALSE    cited   
+      11 W2153579005 FALSE    cited   
+      12 W2166481425 FALSE    cited   
+      13 W2250539671 FALSE    cited   
+      14 W2251249502 FALSE    cited   
+      15 W2251861449 FALSE    cited   
+      16 W2251869843 FALSE    cited   
+      17 W2252212014 FALSE    cited   
+      18 W2442495973 FALSE    cited   
+      19 W2462443510 FALSE    cited   
+      20 W2525778437 FALSE    cited   
+      21 W2577479404 FALSE    cited   
+      22 W2593028313 FALSE    cited   
+      23 W2741809807 FALSE    cited   
+      24 W2766528118 FALSE    cited   
+      25 W2807650837 FALSE    cited   
+      26 W2810053269 FALSE    cited   
+      27 W2849933844 FALSE    cited   
+      28 W2891066092 FALSE    cited   
+      29 W2896826974 FALSE    cited   
+      30 W2911997761 FALSE    cited   
+      31 W2936368166 FALSE    cited   
+      32 W2938946739 FALSE    cited   
+      33 W2962739339 FALSE    cited   
+      34 W2963090765 FALSE    cited   
+      35 W2963118869 FALSE    cited   
+      36 W2963341956 FALSE    cited   
+      37 W2965202507 FALSE    cited   
+      38 W296960487  FALSE    cited   
+      39 W3101913037 FALSE    cited   
+      40 W618607536  FALSE    cited   
+      41 W91322025   FALSE    cited   
+      42 W4293919086 FALSE    citing  
+      43 W4311043552 FALSE    citing  
+      44 W4387316167 FALSE    citing  
+      45 W3045921891 TRUE     keypaper
+      46 W3046863325 TRUE     keypaper
     Code
       print(dplyr::collect(dplyr::arrange(results_openalexPro$edges, edge_type, from,
       to)), n = Inf)
     Output
-      # A tibble: 1,295 x 3
-           from                             to                               edge_type
-           <chr>                            <chr>                            <chr>    
-         1 https://openalex.org/W3045921891 https://openalex.org/W1500530942 core     
-         2 https://openalex.org/W3045921891 https://openalex.org/W1516819724 core     
-         3 https://openalex.org/W3045921891 https://openalex.org/W1525595230 core     
-         4 https://openalex.org/W3045921891 https://openalex.org/W1572136682 core     
-         5 https://openalex.org/W3045921891 https://openalex.org/W1854214752 core     
-         6 https://openalex.org/W3045921891 https://openalex.org/W1909800943 core     
-         7 https://openalex.org/W3045921891 https://openalex.org/W205532704  core     
-         8 https://openalex.org/W3045921891 https://openalex.org/W2091406001 core     
-         9 https://openalex.org/W3045921891 https://openalex.org/W2096537696 core     
-        10 https://openalex.org/W3045921891 https://openalex.org/W2153579005 core     
-        11 https://openalex.org/W3045921891 https://openalex.org/W2166481425 core     
-        12 https://openalex.org/W3045921891 https://openalex.org/W2250539671 core     
-        13 https://openalex.org/W3045921891 https://openalex.org/W2251249502 core     
-        14 https://openalex.org/W3045921891 https://openalex.org/W2251861449 core     
-        15 https://openalex.org/W3045921891 https://openalex.org/W2251869843 core     
-        16 https://openalex.org/W3045921891 https://openalex.org/W2252212014 core     
-        17 https://openalex.org/W3045921891 https://openalex.org/W2442495973 core     
-        18 https://openalex.org/W3045921891 https://openalex.org/W2462443510 core     
-        19 https://openalex.org/W3045921891 https://openalex.org/W2525778437 core     
-        20 https://openalex.org/W3045921891 https://openalex.org/W2577479404 core     
-        21 https://openalex.org/W3045921891 https://openalex.org/W2593028313 core     
-        22 https://openalex.org/W3045921891 https://openalex.org/W2741809807 core     
-        23 https://openalex.org/W3045921891 https://openalex.org/W2807650837 core     
-        24 https://openalex.org/W3045921891 https://openalex.org/W2810053269 core     
-        25 https://openalex.org/W3045921891 https://openalex.org/W2849933844 core     
-        26 https://openalex.org/W3045921891 https://openalex.org/W2891066092 core     
-        27 https://openalex.org/W3045921891 https://openalex.org/W2896826974 core     
-        28 https://openalex.org/W3045921891 https://openalex.org/W2911997761 core     
-        29 https://openalex.org/W3045921891 https://openalex.org/W2936368166 core     
-        30 https://openalex.org/W3045921891 https://openalex.org/W2962739339 core     
-        31 https://openalex.org/W3045921891 https://openalex.org/W2963090765 core     
-        32 https://openalex.org/W3045921891 https://openalex.org/W2963118869 core     
-        33 https://openalex.org/W3045921891 https://openalex.org/W2963341956 core     
-        34 https://openalex.org/W3045921891 https://openalex.org/W296960487  core     
-        35 https://openalex.org/W3045921891 https://openalex.org/W3101913037 core     
-        36 https://openalex.org/W3045921891 https://openalex.org/W618607536  core     
-        37 https://openalex.org/W3045921891 https://openalex.org/W91322025   core     
-        38 https://openalex.org/W3046863325 https://openalex.org/W1996515099 core     
-        39 https://openalex.org/W3046863325 https://openalex.org/W2741809807 core     
-        40 https://openalex.org/W3046863325 https://openalex.org/W2766528118 core     
-        41 https://openalex.org/W3046863325 https://openalex.org/W2938946739 core     
-        42 https://openalex.org/W3046863325 https://openalex.org/W2965202507 core     
-        43 https://openalex.org/W4293919086 https://openalex.org/W3046863325 core     
-        44 https://openalex.org/W4311043552 https://openalex.org/W3046863325 core     
-        45 https://openalex.org/W4387316167 https://openalex.org/W3046863325 core     
-        46 https://openalex.org/W1516819724 https://openalex.org/W2096537696 extended 
-        47 https://openalex.org/W1996515099 https://openalex.org/W1572136682 extended 
-        48 https://openalex.org/W2096537696 https://openalex.org/W205532704  extended 
-        49 https://openalex.org/W2096537696 https://openalex.org/W2442495973 extended 
-        50 https://openalex.org/W2096537696 https://openalex.org/W618607536  extended 
-        51 https://openalex.org/W2250539671 https://openalex.org/W2153579005 extended 
-        52 https://openalex.org/W2251249502 https://openalex.org/W2153579005 extended 
-        53 https://openalex.org/W2251249502 https://openalex.org/W2251861449 extended 
-        54 https://openalex.org/W2251869843 https://openalex.org/W2251861449 extended 
-        55 https://openalex.org/W2252212014 https://openalex.org/W1500530942 extended 
-        56 https://openalex.org/W2252212014 https://openalex.org/W1525595230 extended 
-        57 https://openalex.org/W2252212014 https://openalex.org/W2096537696 extended 
-        58 https://openalex.org/W2252212014 https://openalex.org/W2442495973 extended 
-        59 https://openalex.org/W2252212014 https://openalex.org/W3101913037 extended 
-        60 https://openalex.org/W2252212014 https://openalex.org/W618607536  extended 
-        61 https://openalex.org/W2442495973 https://openalex.org/W205532704  extended 
-        62 https://openalex.org/W2462443510 https://openalex.org/W1500530942 extended 
-        63 https://openalex.org/W2462443510 https://openalex.org/W1516819724 extended 
-        64 https://openalex.org/W2462443510 https://openalex.org/W205532704  extended 
-        65 https://openalex.org/W2462443510 https://openalex.org/W2096537696 extended 
-        66 https://openalex.org/W2593028313 https://openalex.org/W1572136682 extended 
-        67 https://openalex.org/W2807650837 https://openalex.org/W2153579005 extended 
-        68 https://openalex.org/W2807650837 https://openalex.org/W2250539671 extended 
-        69 https://openalex.org/W2810053269 https://openalex.org/W1572136682 extended 
-        70 https://openalex.org/W2896826974 https://openalex.org/W2593028313 extended 
-        71 https://openalex.org/W2911997761 https://openalex.org/W2963341956 extended 
-        72 https://openalex.org/W2936368166 https://openalex.org/W2442495973 extended 
-        73 https://openalex.org/W2962739339 https://openalex.org/W2153579005 extended 
-        74 https://openalex.org/W2962739339 https://openalex.org/W2250539671 extended 
-        75 https://openalex.org/W2963341956 https://openalex.org/W2153579005 extended 
-        76 https://openalex.org/W2963341956 https://openalex.org/W2250539671 extended 
-        77 https://openalex.org/W2963341956 https://openalex.org/W2962739339 extended 
-        78 https://openalex.org/W2965202507 https://openalex.org/W2741809807 extended 
-        79 https://openalex.org/W3101913037 https://openalex.org/W1525595230 extended 
-        80 https://openalex.org/W3101913037 https://openalex.org/W1854214752 extended 
-        81 https://openalex.org/W91322025   https://openalex.org/W2442495973 extended 
-        82 https://openalex.org/W1500530942 https://openalex.org/W1516240602 outside  
-        83 https://openalex.org/W1500530942 https://openalex.org/W1975879668 outside  
-        84 https://openalex.org/W1500530942 https://openalex.org/W1979773093 outside  
-        85 https://openalex.org/W1500530942 https://openalex.org/W1982464493 outside  
-        86 https://openalex.org/W1500530942 https://openalex.org/W2002664886 outside  
-        87 https://openalex.org/W1500530942 https://openalex.org/W2006802446 outside  
-        88 https://openalex.org/W1500530942 https://openalex.org/W2027943492 outside  
-        89 https://openalex.org/W1500530942 https://openalex.org/W2050355460 outside  
-        90 https://openalex.org/W1500530942 https://openalex.org/W2053154970 outside  
-        91 https://openalex.org/W1500530942 https://openalex.org/W2070285512 outside  
-        92 https://openalex.org/W1500530942 https://openalex.org/W2101819947 outside  
-        93 https://openalex.org/W1500530942 https://openalex.org/W2120587524 outside  
-        94 https://openalex.org/W1500530942 https://openalex.org/W2123107826 outside  
-        95 https://openalex.org/W1500530942 https://openalex.org/W2146777297 outside  
-        96 https://openalex.org/W1500530942 https://openalex.org/W2153222072 outside  
-        97 https://openalex.org/W1500530942 https://openalex.org/W2402929825 outside  
-        98 https://openalex.org/W1500530942 https://openalex.org/W2907147533 outside  
-        99 https://openalex.org/W1516819724 https://openalex.org/W2479517029 outside  
-       100 https://openalex.org/W1516819724 https://openalex.org/W2911964244 outside  
-       101 https://openalex.org/W1525595230 https://openalex.org/W1907578970 outside  
-       102 https://openalex.org/W1525595230 https://openalex.org/W2015933299 outside  
-       103 https://openalex.org/W1525595230 https://openalex.org/W2064418625 outside  
-       104 https://openalex.org/W1525595230 https://openalex.org/W2066636486 outside  
-       105 https://openalex.org/W1525595230 https://openalex.org/W2138621811 outside  
-       106 https://openalex.org/W1525595230 https://openalex.org/W2144270295 outside  
-       107 https://openalex.org/W1525595230 https://openalex.org/W2150824314 outside  
-       108 https://openalex.org/W1525595230 https://openalex.org/W2156641871 outside  
-       109 https://openalex.org/W1525595230 https://openalex.org/W2169602691 outside  
-       110 https://openalex.org/W1525595230 https://openalex.org/W3122553793 outside  
-       111 https://openalex.org/W1572136682 https://openalex.org/W2003014790 outside  
-       112 https://openalex.org/W1572136682 https://openalex.org/W2032800154 outside  
-       113 https://openalex.org/W1572136682 https://openalex.org/W2091636366 outside  
-       114 https://openalex.org/W1572136682 https://openalex.org/W2128980381 outside  
-       115 https://openalex.org/W1909800943 https://openalex.org/W1579541243 outside  
-       116 https://openalex.org/W1909800943 https://openalex.org/W1889026943 outside  
-       117 https://openalex.org/W1909800943 https://openalex.org/W1964404845 outside  
-       118 https://openalex.org/W1909800943 https://openalex.org/W1972137089 outside  
-       119 https://openalex.org/W1909800943 https://openalex.org/W1989868360 outside  
-       120 https://openalex.org/W1909800943 https://openalex.org/W1995945562 outside  
-       121 https://openalex.org/W1909800943 https://openalex.org/W2016264902 outside  
-       122 https://openalex.org/W1909800943 https://openalex.org/W2035729615 outside  
-       123 https://openalex.org/W1909800943 https://openalex.org/W2065900167 outside  
-       124 https://openalex.org/W1909800943 https://openalex.org/W2069057356 outside  
-       125 https://openalex.org/W1909800943 https://openalex.org/W2085125419 outside  
-       126 https://openalex.org/W1909800943 https://openalex.org/W2097879961 outside  
-       127 https://openalex.org/W1909800943 https://openalex.org/W2121878111 outside  
-       128 https://openalex.org/W1909800943 https://openalex.org/W2124181495 outside  
-       129 https://openalex.org/W1909800943 https://openalex.org/W2155916155 outside  
-       130 https://openalex.org/W1909800943 https://openalex.org/W2173213060 outside  
-       131 https://openalex.org/W1909800943 https://openalex.org/W2291351514 outside  
-       132 https://openalex.org/W1909800943 https://openalex.org/W2582743722 outside  
-       133 https://openalex.org/W1909800943 https://openalex.org/W3026721701 outside  
-       134 https://openalex.org/W1909800943 https://openalex.org/W3106889297 outside  
-       135 https://openalex.org/W1909800943 https://openalex.org/W4210688903 outside  
-       136 https://openalex.org/W1909800943 https://openalex.org/W4230173782 outside  
-       137 https://openalex.org/W1909800943 https://openalex.org/W4298872162 outside  
-       138 https://openalex.org/W1909800943 https://openalex.org/W4301752816 outside  
-       139 https://openalex.org/W1909800943 https://openalex.org/W4399583268 outside  
-       140 https://openalex.org/W1909800943 https://openalex.org/W596013814  outside  
-       141 https://openalex.org/W1909800943 https://openalex.org/W652383646  outside  
-       142 https://openalex.org/W1996515099 https://openalex.org/W1553564559 outside  
-       143 https://openalex.org/W1996515099 https://openalex.org/W1715687586 outside  
-       144 https://openalex.org/W1996515099 https://openalex.org/W1970217003 outside  
-       145 https://openalex.org/W1996515099 https://openalex.org/W1982149803 outside  
-       146 https://openalex.org/W1996515099 https://openalex.org/W1983161454 outside  
-       147 https://openalex.org/W1996515099 https://openalex.org/W1994503791 outside  
-       148 https://openalex.org/W1996515099 https://openalex.org/W1997299998 outside  
-       149 https://openalex.org/W1996515099 https://openalex.org/W2010112142 outside  
-       150 https://openalex.org/W1996515099 https://openalex.org/W2027794266 outside  
-       151 https://openalex.org/W1996515099 https://openalex.org/W2045313021 outside  
-       152 https://openalex.org/W1996515099 https://openalex.org/W2048185449 outside  
-       153 https://openalex.org/W1996515099 https://openalex.org/W2049863276 outside  
-       154 https://openalex.org/W1996515099 https://openalex.org/W2062435070 outside  
-       155 https://openalex.org/W1996515099 https://openalex.org/W2068425785 outside  
-       156 https://openalex.org/W1996515099 https://openalex.org/W2068875466 outside  
-       157 https://openalex.org/W1996515099 https://openalex.org/W2071931474 outside  
-       158 https://openalex.org/W1996515099 https://openalex.org/W2073023209 outside  
-       159 https://openalex.org/W1996515099 https://openalex.org/W2086496065 outside  
-       160 https://openalex.org/W1996515099 https://openalex.org/W2104772551 outside  
-       161 https://openalex.org/W1996515099 https://openalex.org/W2148772173 outside  
-       162 https://openalex.org/W1996515099 https://openalex.org/W3099857050 outside  
-       163 https://openalex.org/W1996515099 https://openalex.org/W3101021061 outside  
-       164 https://openalex.org/W1996515099 https://openalex.org/W3101689191 outside  
-       165 https://openalex.org/W1996515099 https://openalex.org/W3102119685 outside  
-       166 https://openalex.org/W1996515099 https://openalex.org/W3105776975 outside  
-       167 https://openalex.org/W1996515099 https://openalex.org/W3130540911 outside  
-       168 https://openalex.org/W1996515099 https://openalex.org/W3154793279 outside  
-       169 https://openalex.org/W1996515099 https://openalex.org/W4214836368 outside  
-       170 https://openalex.org/W1996515099 https://openalex.org/W4240507605 outside  
-       171 https://openalex.org/W2091406001 https://openalex.org/W1994149163 outside  
-       172 https://openalex.org/W2091406001 https://openalex.org/W1994162483 outside  
-       173 https://openalex.org/W2091406001 https://openalex.org/W2007558434 outside  
-       174 https://openalex.org/W2091406001 https://openalex.org/W2018858523 outside  
-       175 https://openalex.org/W2091406001 https://openalex.org/W2031797820 outside  
-       176 https://openalex.org/W2091406001 https://openalex.org/W2032592399 outside  
-       177 https://openalex.org/W2091406001 https://openalex.org/W2043845271 outside  
-       178 https://openalex.org/W2091406001 https://openalex.org/W2058873076 outside  
-       179 https://openalex.org/W2091406001 https://openalex.org/W2120062331 outside  
-       180 https://openalex.org/W2091406001 https://openalex.org/W2168745915 outside  
-       181 https://openalex.org/W2091406001 https://openalex.org/W2797098714 outside  
-       182 https://openalex.org/W2091406001 https://openalex.org/W2960963589 outside  
-       183 https://openalex.org/W2096537696 https://openalex.org/W1480287196 outside  
-       184 https://openalex.org/W2096537696 https://openalex.org/W1515842608 outside  
-       185 https://openalex.org/W2096537696 https://openalex.org/W1568297139 outside  
-       186 https://openalex.org/W2096537696 https://openalex.org/W2001829063 outside  
-       187 https://openalex.org/W2096537696 https://openalex.org/W2004761926 outside  
-       188 https://openalex.org/W2096537696 https://openalex.org/W2006802446 outside  
-       189 https://openalex.org/W2096537696 https://openalex.org/W2017513070 outside  
-       190 https://openalex.org/W2096537696 https://openalex.org/W2028473264 outside  
-       191 https://openalex.org/W2096537696 https://openalex.org/W2040838629 outside  
-       192 https://openalex.org/W2096537696 https://openalex.org/W2050355460 outside  
-       193 https://openalex.org/W2096537696 https://openalex.org/W2051649768 outside  
-       194 https://openalex.org/W2096537696 https://openalex.org/W2053154970 outside  
-       195 https://openalex.org/W2096537696 https://openalex.org/W2076327529 outside  
-       196 https://openalex.org/W2096537696 https://openalex.org/W2083566963 outside  
-       197 https://openalex.org/W2096537696 https://openalex.org/W2085809930 outside  
-       198 https://openalex.org/W2096537696 https://openalex.org/W2101390659 outside  
-       199 https://openalex.org/W2096537696 https://openalex.org/W2105897558 outside  
-       200 https://openalex.org/W2096537696 https://openalex.org/W2107141268 outside  
-       201 https://openalex.org/W2096537696 https://openalex.org/W2110854897 outside  
-       202 https://openalex.org/W2096537696 https://openalex.org/W2115516470 outside  
-       203 https://openalex.org/W2096537696 https://openalex.org/W2116692665 outside  
-       204 https://openalex.org/W2096537696 https://openalex.org/W2118585731 outside  
-       205 https://openalex.org/W2096537696 https://openalex.org/W2120587524 outside  
-       206 https://openalex.org/W2096537696 https://openalex.org/W2121678130 outside  
-       207 https://openalex.org/W2096537696 https://openalex.org/W2123107826 outside  
-       208 https://openalex.org/W2096537696 https://openalex.org/W2143589337 outside  
-       209 https://openalex.org/W2096537696 https://openalex.org/W2146737815 outside  
-       210 https://openalex.org/W2096537696 https://openalex.org/W2153635508 outside  
-       211 https://openalex.org/W2096537696 https://openalex.org/W2158291389 outside  
-       212 https://openalex.org/W2096537696 https://openalex.org/W2159230276 outside  
-       213 https://openalex.org/W2096537696 https://openalex.org/W2168579166 outside  
-       214 https://openalex.org/W2096537696 https://openalex.org/W2168652246 outside  
-       215 https://openalex.org/W2096537696 https://openalex.org/W2168905447 outside  
-       216 https://openalex.org/W2096537696 https://openalex.org/W2171283231 outside  
-       217 https://openalex.org/W2096537696 https://openalex.org/W2251672315 outside  
-       218 https://openalex.org/W2096537696 https://openalex.org/W2402929825 outside  
-       219 https://openalex.org/W2096537696 https://openalex.org/W273036708  outside  
-       220 https://openalex.org/W2096537696 https://openalex.org/W2781804600 outside  
-       221 https://openalex.org/W2096537696 https://openalex.org/W2801356492 outside  
-       222 https://openalex.org/W2096537696 https://openalex.org/W2911864677 outside  
-       223 https://openalex.org/W2096537696 https://openalex.org/W2914431807 outside  
-       224 https://openalex.org/W2096537696 https://openalex.org/W4246948003 outside  
-       225 https://openalex.org/W2096537696 https://openalex.org/W4250467157 outside  
-       226 https://openalex.org/W2096537696 https://openalex.org/W4285719527 outside  
-       227 https://openalex.org/W2096537696 https://openalex.org/W76749362   outside  
-       228 https://openalex.org/W2153579005 https://openalex.org/W1423339008 outside  
-       229 https://openalex.org/W2153579005 https://openalex.org/W1498436455 outside  
-       230 https://openalex.org/W2153579005 https://openalex.org/W1614298861 outside  
-       231 https://openalex.org/W2153579005 https://openalex.org/W1662133657 outside  
-       232 https://openalex.org/W2153579005 https://openalex.org/W1889268436 outside  
-       233 https://openalex.org/W2153579005 https://openalex.org/W1965154800 outside  
-       234 https://openalex.org/W2153579005 https://openalex.org/W1970689298 outside  
-       235 https://openalex.org/W2153579005 https://openalex.org/W21006490   outside  
-       236 https://openalex.org/W2153579005 https://openalex.org/W2117130368 outside  
-       237 https://openalex.org/W2153579005 https://openalex.org/W2120861206 outside  
-       238 https://openalex.org/W2153579005 https://openalex.org/W2131462252 outside  
-       239 https://openalex.org/W2153579005 https://openalex.org/W2132339004 outside  
-       240 https://openalex.org/W2153579005 https://openalex.org/W2138204974 outside  
-       241 https://openalex.org/W2153579005 https://openalex.org/W2141599568 outside  
-       242 https://openalex.org/W2153579005 https://openalex.org/W2158139315 outside  
-       243 https://openalex.org/W2153579005 https://openalex.org/W2171928131 outside  
-       244 https://openalex.org/W2153579005 https://openalex.org/W22861983   outside  
-       245 https://openalex.org/W2153579005 https://openalex.org/W2962769333 outside  
-       246 https://openalex.org/W2153579005 https://openalex.org/W36903255   outside  
-       247 https://openalex.org/W2166481425 https://openalex.org/W1541806262 outside  
-       248 https://openalex.org/W2166481425 https://openalex.org/W1974165523 outside  
-       249 https://openalex.org/W2166481425 https://openalex.org/W1974971448 outside  
-       250 https://openalex.org/W2166481425 https://openalex.org/W1976738492 outside  
-       251 https://openalex.org/W2166481425 https://openalex.org/W1982398489 outside  
-       252 https://openalex.org/W2166481425 https://openalex.org/W1996732432 outside  
-       253 https://openalex.org/W2166481425 https://openalex.org/W2023761963 outside  
-       254 https://openalex.org/W2166481425 https://openalex.org/W2024013999 outside  
-       255 https://openalex.org/W2166481425 https://openalex.org/W2051203581 outside  
-       256 https://openalex.org/W2166481425 https://openalex.org/W2076022457 outside  
-       257 https://openalex.org/W2166481425 https://openalex.org/W2087871831 outside  
-       258 https://openalex.org/W2166481425 https://openalex.org/W3008021358 outside  
-       259 https://openalex.org/W2250539671 https://openalex.org/W1495550473 outside  
-       260 https://openalex.org/W2250539671 https://openalex.org/W1499253590 outside  
-       261 https://openalex.org/W2250539671 https://openalex.org/W1614298861 outside  
-       262 https://openalex.org/W2250539671 https://openalex.org/W1978400666 outside  
-       263 https://openalex.org/W2250539671 https://openalex.org/W1981617416 outside  
-       264 https://openalex.org/W2250539671 https://openalex.org/W2067438047 outside  
-       265 https://openalex.org/W2250539671 https://openalex.org/W2072128103 outside  
-       266 https://openalex.org/W2250539671 https://openalex.org/W2077428231 outside  
-       267 https://openalex.org/W2250539671 https://openalex.org/W2080100102 outside  
-       268 https://openalex.org/W2250539671 https://openalex.org/W2097732278 outside  
-       269 https://openalex.org/W2250539671 https://openalex.org/W2103318667 outside  
-       270 https://openalex.org/W2250539671 https://openalex.org/W2117130368 outside  
-       271 https://openalex.org/W2250539671 https://openalex.org/W2118020653 outside  
-       272 https://openalex.org/W2250539671 https://openalex.org/W2133280805 outside  
-       273 https://openalex.org/W2250539671 https://openalex.org/W2141599568 outside  
-       274 https://openalex.org/W2250539671 https://openalex.org/W2144578941 outside  
-       275 https://openalex.org/W2250539671 https://openalex.org/W2146502635 outside  
-       276 https://openalex.org/W2250539671 https://openalex.org/W2147152072 outside  
-       277 https://openalex.org/W2250539671 https://openalex.org/W2155169782 outside  
-       278 https://openalex.org/W2250539671 https://openalex.org/W2158139315 outside  
-       279 https://openalex.org/W2250539671 https://openalex.org/W2158899491 outside  
-       280 https://openalex.org/W2250539671 https://openalex.org/W2164019165 outside  
-       281 https://openalex.org/W2250539671 https://openalex.org/W2167510172 outside  
-       282 https://openalex.org/W2250539671 https://openalex.org/W2250189634 outside  
-       283 https://openalex.org/W2250539671 https://openalex.org/W2251012068 outside  
-       284 https://openalex.org/W2250539671 https://openalex.org/W2251803266 outside  
-       285 https://openalex.org/W2250539671 https://openalex.org/W4285719527 outside  
-       286 https://openalex.org/W2251249502 https://openalex.org/W106250223  outside  
-       287 https://openalex.org/W2251249502 https://openalex.org/W1614298861 outside  
-       288 https://openalex.org/W2251249502 https://openalex.org/W1942015218 outside  
-       289 https://openalex.org/W2251249502 https://openalex.org/W1977155386 outside  
-       290 https://openalex.org/W2251249502 https://openalex.org/W1980318031 outside  
-       291 https://openalex.org/W2251249502 https://openalex.org/W1982854161 outside  
-       292 https://openalex.org/W2251249502 https://openalex.org/W2016381774 outside  
-       293 https://openalex.org/W2251249502 https://openalex.org/W2072240081 outside  
-       294 https://openalex.org/W2251249502 https://openalex.org/W2112178080 outside  
-       295 https://openalex.org/W2251249502 https://openalex.org/W2138615112 outside  
-       296 https://openalex.org/W2251249502 https://openalex.org/W2144232471 outside  
-       297 https://openalex.org/W2251249502 https://openalex.org/W2145327091 outside  
-       298 https://openalex.org/W2251249502 https://openalex.org/W2150248423 outside  
-       299 https://openalex.org/W2251249502 https://openalex.org/W2153233077 outside  
-       300 https://openalex.org/W2251249502 https://openalex.org/W2250287365 outside  
-       301 https://openalex.org/W2251249502 https://openalex.org/W2250397934 outside  
-       302 https://openalex.org/W2251249502 https://openalex.org/W2250590686 outside  
-       303 https://openalex.org/W2251249502 https://openalex.org/W2251521080 outside  
-       304 https://openalex.org/W2251249502 https://openalex.org/W4245436919 outside  
-       305 https://openalex.org/W2251249502 https://openalex.org/W4294170691 outside  
-       306 https://openalex.org/W2251861449 https://openalex.org/W145425800  outside  
-       307 https://openalex.org/W2251861449 https://openalex.org/W1980776243 outside  
-       308 https://openalex.org/W2251861449 https://openalex.org/W2011632873 outside  
-       309 https://openalex.org/W2251861449 https://openalex.org/W2038721957 outside  
-       310 https://openalex.org/W2251861449 https://openalex.org/W2080100102 outside  
-       311 https://openalex.org/W2251861449 https://openalex.org/W2088911157 outside  
-       312 https://openalex.org/W2251861449 https://openalex.org/W2121184547 outside  
-       313 https://openalex.org/W2251861449 https://openalex.org/W2147192413 outside  
-       314 https://openalex.org/W2251861449 https://openalex.org/W2164290393 outside  
-       315 https://openalex.org/W2251861449 https://openalex.org/W2169279899 outside  
-       316 https://openalex.org/W2251869843 https://openalex.org/W1484288670 outside  
-       317 https://openalex.org/W2251869843 https://openalex.org/W1608322251 outside  
-       318 https://openalex.org/W2251869843 https://openalex.org/W1889268436 outside  
-       319 https://openalex.org/W2251869843 https://openalex.org/W1984052055 outside  
-       320 https://openalex.org/W2251869843 https://openalex.org/W2104740481 outside  
-       321 https://openalex.org/W2251869843 https://openalex.org/W2106612368 outside  
-       322 https://openalex.org/W2251869843 https://openalex.org/W2108704114 outside  
-       323 https://openalex.org/W2251869843 https://openalex.org/W2118296893 outside  
-       324 https://openalex.org/W2251869843 https://openalex.org/W2121129054 outside  
-       325 https://openalex.org/W2251869843 https://openalex.org/W2130158090 outside  
-       326 https://openalex.org/W2251869843 https://openalex.org/W2137607259 outside  
-       327 https://openalex.org/W2251869843 https://openalex.org/W2139404310 outside  
-       328 https://openalex.org/W2251869843 https://openalex.org/W2155484602 outside  
-       329 https://openalex.org/W2251869843 https://openalex.org/W2165646510 outside  
-       330 https://openalex.org/W2251869843 https://openalex.org/W2170502136 outside  
-       331 https://openalex.org/W2251869843 https://openalex.org/W2250307601 outside  
-       332 https://openalex.org/W2251869843 https://openalex.org/W2250790822 outside  
-       333 https://openalex.org/W2251869843 https://openalex.org/W2251145153 outside  
-       334 https://openalex.org/W2251869843 https://openalex.org/W2251318600 outside  
-       335 https://openalex.org/W2251869843 https://openalex.org/W2251919380 outside  
-       336 https://openalex.org/W2251869843 https://openalex.org/W2396767181 outside  
-       337 https://openalex.org/W2252212014 https://openalex.org/W102951417  outside  
-       338 https://openalex.org/W2252212014 https://openalex.org/W1570031249 outside  
-       339 https://openalex.org/W2252212014 https://openalex.org/W1574989980 outside  
-       340 https://openalex.org/W2252212014 https://openalex.org/W2032566933 outside  
-       341 https://openalex.org/W2252212014 https://openalex.org/W2045738181 outside  
-       342 https://openalex.org/W2252212014 https://openalex.org/W2101390659 outside  
-       343 https://openalex.org/W2252212014 https://openalex.org/W2105140343 outside  
-       344 https://openalex.org/W2252212014 https://openalex.org/W2118370253 outside  
-       345 https://openalex.org/W2252212014 https://openalex.org/W2120481102 outside  
-       346 https://openalex.org/W2252212014 https://openalex.org/W2120587524 outside  
-       347 https://openalex.org/W2252212014 https://openalex.org/W2127368645 outside  
-       348 https://openalex.org/W2252212014 https://openalex.org/W2128108764 outside  
-       349 https://openalex.org/W2252212014 https://openalex.org/W2133227439 outside  
-       350 https://openalex.org/W2252212014 https://openalex.org/W2144512097 outside  
-       351 https://openalex.org/W2252212014 https://openalex.org/W2149801561 outside  
-       352 https://openalex.org/W2252212014 https://openalex.org/W2158291389 outside  
-       353 https://openalex.org/W2252212014 https://openalex.org/W2160992478 outside  
-       354 https://openalex.org/W2252212014 https://openalex.org/W2166806362 outside  
-       355 https://openalex.org/W2252212014 https://openalex.org/W2168905447 outside  
-       356 https://openalex.org/W2252212014 https://openalex.org/W2171283231 outside  
-       357 https://openalex.org/W2252212014 https://openalex.org/W2252173290 outside  
-       358 https://openalex.org/W2252212014 https://openalex.org/W41621595   outside  
-       359 https://openalex.org/W2252212014 https://openalex.org/W4285719527 outside  
-       360 https://openalex.org/W2252212014 https://openalex.org/W76749362   outside  
-       361 https://openalex.org/W2442495973 https://openalex.org/W135764212  outside  
-       362 https://openalex.org/W2442495973 https://openalex.org/W1497212108 outside  
-       363 https://openalex.org/W2442495973 https://openalex.org/W1513168555 outside  
-       364 https://openalex.org/W2442495973 https://openalex.org/W1559838295 outside  
-       365 https://openalex.org/W2442495973 https://openalex.org/W1571541043 outside  
-       366 https://openalex.org/W2442495973 https://openalex.org/W1577877742 outside  
-       367 https://openalex.org/W2442495973 https://openalex.org/W1605860798 outside  
-       368 https://openalex.org/W2442495973 https://openalex.org/W1626945812 outside  
-       369 https://openalex.org/W2442495973 https://openalex.org/W1673478674 outside  
-       370 https://openalex.org/W2442495973 https://openalex.org/W1710422233 outside  
-       371 https://openalex.org/W2442495973 https://openalex.org/W1825434232 outside  
-       372 https://openalex.org/W2442495973 https://openalex.org/W1828401780 outside  
-       373 https://openalex.org/W2442495973 https://openalex.org/W1950936596 outside  
-       374 https://openalex.org/W2442495973 https://openalex.org/W1956559956 outside  
-       375 https://openalex.org/W2442495973 https://openalex.org/W1973513505 outside  
-       376 https://openalex.org/W2442495973 https://openalex.org/W1974339500 outside  
-       377 https://openalex.org/W2442495973 https://openalex.org/W1977736702 outside  
-       378 https://openalex.org/W2442495973 https://openalex.org/W1979068940 outside  
-       379 https://openalex.org/W2442495973 https://openalex.org/W1980118257 outside  
-       380 https://openalex.org/W2442495973 https://openalex.org/W1982110842 outside  
-       381 https://openalex.org/W2442495973 https://openalex.org/W1982697162 outside  
-       382 https://openalex.org/W2442495973 https://openalex.org/W1996250712 outside  
-       383 https://openalex.org/W2442495973 https://openalex.org/W2002664886 outside  
-       384 https://openalex.org/W2442495973 https://openalex.org/W2004737172 outside  
-       385 https://openalex.org/W2442495973 https://openalex.org/W2005422315 outside  
-       386 https://openalex.org/W2442495973 https://openalex.org/W2007709031 outside  
-       387 https://openalex.org/W2442495973 https://openalex.org/W2027429929 outside  
-       388 https://openalex.org/W2442495973 https://openalex.org/W2028009320 outside  
-       389 https://openalex.org/W2442495973 https://openalex.org/W2028473264 outside  
-       390 https://openalex.org/W2442495973 https://openalex.org/W2028651247 outside  
-       391 https://openalex.org/W2442495973 https://openalex.org/W2028962062 outside  
-       392 https://openalex.org/W2442495973 https://openalex.org/W2031275836 outside  
-       393 https://openalex.org/W2442495973 https://openalex.org/W2038051455 outside  
-       394 https://openalex.org/W2442495973 https://openalex.org/W2041950349 outside  
-       395 https://openalex.org/W2442495973 https://openalex.org/W2042432758 outside  
-       396 https://openalex.org/W2442495973 https://openalex.org/W2048207804 outside  
-       397 https://openalex.org/W2442495973 https://openalex.org/W2049852578 outside  
-       398 https://openalex.org/W2442495973 https://openalex.org/W2051419509 outside  
-       399 https://openalex.org/W2442495973 https://openalex.org/W2060216474 outside  
-       400 https://openalex.org/W2442495973 https://openalex.org/W2061312249 outside  
-       401 https://openalex.org/W2442495973 https://openalex.org/W2064957402 outside  
-       402 https://openalex.org/W2442495973 https://openalex.org/W2065553296 outside  
-       403 https://openalex.org/W2442495973 https://openalex.org/W2088802729 outside  
-       404 https://openalex.org/W2442495973 https://openalex.org/W2092246763 outside  
-       405 https://openalex.org/W2442495973 https://openalex.org/W2092488901 outside  
-       406 https://openalex.org/W2442495973 https://openalex.org/W2093506210 outside  
-       407 https://openalex.org/W2442495973 https://openalex.org/W2097096171 outside  
-       408 https://openalex.org/W2442495973 https://openalex.org/W2098618819 outside  
-       409 https://openalex.org/W2442495973 https://openalex.org/W2100374502 outside  
-       410 https://openalex.org/W2442495973 https://openalex.org/W2101390659 outside  
-       411 https://openalex.org/W2442495973 https://openalex.org/W2109730238 outside  
-       412 https://openalex.org/W2442495973 https://openalex.org/W2110017317 outside  
-       413 https://openalex.org/W2442495973 https://openalex.org/W2114332321 outside  
-       414 https://openalex.org/W2442495973 https://openalex.org/W2116780029 outside  
-       415 https://openalex.org/W2442495973 https://openalex.org/W2118119027 outside  
-       416 https://openalex.org/W2442495973 https://openalex.org/W2118733980 outside  
-       417 https://openalex.org/W2442495973 https://openalex.org/W2118898541 outside  
-       418 https://openalex.org/W2442495973 https://openalex.org/W2119187129 outside  
-       419 https://openalex.org/W2442495973 https://openalex.org/W2126942339 outside  
-       420 https://openalex.org/W2442495973 https://openalex.org/W2128970689 outside  
-       421 https://openalex.org/W2442495973 https://openalex.org/W2134999050 outside  
-       422 https://openalex.org/W2442495973 https://openalex.org/W2137591918 outside  
-       423 https://openalex.org/W2442495973 https://openalex.org/W2149593800 outside  
-       424 https://openalex.org/W2442495973 https://openalex.org/W2150569271 outside  
-       425 https://openalex.org/W2442495973 https://openalex.org/W2153222072 outside  
-       426 https://openalex.org/W2442495973 https://openalex.org/W2153804780 outside  
-       427 https://openalex.org/W2442495973 https://openalex.org/W2154498027 outside  
-       428 https://openalex.org/W2442495973 https://openalex.org/W2158291389 outside  
-       429 https://openalex.org/W2442495973 https://openalex.org/W2164777277 outside  
-       430 https://openalex.org/W2442495973 https://openalex.org/W2166347079 outside  
-       431 https://openalex.org/W2442495973 https://openalex.org/W2166806362 outside  
-       432 https://openalex.org/W2442495973 https://openalex.org/W2491155000 outside  
-       433 https://openalex.org/W2442495973 https://openalex.org/W2907147533 outside  
-       434 https://openalex.org/W2442495973 https://openalex.org/W2998461326 outside  
-       435 https://openalex.org/W2442495973 https://openalex.org/W3035219831 outside  
-       436 https://openalex.org/W2442495973 https://openalex.org/W4231162912 outside  
-       437 https://openalex.org/W2442495973 https://openalex.org/W4231741839 outside  
-       438 https://openalex.org/W2442495973 https://openalex.org/W4235728695 outside  
-       439 https://openalex.org/W2442495973 https://openalex.org/W4241850027 outside  
-       440 https://openalex.org/W2442495973 https://openalex.org/W99221312   outside  
-       441 https://openalex.org/W2462443510 https://openalex.org/W1523904107 outside  
-       442 https://openalex.org/W2462443510 https://openalex.org/W1978059262 outside  
-       443 https://openalex.org/W2462443510 https://openalex.org/W2023930240 outside  
-       444 https://openalex.org/W2462443510 https://openalex.org/W2088336913 outside  
-       445 https://openalex.org/W2462443510 https://openalex.org/W2123682292 outside  
-       446 https://openalex.org/W2462443510 https://openalex.org/W2146936057 outside  
-       447 https://openalex.org/W2462443510 https://openalex.org/W2149801561 outside  
-       448 https://openalex.org/W2462443510 https://openalex.org/W2160969793 outside  
-       449 https://openalex.org/W2462443510 https://openalex.org/W2250440868 outside  
-       450 https://openalex.org/W2462443510 https://openalex.org/W2479156095 outside  
-       451 https://openalex.org/W2462443510 https://openalex.org/W2517720908 outside  
-       452 https://openalex.org/W2462443510 https://openalex.org/W2579547421 outside  
-       453 https://openalex.org/W2462443510 https://openalex.org/W304411614  outside  
-       454 https://openalex.org/W2462443510 https://openalex.org/W4255299494 outside  
-       455 https://openalex.org/W2462443510 https://openalex.org/W80379025   outside  
-       456 https://openalex.org/W2462443510 https://openalex.org/W926830766  outside  
-       457 https://openalex.org/W2525778437 https://openalex.org/W1968594024 outside  
-       458 https://openalex.org/W2525778437 https://openalex.org/W2121879602 outside  
-       459 https://openalex.org/W2525778437 https://openalex.org/W2251743902 outside  
-       460 https://openalex.org/W2525778437 https://openalex.org/W2964121744 outside  
-       461 https://openalex.org/W2577479404 https://openalex.org/W1589660493 outside  
-       462 https://openalex.org/W2577479404 https://openalex.org/W2012251902 outside  
-       463 https://openalex.org/W2577479404 https://openalex.org/W2073023209 outside  
-       464 https://openalex.org/W2577479404 https://openalex.org/W2169082498 outside  
-       465 https://openalex.org/W2593028313 https://openalex.org/W1508473354 outside  
-       466 https://openalex.org/W2593028313 https://openalex.org/W1517593287 outside  
-       467 https://openalex.org/W2593028313 https://openalex.org/W1640247171 outside  
-       468 https://openalex.org/W2593028313 https://openalex.org/W1953503995 outside  
-       469 https://openalex.org/W2593028313 https://openalex.org/W2019753053 outside  
-       470 https://openalex.org/W2593028313 https://openalex.org/W2023930240 outside  
-       471 https://openalex.org/W2593028313 https://openalex.org/W2041971736 outside  
-       472 https://openalex.org/W2593028313 https://openalex.org/W2042990063 outside  
-       473 https://openalex.org/W2593028313 https://openalex.org/W2064816492 outside  
-       474 https://openalex.org/W2593028313 https://openalex.org/W2064961604 outside  
-       475 https://openalex.org/W2593028313 https://openalex.org/W2068452509 outside  
-       476 https://openalex.org/W2593028313 https://openalex.org/W2073023209 outside  
-       477 https://openalex.org/W2593028313 https://openalex.org/W2101234009 outside  
-       478 https://openalex.org/W2593028313 https://openalex.org/W2128438887 outside  
-       479 https://openalex.org/W2593028313 https://openalex.org/W2129286173 outside  
-       480 https://openalex.org/W2593028313 https://openalex.org/W2132631086 outside  
-       481 https://openalex.org/W2593028313 https://openalex.org/W2151568674 outside  
-       482 https://openalex.org/W2593028313 https://openalex.org/W2164277894 outside  
-       483 https://openalex.org/W2593028313 https://openalex.org/W2300777861 outside  
-       484 https://openalex.org/W2593028313 https://openalex.org/W2472513771 outside  
-       485 https://openalex.org/W2593028313 https://openalex.org/W2479682262 outside  
-       486 https://openalex.org/W2593028313 https://openalex.org/W2525687297 outside  
-       487 https://openalex.org/W2593028313 https://openalex.org/W2567946352 outside  
-       488 https://openalex.org/W2593028313 https://openalex.org/W2573225424 outside  
-       489 https://openalex.org/W2593028313 https://openalex.org/W2963475133 outside  
-       490 https://openalex.org/W2593028313 https://openalex.org/W3130540911 outside  
-       491 https://openalex.org/W2593028313 https://openalex.org/W4235451245 outside  
-       492 https://openalex.org/W2593028313 https://openalex.org/W4255299494 outside  
-       493 https://openalex.org/W2741809807 https://openalex.org/W1560783210 outside  
-       494 https://openalex.org/W2741809807 https://openalex.org/W1724212071 outside  
-       495 https://openalex.org/W2741809807 https://openalex.org/W1767272795 outside  
-       496 https://openalex.org/W2741809807 https://openalex.org/W1917633107 outside  
-       497 https://openalex.org/W2741809807 https://openalex.org/W1931854307 outside  
-       498 https://openalex.org/W2741809807 https://openalex.org/W1944943415 outside  
-       499 https://openalex.org/W2741809807 https://openalex.org/W1957687230 outside  
-       500 https://openalex.org/W2741809807 https://openalex.org/W1989318653 outside  
-       501 https://openalex.org/W2741809807 https://openalex.org/W2003844967 outside  
-       502 https://openalex.org/W2741809807 https://openalex.org/W2016860460 outside  
-       503 https://openalex.org/W2741809807 https://openalex.org/W2020807482 outside  
-       504 https://openalex.org/W2741809807 https://openalex.org/W2029057325 outside  
-       505 https://openalex.org/W2741809807 https://openalex.org/W2031754690 outside  
-       506 https://openalex.org/W2741809807 https://openalex.org/W2048185449 outside  
-       507 https://openalex.org/W2741809807 https://openalex.org/W2078310052 outside  
-       508 https://openalex.org/W2741809807 https://openalex.org/W2089123513 outside  
-       509 https://openalex.org/W2741809807 https://openalex.org/W2115339903 outside  
-       510 https://openalex.org/W2741809807 https://openalex.org/W2140880926 outside  
-       511 https://openalex.org/W2741809807 https://openalex.org/W2160597895 outside  
-       512 https://openalex.org/W2741809807 https://openalex.org/W2231201268 outside  
-       513 https://openalex.org/W2741809807 https://openalex.org/W2299516731 outside  
-       514 https://openalex.org/W2741809807 https://openalex.org/W2306268324 outside  
-       515 https://openalex.org/W2741809807 https://openalex.org/W2322381034 outside  
-       516 https://openalex.org/W2741809807 https://openalex.org/W2343014812 outside  
-       517 https://openalex.org/W2741809807 https://openalex.org/W2345375849 outside  
-       518 https://openalex.org/W2741809807 https://openalex.org/W2463568293 outside  
-       519 https://openalex.org/W2741809807 https://openalex.org/W2511661767 outside  
-       520 https://openalex.org/W2741809807 https://openalex.org/W2511663072 outside  
-       521 https://openalex.org/W2741809807 https://openalex.org/W2520991028 outside  
-       522 https://openalex.org/W2741809807 https://openalex.org/W2563251083 outside  
-       523 https://openalex.org/W2741809807 https://openalex.org/W2566143661 outside  
-       524 https://openalex.org/W2741809807 https://openalex.org/W2587705861 outside  
-       525 https://openalex.org/W2741809807 https://openalex.org/W2588027260 outside  
-       526 https://openalex.org/W2741809807 https://openalex.org/W2611818942 outside  
-       527 https://openalex.org/W2741809807 https://openalex.org/W2737712680 outside  
-       528 https://openalex.org/W2741809807 https://openalex.org/W2753353163 outside  
-       529 https://openalex.org/W2741809807 https://openalex.org/W2762597540 outside  
-       530 https://openalex.org/W2741809807 https://openalex.org/W2785823074 outside  
-       531 https://openalex.org/W2741809807 https://openalex.org/W2953072907 outside  
-       532 https://openalex.org/W2741809807 https://openalex.org/W2997143876 outside  
-       533 https://openalex.org/W2741809807 https://openalex.org/W3012252063 outside  
-       534 https://openalex.org/W2741809807 https://openalex.org/W3121567788 outside  
-       535 https://openalex.org/W2741809807 https://openalex.org/W4254015553 outside  
-       536 https://openalex.org/W2741809807 https://openalex.org/W4298108315 outside  
-       537 https://openalex.org/W2741809807 https://openalex.org/W4301734034 outside  
-       538 https://openalex.org/W2766528118 https://openalex.org/W1005483714 outside  
-       539 https://openalex.org/W2766528118 https://openalex.org/W1715687586 outside  
-       540 https://openalex.org/W2766528118 https://openalex.org/W1909753460 outside  
-       541 https://openalex.org/W2766528118 https://openalex.org/W2003786618 outside  
-       542 https://openalex.org/W2766528118 https://openalex.org/W2086496065 outside  
-       543 https://openalex.org/W2766528118 https://openalex.org/W2257858171 outside  
-       544 https://openalex.org/W2766528118 https://openalex.org/W2511663072 outside  
-       545 https://openalex.org/W2766528118 https://openalex.org/W2521613271 outside  
-       546 https://openalex.org/W2766528118 https://openalex.org/W3122411544 outside  
-       547 https://openalex.org/W2766528118 https://openalex.org/W4285719527 outside  
-       548 https://openalex.org/W2766528118 https://openalex.org/W4297173270 outside  
-       549 https://openalex.org/W2807650837 https://openalex.org/W132022748  outside  
-       550 https://openalex.org/W2807650837 https://openalex.org/W1513718494 outside  
-       551 https://openalex.org/W2807650837 https://openalex.org/W155592222  outside  
-       552 https://openalex.org/W2807650837 https://openalex.org/W1570098300 outside  
-       553 https://openalex.org/W2807650837 https://openalex.org/W1584739173 outside  
-       554 https://openalex.org/W2807650837 https://openalex.org/W1662133657 outside  
-       555 https://openalex.org/W2807650837 https://openalex.org/W1836814292 outside  
-       556 https://openalex.org/W2807650837 https://openalex.org/W1854884267 outside  
-       557 https://openalex.org/W2807650837 https://openalex.org/W1973826788 outside  
-       558 https://openalex.org/W2807650837 https://openalex.org/W1978400666 outside  
-       559 https://openalex.org/W2807650837 https://openalex.org/W1981782113 outside  
-       560 https://openalex.org/W2807650837 https://openalex.org/W1990858934 outside  
-       561 https://openalex.org/W2807650837 https://openalex.org/W2019096529 outside  
-       562 https://openalex.org/W2807650837 https://openalex.org/W2049684127 outside  
-       563 https://openalex.org/W2807650837 https://openalex.org/W2063804110 outside  
-       564 https://openalex.org/W2807650837 https://openalex.org/W2072644219 outside  
-       565 https://openalex.org/W2807650837 https://openalex.org/W2102343050 outside  
-       566 https://openalex.org/W2807650837 https://openalex.org/W2105286768 outside  
-       567 https://openalex.org/W2807650837 https://openalex.org/W2107550813 outside  
-       568 https://openalex.org/W2807650837 https://openalex.org/W2125031621 outside  
-       569 https://openalex.org/W2807650837 https://openalex.org/W2147152072 outside  
-       570 https://openalex.org/W2807650837 https://openalex.org/W2148763605 outside  
-       571 https://openalex.org/W2807650837 https://openalex.org/W2171343266 outside  
-       572 https://openalex.org/W2807650837 https://openalex.org/W2180877453 outside  
-       573 https://openalex.org/W2807650837 https://openalex.org/W2251769296 outside  
-       574 https://openalex.org/W2807650837 https://openalex.org/W2296560646 outside  
-       575 https://openalex.org/W2807650837 https://openalex.org/W2299546746 outside  
-       576 https://openalex.org/W2807650837 https://openalex.org/W2307020448 outside  
-       577 https://openalex.org/W2807650837 https://openalex.org/W2323881768 outside  
-       578 https://openalex.org/W2807650837 https://openalex.org/W2399378566 outside  
-       579 https://openalex.org/W2807650837 https://openalex.org/W2475032637 outside  
-       580 https://openalex.org/W2807650837 https://openalex.org/W2489258484 outside  
-       581 https://openalex.org/W2807650837 https://openalex.org/W2508578776 outside  
-       582 https://openalex.org/W2807650837 https://openalex.org/W250892164  outside  
-       583 https://openalex.org/W2807650837 https://openalex.org/W2515394543 outside  
-       584 https://openalex.org/W2807650837 https://openalex.org/W2558546935 outside  
-       585 https://openalex.org/W2807650837 https://openalex.org/W2605242105 outside  
-       586 https://openalex.org/W2807650837 https://openalex.org/W2617139001 outside  
-       587 https://openalex.org/W2807650837 https://openalex.org/W2735070829 outside  
-       588 https://openalex.org/W2807650837 https://openalex.org/W2740377422 outside  
-       589 https://openalex.org/W2807650837 https://openalex.org/W2741040861 outside  
-       590 https://openalex.org/W2807650837 https://openalex.org/W2759556264 outside  
-       591 https://openalex.org/W2807650837 https://openalex.org/W2767231321 outside  
-       592 https://openalex.org/W2807650837 https://openalex.org/W2804830075 outside  
-       593 https://openalex.org/W2807650837 https://openalex.org/W2904266214 outside  
-       594 https://openalex.org/W2807650837 https://openalex.org/W2950577311 outside  
-       595 https://openalex.org/W2807650837 https://openalex.org/W2963099212 outside  
-       596 https://openalex.org/W2807650837 https://openalex.org/W2963586458 outside  
-       597 https://openalex.org/W2807650837 https://openalex.org/W2963733758 outside  
-       598 https://openalex.org/W2807650837 https://openalex.org/W2963760040 outside  
-       599 https://openalex.org/W2807650837 https://openalex.org/W2963780471 outside  
-       600 https://openalex.org/W2807650837 https://openalex.org/W2964231305 outside  
-       601 https://openalex.org/W2807650837 https://openalex.org/W2964325543 outside  
-       602 https://openalex.org/W2807650837 https://openalex.org/W2979401726 outside  
-       603 https://openalex.org/W2807650837 https://openalex.org/W3101767658 outside  
-       604 https://openalex.org/W2807650837 https://openalex.org/W31873193   outside  
-       605 https://openalex.org/W2807650837 https://openalex.org/W36967578   outside  
-       606 https://openalex.org/W2807650837 https://openalex.org/W594069839  outside  
-       607 https://openalex.org/W2807650837 https://openalex.org/W650889124  outside  
-       608 https://openalex.org/W2807650837 https://openalex.org/W88980739   outside  
-       609 https://openalex.org/W2810053269 https://openalex.org/W1509146554 outside  
-       610 https://openalex.org/W2810053269 https://openalex.org/W160748399  outside  
-       611 https://openalex.org/W2810053269 https://openalex.org/W1775823180 outside  
-       612 https://openalex.org/W2810053269 https://openalex.org/W1793987952 outside  
-       613 https://openalex.org/W2810053269 https://openalex.org/W1965638471 outside  
-       614 https://openalex.org/W2810053269 https://openalex.org/W1974132922 outside  
-       615 https://openalex.org/W2810053269 https://openalex.org/W1986828568 outside  
-       616 https://openalex.org/W2810053269 https://openalex.org/W1992066818 outside  
-       617 https://openalex.org/W2810053269 https://openalex.org/W2048803507 outside  
-       618 https://openalex.org/W2810053269 https://openalex.org/W2051290211 outside  
-       619 https://openalex.org/W2810053269 https://openalex.org/W2053763640 outside  
-       620 https://openalex.org/W2810053269 https://openalex.org/W2073023209 outside  
-       621 https://openalex.org/W2810053269 https://openalex.org/W2110787135 outside  
-       622 https://openalex.org/W2810053269 https://openalex.org/W2113329865 outside  
-       623 https://openalex.org/W2810053269 https://openalex.org/W2115584760 outside  
-       624 https://openalex.org/W2810053269 https://openalex.org/W2127267264 outside  
-       625 https://openalex.org/W2810053269 https://openalex.org/W2127492100 outside  
-       626 https://openalex.org/W2810053269 https://openalex.org/W2132346968 outside  
-       627 https://openalex.org/W2810053269 https://openalex.org/W2164277894 outside  
-       628 https://openalex.org/W2810053269 https://openalex.org/W2164632072 outside  
-       629 https://openalex.org/W2810053269 https://openalex.org/W2378789977 outside  
-       630 https://openalex.org/W2810053269 https://openalex.org/W2396414759 outside  
-       631 https://openalex.org/W2810053269 https://openalex.org/W250553205  outside  
-       632 https://openalex.org/W2810053269 https://openalex.org/W2521092731 outside  
-       633 https://openalex.org/W2810053269 https://openalex.org/W2525691018 outside  
-       634 https://openalex.org/W2810053269 https://openalex.org/W2579102106 outside  
-       635 https://openalex.org/W2810053269 https://openalex.org/W2949377321 outside  
-       636 https://openalex.org/W2810053269 https://openalex.org/W2962690183 outside  
-       637 https://openalex.org/W2810053269 https://openalex.org/W2964135759 outside  
-       638 https://openalex.org/W2810053269 https://openalex.org/W4233608910 outside  
-       639 https://openalex.org/W2810053269 https://openalex.org/W4244063436 outside  
-       640 https://openalex.org/W2810053269 https://openalex.org/W4299802090 outside  
-       641 https://openalex.org/W2810053269 https://openalex.org/W595373256  outside  
-       642 https://openalex.org/W2810053269 https://openalex.org/W70125044   outside  
-       643 https://openalex.org/W2810053269 https://openalex.org/W76678209   outside  
-       644 https://openalex.org/W2849933844 https://openalex.org/W1941311111 outside  
-       645 https://openalex.org/W2849933844 https://openalex.org/W1979926645 outside  
-       646 https://openalex.org/W2849933844 https://openalex.org/W2064816492 outside  
-       647 https://openalex.org/W2849933844 https://openalex.org/W2073023209 outside  
-       648 https://openalex.org/W2849933844 https://openalex.org/W2114094964 outside  
-       649 https://openalex.org/W2849933844 https://openalex.org/W2127896742 outside  
-       650 https://openalex.org/W2849933844 https://openalex.org/W2132667083 outside  
-       651 https://openalex.org/W2849933844 https://openalex.org/W2164277894 outside  
-       652 https://openalex.org/W2849933844 https://openalex.org/W2274116681 outside  
-       653 https://openalex.org/W2849933844 https://openalex.org/W2338922590 outside  
-       654 https://openalex.org/W2849933844 https://openalex.org/W2397349251 outside  
-       655 https://openalex.org/W2849933844 https://openalex.org/W2488987723 outside  
-       656 https://openalex.org/W2849933844 https://openalex.org/W2514259213 outside  
-       657 https://openalex.org/W2849933844 https://openalex.org/W2518646621 outside  
-       658 https://openalex.org/W2849933844 https://openalex.org/W2610080780 outside  
-       659 https://openalex.org/W2849933844 https://openalex.org/W2728153594 outside  
-       660 https://openalex.org/W2849933844 https://openalex.org/W2766003986 outside  
-       661 https://openalex.org/W2849933844 https://openalex.org/W2766779024 outside  
-       662 https://openalex.org/W2849933844 https://openalex.org/W2793099400 outside  
-       663 https://openalex.org/W2849933844 https://openalex.org/W2804115742 outside  
-       664 https://openalex.org/W2849933844 https://openalex.org/W2962678849 outside  
-       665 https://openalex.org/W2849933844 https://openalex.org/W3100189117 outside  
-       666 https://openalex.org/W2849933844 https://openalex.org/W3125169599 outside  
-       667 https://openalex.org/W2849933844 https://openalex.org/W4233851799 outside  
-       668 https://openalex.org/W2849933844 https://openalex.org/W4254027920 outside  
-       669 https://openalex.org/W2891066092 https://openalex.org/W124349300  outside  
-       670 https://openalex.org/W2891066092 https://openalex.org/W147350961  outside  
-       671 https://openalex.org/W2891066092 https://openalex.org/W1488363850 outside  
-       672 https://openalex.org/W2891066092 https://openalex.org/W1495320385 outside  
-       673 https://openalex.org/W2891066092 https://openalex.org/W1533576359 outside  
-       674 https://openalex.org/W2891066092 https://openalex.org/W1556170248 outside  
-       675 https://openalex.org/W2891066092 https://openalex.org/W1556533847 outside  
-       676 https://openalex.org/W2891066092 https://openalex.org/W1568406678 outside  
-       677 https://openalex.org/W2891066092 https://openalex.org/W1574440611 outside  
-       678 https://openalex.org/W2891066092 https://openalex.org/W1579811429 outside  
-       679 https://openalex.org/W2891066092 https://openalex.org/W1586232984 outside  
-       680 https://openalex.org/W2891066092 https://openalex.org/W1588395940 outside  
-       681 https://openalex.org/W2891066092 https://openalex.org/W1597568827 outside  
-       682 https://openalex.org/W2891066092 https://openalex.org/W1927197813 outside  
-       683 https://openalex.org/W2891066092 https://openalex.org/W1964196470 outside  
-       684 https://openalex.org/W2891066092 https://openalex.org/W1972398108 outside  
-       685 https://openalex.org/W2891066092 https://openalex.org/W1991169218 outside  
-       686 https://openalex.org/W2891066092 https://openalex.org/W2068648383 outside  
-       687 https://openalex.org/W2891066092 https://openalex.org/W2085574295 outside  
-       688 https://openalex.org/W2891066092 https://openalex.org/W2097983280 outside  
-       689 https://openalex.org/W2891066092 https://openalex.org/W2101672700 outside  
-       690 https://openalex.org/W2891066092 https://openalex.org/W2131046076 outside  
-       691 https://openalex.org/W2891066092 https://openalex.org/W2136040516 outside  
-       692 https://openalex.org/W2891066092 https://openalex.org/W2148147515 outside  
-       693 https://openalex.org/W2891066092 https://openalex.org/W2191713413 outside  
-       694 https://openalex.org/W2891066092 https://openalex.org/W22416009   outside  
-       695 https://openalex.org/W2891066092 https://openalex.org/W2303522472 outside  
-       696 https://openalex.org/W2891066092 https://openalex.org/W2314309526 outside  
-       697 https://openalex.org/W2891066092 https://openalex.org/W2322182166 outside  
-       698 https://openalex.org/W2891066092 https://openalex.org/W2480659012 outside  
-       699 https://openalex.org/W2891066092 https://openalex.org/W2484804913 outside  
-       700 https://openalex.org/W2891066092 https://openalex.org/W2487063104 outside  
-       701 https://openalex.org/W2891066092 https://openalex.org/W2489155358 outside  
-       702 https://openalex.org/W2891066092 https://openalex.org/W2553936366 outside  
-       703 https://openalex.org/W2891066092 https://openalex.org/W2559748900 outside  
-       704 https://openalex.org/W2891066092 https://openalex.org/W2566705968 outside  
-       705 https://openalex.org/W2891066092 https://openalex.org/W2568177153 outside  
-       706 https://openalex.org/W2891066092 https://openalex.org/W2587890708 outside  
-       707 https://openalex.org/W2891066092 https://openalex.org/W2594829037 outside  
-       708 https://openalex.org/W2891066092 https://openalex.org/W2757396425 outside  
-       709 https://openalex.org/W2891066092 https://openalex.org/W376675759  outside  
-       710 https://openalex.org/W2891066092 https://openalex.org/W398920993  outside  
-       711 https://openalex.org/W2891066092 https://openalex.org/W4233028252 outside  
-       712 https://openalex.org/W2891066092 https://openalex.org/W4285719527 outside  
-       713 https://openalex.org/W2891066092 https://openalex.org/W432761262  outside  
-       714 https://openalex.org/W2891066092 https://openalex.org/W564018664  outside  
-       715 https://openalex.org/W2891066092 https://openalex.org/W582936456  outside  
-       716 https://openalex.org/W2891066092 https://openalex.org/W589544906  outside  
-       717 https://openalex.org/W2891066092 https://openalex.org/W612069518  outside  
-       718 https://openalex.org/W2891066092 https://openalex.org/W650398330  outside  
-       719 https://openalex.org/W2891066092 https://openalex.org/W658502922  outside  
-       720 https://openalex.org/W2896826974 https://openalex.org/W143675921  outside  
-       721 https://openalex.org/W2896826974 https://openalex.org/W1491754772 outside  
-       722 https://openalex.org/W2896826974 https://openalex.org/W1523932947 outside  
-       723 https://openalex.org/W2896826974 https://openalex.org/W1529519400 outside  
-       724 https://openalex.org/W2896826974 https://openalex.org/W1531607676 outside  
-       725 https://openalex.org/W2896826974 https://openalex.org/W1536474489 outside  
-       726 https://openalex.org/W2896826974 https://openalex.org/W1696956904 outside  
-       727 https://openalex.org/W2896826974 https://openalex.org/W1731700882 outside  
-       728 https://openalex.org/W2896826974 https://openalex.org/W1761052593 outside  
-       729 https://openalex.org/W2896826974 https://openalex.org/W1958928194 outside  
-       730 https://openalex.org/W2896826974 https://openalex.org/W1965259429 outside  
-       731 https://openalex.org/W2896826974 https://openalex.org/W1968365422 outside  
-       732 https://openalex.org/W2896826974 https://openalex.org/W1971087125 outside  
-       733 https://openalex.org/W2896826974 https://openalex.org/W1977862340 outside  
-       734 https://openalex.org/W2896826974 https://openalex.org/W1979116104 outside  
-       735 https://openalex.org/W2896826974 https://openalex.org/W1982070737 outside  
-       736 https://openalex.org/W2896826974 https://openalex.org/W1982826806 outside  
-       737 https://openalex.org/W2896826974 https://openalex.org/W1986192078 outside  
-       738 https://openalex.org/W2896826974 https://openalex.org/W1988169643 outside  
-       739 https://openalex.org/W2896826974 https://openalex.org/W2020118844 outside  
-       740 https://openalex.org/W2896826974 https://openalex.org/W2024493527 outside  
-       741 https://openalex.org/W2896826974 https://openalex.org/W2026164865 outside  
-       742 https://openalex.org/W2896826974 https://openalex.org/W2029391677 outside  
-       743 https://openalex.org/W2896826974 https://openalex.org/W2038196424 outside  
-       744 https://openalex.org/W2896826974 https://openalex.org/W2048438282 outside  
-       745 https://openalex.org/W2896826974 https://openalex.org/W2063103323 outside  
-       746 https://openalex.org/W2896826974 https://openalex.org/W2064816492 outside  
-       747 https://openalex.org/W2896826974 https://openalex.org/W2067517664 outside  
-       748 https://openalex.org/W2896826974 https://openalex.org/W2074002348 outside  
-       749 https://openalex.org/W2896826974 https://openalex.org/W2096360326 outside  
-       750 https://openalex.org/W2896826974 https://openalex.org/W2117449104 outside  
-       751 https://openalex.org/W2896826974 https://openalex.org/W2138893419 outside  
-       752 https://openalex.org/W2896826974 https://openalex.org/W2139073212 outside  
-       753 https://openalex.org/W2896826974 https://openalex.org/W2139282251 outside  
-       754 https://openalex.org/W2896826974 https://openalex.org/W2139466197 outside  
-       755 https://openalex.org/W2896826974 https://openalex.org/W2142756309 outside  
-       756 https://openalex.org/W2896826974 https://openalex.org/W2142877669 outside  
-       757 https://openalex.org/W2896826974 https://openalex.org/W2150290224 outside  
-       758 https://openalex.org/W2896826974 https://openalex.org/W2151071722 outside  
-       759 https://openalex.org/W2896826974 https://openalex.org/W2163887529 outside  
-       760 https://openalex.org/W2896826974 https://openalex.org/W2166317738 outside  
-       761 https://openalex.org/W2896826974 https://openalex.org/W2171124651 outside  
-       762 https://openalex.org/W2896826974 https://openalex.org/W2173130871 outside  
-       763 https://openalex.org/W2896826974 https://openalex.org/W2187587692 outside  
-       764 https://openalex.org/W2896826974 https://openalex.org/W2221554129 outside  
-       765 https://openalex.org/W2896826974 https://openalex.org/W2264501383 outside  
-       766 https://openalex.org/W2896826974 https://openalex.org/W2298224214 outside  
-       767 https://openalex.org/W2896826974 https://openalex.org/W2317269115 outside  
-       768 https://openalex.org/W2896826974 https://openalex.org/W2341508074 outside  
-       769 https://openalex.org/W2896826974 https://openalex.org/W2397349251 outside  
-       770 https://openalex.org/W2896826974 https://openalex.org/W2409787008 outside  
-       771 https://openalex.org/W2896826974 https://openalex.org/W2419419954 outside  
-       772 https://openalex.org/W2896826974 https://openalex.org/W2426372034 outside  
-       773 https://openalex.org/W2896826974 https://openalex.org/W2480924963 outside  
-       774 https://openalex.org/W2896826974 https://openalex.org/W2488987723 outside  
-       775 https://openalex.org/W2896826974 https://openalex.org/W2512078133 outside  
-       776 https://openalex.org/W2896826974 https://openalex.org/W2515889430 outside  
-       777 https://openalex.org/W2896826974 https://openalex.org/W2518646621 outside  
-       778 https://openalex.org/W2896826974 https://openalex.org/W2528406562 outside  
-       779 https://openalex.org/W2896826974 https://openalex.org/W2528525856 outside  
-       780 https://openalex.org/W2896826974 https://openalex.org/W2533200693 outside  
-       781 https://openalex.org/W2896826974 https://openalex.org/W2547617692 outside  
-       782 https://openalex.org/W2896826974 https://openalex.org/W2567946352 outside  
-       783 https://openalex.org/W2896826974 https://openalex.org/W2574963600 outside  
-       784 https://openalex.org/W2896826974 https://openalex.org/W2582736804 outside  
-       785 https://openalex.org/W2896826974 https://openalex.org/W2585624576 outside  
-       786 https://openalex.org/W2896826974 https://openalex.org/W2590116898 outside  
-       787 https://openalex.org/W2896826974 https://openalex.org/W2724499206 outside  
-       788 https://openalex.org/W2896826974 https://openalex.org/W2745888331 outside  
-       789 https://openalex.org/W2896826974 https://openalex.org/W2753968569 outside  
-       790 https://openalex.org/W2896826974 https://openalex.org/W2761768825 outside  
-       791 https://openalex.org/W2896826974 https://openalex.org/W2761849792 outside  
-       792 https://openalex.org/W2896826974 https://openalex.org/W2765323086 outside  
-       793 https://openalex.org/W2896826974 https://openalex.org/W2766079223 outside  
-       794 https://openalex.org/W2896826974 https://openalex.org/W2787214566 outside  
-       795 https://openalex.org/W2896826974 https://openalex.org/W2791998006 outside  
-       796 https://openalex.org/W2896826974 https://openalex.org/W2800179176 outside  
-       797 https://openalex.org/W2896826974 https://openalex.org/W2804683589 outside  
-       798 https://openalex.org/W2896826974 https://openalex.org/W2810937555 outside  
-       799 https://openalex.org/W2896826974 https://openalex.org/W2888849740 outside  
-       800 https://openalex.org/W2896826974 https://openalex.org/W2943554073 outside  
-       801 https://openalex.org/W2896826974 https://openalex.org/W2951488006 outside  
-       802 https://openalex.org/W2896826974 https://openalex.org/W2953318847 outside  
-       803 https://openalex.org/W2896826974 https://openalex.org/W2962678849 outside  
-       804 https://openalex.org/W2896826974 https://openalex.org/W2963409780 outside  
-       805 https://openalex.org/W2896826974 https://openalex.org/W2963761964 outside  
-       806 https://openalex.org/W2896826974 https://openalex.org/W3104705690 outside  
-       807 https://openalex.org/W2896826974 https://openalex.org/W3104812864 outside  
-       808 https://openalex.org/W2896826974 https://openalex.org/W3123158876 outside  
-       809 https://openalex.org/W2896826974 https://openalex.org/W3125777910 outside  
-       810 https://openalex.org/W2896826974 https://openalex.org/W3130540911 outside  
-       811 https://openalex.org/W2896826974 https://openalex.org/W3132937684 outside  
-       812 https://openalex.org/W2896826974 https://openalex.org/W319315373  outside  
-       813 https://openalex.org/W2896826974 https://openalex.org/W4211111750 outside  
-       814 https://openalex.org/W2896826974 https://openalex.org/W4211168474 outside  
-       815 https://openalex.org/W2896826974 https://openalex.org/W4256461005 outside  
-       816 https://openalex.org/W2896826974 https://openalex.org/W4300286877 outside  
-       817 https://openalex.org/W2911997761 https://openalex.org/W1514535095 outside  
-       818 https://openalex.org/W2911997761 https://openalex.org/W1522301498 outside  
-       819 https://openalex.org/W2911997761 https://openalex.org/W1566018662 outside  
-       820 https://openalex.org/W2911997761 https://openalex.org/W1610356397 outside  
-       821 https://openalex.org/W2911997761 https://openalex.org/W1622676895 outside  
-       822 https://openalex.org/W2911997761 https://openalex.org/W1660390307 outside  
-       823 https://openalex.org/W2911997761 https://openalex.org/W1793121960 outside  
-       824 https://openalex.org/W2911997761 https://openalex.org/W1801721664 outside  
-       825 https://openalex.org/W2911997761 https://openalex.org/W1832693441 outside  
-       826 https://openalex.org/W2911997761 https://openalex.org/W1880262756 outside  
-       827 https://openalex.org/W2911997761 https://openalex.org/W1902237438 outside  
-       828 https://openalex.org/W2911997761 https://openalex.org/W1965667542 outside  
-       829 https://openalex.org/W2911997761 https://openalex.org/W1966443646 outside  
-       830 https://openalex.org/W2911997761 https://openalex.org/W1995672491 outside  
-       831 https://openalex.org/W2911997761 https://openalex.org/W1998257453 outside  
-       832 https://openalex.org/W2911997761 https://openalex.org/W2049434052 outside  
-       833 https://openalex.org/W2911997761 https://openalex.org/W2064675550 outside  
-       834 https://openalex.org/W2911997761 https://openalex.org/W2066636486 outside  
-       835 https://openalex.org/W2911997761 https://openalex.org/W2071080574 outside  
-       836 https://openalex.org/W2911997761 https://openalex.org/W2098824882 outside  
-       837 https://openalex.org/W2911997761 https://openalex.org/W2100495367 outside  
-       838 https://openalex.org/W2911997761 https://openalex.org/W2103333826 outside  
-       839 https://openalex.org/W2911997761 https://openalex.org/W2119788759 outside  
-       840 https://openalex.org/W2911997761 https://openalex.org/W2123402141 outside  
-       841 https://openalex.org/W2911997761 https://openalex.org/W2127589108 outside  
-       842 https://openalex.org/W2911997761 https://openalex.org/W2156124259 outside  
-       843 https://openalex.org/W2911997761 https://openalex.org/W2162495634 outside  
-       844 https://openalex.org/W2911997761 https://openalex.org/W2171590421 outside  
-       845 https://openalex.org/W2911997761 https://openalex.org/W2178628967 outside  
-       846 https://openalex.org/W2911997761 https://openalex.org/W2211192759 outside  
-       847 https://openalex.org/W2911997761 https://openalex.org/W2251427843 outside  
-       848 https://openalex.org/W2911997761 https://openalex.org/W2252215182 outside  
-       849 https://openalex.org/W2911997761 https://openalex.org/W2402144811 outside  
-       850 https://openalex.org/W2911997761 https://openalex.org/W2407776548 outside  
-       851 https://openalex.org/W2911997761 https://openalex.org/W2470673105 outside  
-       852 https://openalex.org/W2911997761 https://openalex.org/W2483327705 outside  
-       853 https://openalex.org/W2911997761 https://openalex.org/W2508865106 outside  
-       854 https://openalex.org/W2911997761 https://openalex.org/W2510530102 outside  
-       855 https://openalex.org/W2911997761 https://openalex.org/W2510940142 outside  
-       856 https://openalex.org/W2911997761 https://openalex.org/W2536015822 outside  
-       857 https://openalex.org/W2911997761 https://openalex.org/W2556553881 outside  
-       858 https://openalex.org/W2911997761 https://openalex.org/W2563010554 outside  
-       859 https://openalex.org/W2911997761 https://openalex.org/W2592249290 outside  
-       860 https://openalex.org/W2911997761 https://openalex.org/W2648699835 outside  
-       861 https://openalex.org/W2911997761 https://openalex.org/W2742940593 outside  
-       862 https://openalex.org/W2911997761 https://openalex.org/W2766337907 outside  
-       863 https://openalex.org/W2911997761 https://openalex.org/W2803119681 outside  
-       864 https://openalex.org/W2911997761 https://openalex.org/W2963053846 outside  
-       865 https://openalex.org/W2911997761 https://openalex.org/W2963403868 outside  
-       866 https://openalex.org/W2911997761 https://openalex.org/W2964308564 outside  
-       867 https://openalex.org/W2911997761 https://openalex.org/W3016724004 outside  
-       868 https://openalex.org/W2911997761 https://openalex.org/W3102335248 outside  
-       869 https://openalex.org/W2911997761 https://openalex.org/W398859631  outside  
-       870 https://openalex.org/W2911997761 https://openalex.org/W4231510805 outside  
-       871 https://openalex.org/W2911997761 https://openalex.org/W4247950230 outside  
-       872 https://openalex.org/W2911997761 https://openalex.org/W581956982  outside  
-       873 https://openalex.org/W2936368166 https://openalex.org/W113836369  outside  
-       874 https://openalex.org/W2936368166 https://openalex.org/W1500256440 outside  
-       875 https://openalex.org/W2936368166 https://openalex.org/W1527786550 outside  
-       876 https://openalex.org/W2936368166 https://openalex.org/W1583837637 outside  
-       877 https://openalex.org/W2936368166 https://openalex.org/W1632114991 outside  
-       878 https://openalex.org/W2936368166 https://openalex.org/W1793121960 outside  
-       879 https://openalex.org/W2936368166 https://openalex.org/W1810943226 outside  
-       880 https://openalex.org/W2936368166 https://openalex.org/W1902237438 outside  
-       881 https://openalex.org/W2936368166 https://openalex.org/W1943478593 outside  
-       882 https://openalex.org/W2936368166 https://openalex.org/W1986868156 outside  
-       883 https://openalex.org/W2936368166 https://openalex.org/W2007709031 outside  
-       884 https://openalex.org/W2936368166 https://openalex.org/W2064675550 outside  
-       885 https://openalex.org/W2936368166 https://openalex.org/W2095705004 outside  
-       886 https://openalex.org/W2936368166 https://openalex.org/W2107878631 outside  
-       887 https://openalex.org/W2936368166 https://openalex.org/W2150824314 outside  
-       888 https://openalex.org/W2936368166 https://openalex.org/W2157331557 outside  
-       889 https://openalex.org/W2936368166 https://openalex.org/W2254175738 outside  
-       890 https://openalex.org/W2936368166 https://openalex.org/W2265796482 outside  
-       891 https://openalex.org/W2936368166 https://openalex.org/W2293453011 outside  
-       892 https://openalex.org/W2936368166 https://openalex.org/W2293771131 outside  
-       893 https://openalex.org/W2936368166 https://openalex.org/W2409027918 outside  
-       894 https://openalex.org/W2936368166 https://openalex.org/W2474920236 outside  
-       895 https://openalex.org/W2936368166 https://openalex.org/W2507756961 outside  
-       896 https://openalex.org/W2936368166 https://openalex.org/W2530887700 outside  
-       897 https://openalex.org/W2936368166 https://openalex.org/W2534274346 outside  
-       898 https://openalex.org/W2936368166 https://openalex.org/W2535697732 outside  
-       899 https://openalex.org/W2936368166 https://openalex.org/W2563734883 outside  
-       900 https://openalex.org/W2936368166 https://openalex.org/W2574535369 outside  
-       901 https://openalex.org/W2936368166 https://openalex.org/W2576915720 outside  
-       902 https://openalex.org/W2936368166 https://openalex.org/W2596567068 outside  
-       903 https://openalex.org/W2936368166 https://openalex.org/W2597601064 outside  
-       904 https://openalex.org/W2936368166 https://openalex.org/W2599674900 outside  
-       905 https://openalex.org/W2936368166 https://openalex.org/W2602856279 outside  
-       906 https://openalex.org/W2936368166 https://openalex.org/W2606974598 outside  
-       907 https://openalex.org/W2936368166 https://openalex.org/W2607303097 outside  
-       908 https://openalex.org/W2936368166 https://openalex.org/W2611684114 outside  
-       909 https://openalex.org/W2936368166 https://openalex.org/W2612560781 outside  
-       910 https://openalex.org/W2936368166 https://openalex.org/W2626194254 outside  
-       911 https://openalex.org/W2936368166 https://openalex.org/W2766736793 outside  
-       912 https://openalex.org/W2936368166 https://openalex.org/W2769152880 outside  
-       913 https://openalex.org/W2936368166 https://openalex.org/W2792048062 outside  
-       914 https://openalex.org/W2936368166 https://openalex.org/W2792376130 outside  
-       915 https://openalex.org/W2936368166 https://openalex.org/W2897139265 outside  
-       916 https://openalex.org/W2936368166 https://openalex.org/W2902716364 outside  
-       917 https://openalex.org/W2936368166 https://openalex.org/W2914584698 outside  
-       918 https://openalex.org/W2936368166 https://openalex.org/W2949615363 outside  
-       919 https://openalex.org/W2936368166 https://openalex.org/W2949888546 outside  
-       920 https://openalex.org/W2936368166 https://openalex.org/W2950527759 outside  
-       921 https://openalex.org/W2936368166 https://openalex.org/W2951605425 outside  
-       922 https://openalex.org/W2936368166 https://openalex.org/W2952507584 outside  
-       923 https://openalex.org/W2936368166 https://openalex.org/W2962730419 outside  
-       924 https://openalex.org/W2936368166 https://openalex.org/W2962790689 outside  
-       925 https://openalex.org/W2936368166 https://openalex.org/W2962933129 outside  
-       926 https://openalex.org/W2936368166 https://openalex.org/W2962940432 outside  
-       927 https://openalex.org/W2936368166 https://openalex.org/W2962972512 outside  
-       928 https://openalex.org/W2936368166 https://openalex.org/W2963042606 outside  
-       929 https://openalex.org/W2936368166 https://openalex.org/W2963374479 outside  
-       930 https://openalex.org/W2936368166 https://openalex.org/W2963385935 outside  
-       931 https://openalex.org/W2936368166 https://openalex.org/W2963735467 outside  
-       932 https://openalex.org/W2936368166 https://openalex.org/W2963929190 outside  
-       933 https://openalex.org/W2936368166 https://openalex.org/W2963984224 outside  
-       934 https://openalex.org/W2936368166 https://openalex.org/W2964121744 outside  
-       935 https://openalex.org/W2936368166 https://openalex.org/W2964269252 outside  
-       936 https://openalex.org/W2936368166 https://openalex.org/W2964304579 outside  
-       937 https://openalex.org/W2936368166 https://openalex.org/W2964308564 outside  
-       938 https://openalex.org/W2936368166 https://openalex.org/W2979240068 outside  
-       939 https://openalex.org/W2936368166 https://openalex.org/W2990953521 outside  
-       940 https://openalex.org/W2936368166 https://openalex.org/W3037932933 outside  
-       941 https://openalex.org/W2936368166 https://openalex.org/W3183988614 outside  
-       942 https://openalex.org/W2936368166 https://openalex.org/W3207342693 outside  
-       943 https://openalex.org/W2936368166 https://openalex.org/W4206584443 outside  
-       944 https://openalex.org/W2936368166 https://openalex.org/W4229748564 outside  
-       945 https://openalex.org/W2936368166 https://openalex.org/W4236965008 outside  
-       946 https://openalex.org/W2936368166 https://openalex.org/W4243055393 outside  
-       947 https://openalex.org/W2936368166 https://openalex.org/W4300402905 outside  
-       948 https://openalex.org/W2936368166 https://openalex.org/W69640471   outside  
-       949 https://openalex.org/W2938946739 https://openalex.org/W150699991  outside  
-       950 https://openalex.org/W2938946739 https://openalex.org/W1991713242 outside  
-       951 https://openalex.org/W2938946739 https://openalex.org/W2024075610 outside  
-       952 https://openalex.org/W2938946739 https://openalex.org/W2150220236 outside  
-       953 https://openalex.org/W2938946739 https://openalex.org/W2187569332 outside  
-       954 https://openalex.org/W2938946739 https://openalex.org/W2302501749 outside  
-       955 https://openalex.org/W2938946739 https://openalex.org/W2522413525 outside  
-       956 https://openalex.org/W2938946739 https://openalex.org/W2604156647 outside  
-       957 https://openalex.org/W2938946739 https://openalex.org/W2604994368 outside  
-       958 https://openalex.org/W2938946739 https://openalex.org/W2612009452 outside  
-       959 https://openalex.org/W2938946739 https://openalex.org/W2764161090 outside  
-       960 https://openalex.org/W2938946739 https://openalex.org/W2766227634 outside  
-       961 https://openalex.org/W2938946739 https://openalex.org/W2767865716 outside  
-       962 https://openalex.org/W2938946739 https://openalex.org/W2773787581 outside  
-       963 https://openalex.org/W2938946739 https://openalex.org/W2778697372 outside  
-       964 https://openalex.org/W2938946739 https://openalex.org/W2891148407 outside  
-       965 https://openalex.org/W2938946739 https://openalex.org/W2918895389 outside  
-       966 https://openalex.org/W2938946739 https://openalex.org/W2926606343 outside  
-       967 https://openalex.org/W2938946739 https://openalex.org/W3013305275 outside  
-       968 https://openalex.org/W2938946739 https://openalex.org/W3014060694 outside  
-       969 https://openalex.org/W2938946739 https://openalex.org/W3027132030 outside  
-       970 https://openalex.org/W2938946739 https://openalex.org/W403298716  outside  
-       971 https://openalex.org/W2938946739 https://openalex.org/W4386262759 outside  
-       972 https://openalex.org/W2938946739 https://openalex.org/W4394356984 outside  
-       973 https://openalex.org/W2938946739 https://openalex.org/W633162274  outside  
-       974 https://openalex.org/W2962739339 https://openalex.org/W1026270304 outside  
-       975 https://openalex.org/W2962739339 https://openalex.org/W1522301498 outside  
-       976 https://openalex.org/W2962739339 https://openalex.org/W1632114991 outside  
-       977 https://openalex.org/W2962739339 https://openalex.org/W1840435438 outside  
-       978 https://openalex.org/W2962739339 https://openalex.org/W1899794420 outside  
-       979 https://openalex.org/W2962739339 https://openalex.org/W1938755728 outside  
-       980 https://openalex.org/W2962739339 https://openalex.org/W2035717317 outside  
-       981 https://openalex.org/W2962739339 https://openalex.org/W2064675550 outside  
-       982 https://openalex.org/W2962739339 https://openalex.org/W2095705004 outside  
-       983 https://openalex.org/W2962739339 https://openalex.org/W2103076621 outside  
-       984 https://openalex.org/W2962739339 https://openalex.org/W2131494463 outside  
-       985 https://openalex.org/W2962739339 https://openalex.org/W2144578941 outside  
-       986 https://openalex.org/W2962739339 https://openalex.org/W2147880316 outside  
-       987 https://openalex.org/W2962739339 https://openalex.org/W2155069789 outside  
-       988 https://openalex.org/W2962739339 https://openalex.org/W2158139315 outside  
-       989 https://openalex.org/W2962739339 https://openalex.org/W2158847908 outside  
-       990 https://openalex.org/W2962739339 https://openalex.org/W2158899491 outside  
-       991 https://openalex.org/W2962739339 https://openalex.org/W2162456950 outside  
-       992 https://openalex.org/W2962739339 https://openalex.org/W2212703438 outside  
-       993 https://openalex.org/W2962739339 https://openalex.org/W2251035762 outside  
-       994 https://openalex.org/W2962739339 https://openalex.org/W2251599843 outside  
-       995 https://openalex.org/W2962739339 https://openalex.org/W2251939518 outside  
-       996 https://openalex.org/W2962739339 https://openalex.org/W2259472270 outside  
-       997 https://openalex.org/W2962739339 https://openalex.org/W2296283641 outside  
-       998 https://openalex.org/W2962739339 https://openalex.org/W2463895987 outside  
-       999 https://openalex.org/W2962739339 https://openalex.org/W2493916176 outside  
-      1000 https://openalex.org/W2962739339 https://openalex.org/W2507974895 outside  
-      1001 https://openalex.org/W2962739339 https://openalex.org/W2516255829 outside  
-      1002 https://openalex.org/W2962739339 https://openalex.org/W2518202280 outside  
-      1003 https://openalex.org/W2962739339 https://openalex.org/W2551396370 outside  
-      1004 https://openalex.org/W2962739339 https://openalex.org/W2556468274 outside  
-      1005 https://openalex.org/W2962739339 https://openalex.org/W2556888587 outside  
-      1006 https://openalex.org/W2962739339 https://openalex.org/W2605717780 outside  
-      1007 https://openalex.org/W2962739339 https://openalex.org/W2608787653 outside  
-      1008 https://openalex.org/W2962739339 https://openalex.org/W2611669587 outside  
-      1009 https://openalex.org/W2962739339 https://openalex.org/W2740747242 outside  
-      1010 https://openalex.org/W2962739339 https://openalex.org/W2740765036 outside  
-      1011 https://openalex.org/W2962739339 https://openalex.org/W2740782137 outside  
-      1012 https://openalex.org/W2962739339 https://openalex.org/W2756386045 outside  
-      1013 https://openalex.org/W2962739339 https://openalex.org/W2757205734 outside  
-      1014 https://openalex.org/W2962739339 https://openalex.org/W2950621961 outside  
-      1015 https://openalex.org/W2962739339 https://openalex.org/W2951559648 outside  
-      1016 https://openalex.org/W2962739339 https://openalex.org/W2952087486 outside  
-      1017 https://openalex.org/W2962739339 https://openalex.org/W2952230511 outside  
-      1018 https://openalex.org/W2962739339 https://openalex.org/W2952729433 outside  
-      1019 https://openalex.org/W2962739339 https://openalex.org/W2962718483 outside  
-      1020 https://openalex.org/W2962739339 https://openalex.org/W2962832505 outside  
-      1021 https://openalex.org/W2962739339 https://openalex.org/W2962902328 outside  
-      1022 https://openalex.org/W2962739339 https://openalex.org/W2962998327 outside  
-      1023 https://openalex.org/W2962739339 https://openalex.org/W2963167649 outside  
-      1024 https://openalex.org/W2962739339 https://openalex.org/W2963266340 outside  
-      1025 https://openalex.org/W2962739339 https://openalex.org/W2963563735 outside  
-      1026 https://openalex.org/W2962739339 https://openalex.org/W2963625095 outside  
-      1027 https://openalex.org/W2962739339 https://openalex.org/W2963695529 outside  
-      1028 https://openalex.org/W2962739339 https://openalex.org/W2963719234 outside  
-      1029 https://openalex.org/W2962739339 https://openalex.org/W2963748441 outside  
-      1030 https://openalex.org/W2962739339 https://openalex.org/W2963748792 outside  
-      1031 https://openalex.org/W2962739339 https://openalex.org/W2963756346 outside  
-      1032 https://openalex.org/W2962739339 https://openalex.org/W2963769536 outside  
-      1033 https://openalex.org/W2962739339 https://openalex.org/W2964091467 outside  
-      1034 https://openalex.org/W2962739339 https://openalex.org/W2964121744 outside  
-      1035 https://openalex.org/W2962739339 https://openalex.org/W2964199361 outside  
-      1036 https://openalex.org/W2962739339 https://openalex.org/W2964222246 outside  
-      1037 https://openalex.org/W2962739339 https://openalex.org/W3016169217 outside  
-      1038 https://openalex.org/W2962739339 https://openalex.org/W4294170691 outside  
-      1039 https://openalex.org/W2962739339 https://openalex.org/W4299838440 outside  
-      1040 https://openalex.org/W2962739339 https://openalex.org/W4300427683 outside  
-      1041 https://openalex.org/W2962739339 https://openalex.org/W4302343710 outside  
-      1042 https://openalex.org/W2962739339 https://openalex.org/W581956982  outside  
-      1043 https://openalex.org/W2962739339 https://openalex.org/W6908809    outside  
-      1044 https://openalex.org/W2963341956 https://openalex.org/W131533222  outside  
-      1045 https://openalex.org/W2963341956 https://openalex.org/W1486649854 outside  
-      1046 https://openalex.org/W2963341956 https://openalex.org/W1566289585 outside  
-      1047 https://openalex.org/W2963341956 https://openalex.org/W1599016936 outside  
-      1048 https://openalex.org/W2963341956 https://openalex.org/W1840435438 outside  
-      1049 https://openalex.org/W2963341956 https://openalex.org/W2025768430 outside  
-      1050 https://openalex.org/W2963341956 https://openalex.org/W2108598243 outside  
-      1051 https://openalex.org/W2963341956 https://openalex.org/W2117130368 outside  
-      1052 https://openalex.org/W2963341956 https://openalex.org/W2121227244 outside  
-      1053 https://openalex.org/W2963341956 https://openalex.org/W2130903752 outside  
-      1054 https://openalex.org/W2963341956 https://openalex.org/W2131462252 outside  
-      1055 https://openalex.org/W2963341956 https://openalex.org/W2131744502 outside  
-      1056 https://openalex.org/W2963341956 https://openalex.org/W2144578941 outside  
-      1057 https://openalex.org/W2963341956 https://openalex.org/W2149933564 outside  
-      1058 https://openalex.org/W2963341956 https://openalex.org/W2158108973 outside  
-      1059 https://openalex.org/W2963341956 https://openalex.org/W2158139315 outside  
-      1060 https://openalex.org/W2963341956 https://openalex.org/W2170973209 outside  
-      1061 https://openalex.org/W2963341956 https://openalex.org/W2251939518 outside  
-      1062 https://openalex.org/W2963341956 https://openalex.org/W2270070752 outside  
-      1063 https://openalex.org/W2963341956 https://openalex.org/W2396767181 outside  
-      1064 https://openalex.org/W2963341956 https://openalex.org/W2413794162 outside  
-      1065 https://openalex.org/W2963341956 https://openalex.org/W2462831000 outside  
-      1066 https://openalex.org/W2963341956 https://openalex.org/W2507974895 outside  
-      1067 https://openalex.org/W2963341956 https://openalex.org/W2551396370 outside  
-      1068 https://openalex.org/W2963341956 https://openalex.org/W2610858497 outside  
-      1069 https://openalex.org/W2963341956 https://openalex.org/W2784823820 outside  
-      1070 https://openalex.org/W2963341956 https://openalex.org/W2880875857 outside  
-      1071 https://openalex.org/W2963341956 https://openalex.org/W2888329843 outside  
-      1072 https://openalex.org/W2963341956 https://openalex.org/W2891602716 outside  
-      1073 https://openalex.org/W2963341956 https://openalex.org/W2897076808 outside  
-      1074 https://openalex.org/W2963341956 https://openalex.org/W2951714314 outside  
-      1075 https://openalex.org/W2963341956 https://openalex.org/W2962718483 outside  
-      1076 https://openalex.org/W2963341956 https://openalex.org/W2962808855 outside  
-      1077 https://openalex.org/W2963341956 https://openalex.org/W2963026768 outside  
-      1078 https://openalex.org/W2963341956 https://openalex.org/W2963088785 outside  
-      1079 https://openalex.org/W2963341956 https://openalex.org/W2963159690 outside  
-      1080 https://openalex.org/W2963341956 https://openalex.org/W2963339397 outside  
-      1081 https://openalex.org/W2963341956 https://openalex.org/W2963403868 outside  
-      1082 https://openalex.org/W2963341956 https://openalex.org/W2963563735 outside  
-      1083 https://openalex.org/W2963341956 https://openalex.org/W2963564796 outside  
-      1084 https://openalex.org/W2963341956 https://openalex.org/W2963644595 outside  
-      1085 https://openalex.org/W2963341956 https://openalex.org/W2963748441 outside  
-      1086 https://openalex.org/W2963341956 https://openalex.org/W2963756346 outside  
-      1087 https://openalex.org/W2963341956 https://openalex.org/W2963804993 outside  
-      1088 https://openalex.org/W2963341956 https://openalex.org/W2963846996 outside  
-      1089 https://openalex.org/W2963341956 https://openalex.org/W2963918774 outside  
-      1090 https://openalex.org/W2963341956 https://openalex.org/W2978670439 outside  
-      1091 https://openalex.org/W2963341956 https://openalex.org/W3098057198 outside  
-      1092 https://openalex.org/W2963341956 https://openalex.org/W3104033643 outside  
-      1093 https://openalex.org/W2965202507 https://openalex.org/W2403584057 outside  
-      1094 https://openalex.org/W2965202507 https://openalex.org/W2410402467 outside  
-      1095 https://openalex.org/W2965202507 https://openalex.org/W2764161090 outside  
-      1096 https://openalex.org/W2965202507 https://openalex.org/W2918895389 outside  
-      1097 https://openalex.org/W2965202507 https://openalex.org/W2981120761 outside  
-      1098 https://openalex.org/W2965202507 https://openalex.org/W3106477845 outside  
-      1099 https://openalex.org/W3046863325 https://openalex.org/W3098501485 outside  
-      1100 https://openalex.org/W3101913037 https://openalex.org/W111745025  outside  
-      1101 https://openalex.org/W3101913037 https://openalex.org/W1479700690 outside  
-      1102 https://openalex.org/W3101913037 https://openalex.org/W1497212108 outside  
-      1103 https://openalex.org/W3101913037 https://openalex.org/W1566139570 outside  
-      1104 https://openalex.org/W3101913037 https://openalex.org/W1573514622 outside  
-      1105 https://openalex.org/W3101913037 https://openalex.org/W1974339500 outside  
-      1106 https://openalex.org/W3101913037 https://openalex.org/W1977593346 outside  
-      1107 https://openalex.org/W3101913037 https://openalex.org/W1986543644 outside  
-      1108 https://openalex.org/W3101913037 https://openalex.org/W2025475564 outside  
-      1109 https://openalex.org/W3101913037 https://openalex.org/W2026162439 outside  
-      1110 https://openalex.org/W3101913037 https://openalex.org/W2034721576 outside  
-      1111 https://openalex.org/W3101913037 https://openalex.org/W2055452728 outside  
-      1112 https://openalex.org/W3101913037 https://openalex.org/W2066636486 outside  
-      1113 https://openalex.org/W3101913037 https://openalex.org/W2070971859 outside  
-      1114 https://openalex.org/W3101913037 https://openalex.org/W2083305840 outside  
-      1115 https://openalex.org/W3101913037 https://openalex.org/W2092246763 outside  
-      1116 https://openalex.org/W3101913037 https://openalex.org/W2101119909 outside  
-      1117 https://openalex.org/W3101913037 https://openalex.org/W2101210369 outside  
-      1118 https://openalex.org/W3101913037 https://openalex.org/W2101390659 outside  
-      1119 https://openalex.org/W3101913037 https://openalex.org/W2107241511 outside  
-      1120 https://openalex.org/W3101913037 https://openalex.org/W2114837391 outside  
-      1121 https://openalex.org/W3101913037 https://openalex.org/W2115167129 outside  
-      1122 https://openalex.org/W3101913037 https://openalex.org/W2118119027 outside  
-      1123 https://openalex.org/W3101913037 https://openalex.org/W2128672521 outside  
-      1124 https://openalex.org/W3101913037 https://openalex.org/W2129468719 outside  
-      1125 https://openalex.org/W3101913037 https://openalex.org/W2130217807 outside  
-      1126 https://openalex.org/W3101913037 https://openalex.org/W2144211451 outside  
-      1127 https://openalex.org/W3101913037 https://openalex.org/W2146442558 outside  
-      1128 https://openalex.org/W3101913037 https://openalex.org/W2150824314 outside  
-      1129 https://openalex.org/W3101913037 https://openalex.org/W2155709906 outside  
-      1130 https://openalex.org/W3101913037 https://openalex.org/W2156641871 outside  
-      1131 https://openalex.org/W3101913037 https://openalex.org/W2158291389 outside  
-      1132 https://openalex.org/W3101913037 https://openalex.org/W2165469059 outside  
-      1133 https://openalex.org/W3101913037 https://openalex.org/W2166347079 outside  
-      1134 https://openalex.org/W3101913037 https://openalex.org/W2788296320 outside  
-      1135 https://openalex.org/W3101913037 https://openalex.org/W2953285682 outside  
-      1136 https://openalex.org/W3101913037 https://openalex.org/W2953369829 outside  
-      1137 https://openalex.org/W3101913037 https://openalex.org/W3087975536 outside  
-      1138 https://openalex.org/W3101913037 https://openalex.org/W3138773240 outside  
-      1139 https://openalex.org/W3101913037 https://openalex.org/W42510783   outside  
-      1140 https://openalex.org/W3101913037 https://openalex.org/W562246665  outside  
-      1141 https://openalex.org/W4293919086 https://openalex.org/W1993248021 outside  
-      1142 https://openalex.org/W4293919086 https://openalex.org/W2167632452 outside  
-      1143 https://openalex.org/W4293919086 https://openalex.org/W2751675383 outside  
-      1144 https://openalex.org/W4293919086 https://openalex.org/W2778795786 outside  
-      1145 https://openalex.org/W4293919086 https://openalex.org/W3033736142 outside  
-      1146 https://openalex.org/W4293919086 https://openalex.org/W3120758321 outside  
-      1147 https://openalex.org/W4293919086 https://openalex.org/W3122922982 outside  
-      1148 https://openalex.org/W4293919086 https://openalex.org/W3136369402 outside  
-      1149 https://openalex.org/W4293919086 https://openalex.org/W3147746548 outside  
-      1150 https://openalex.org/W4293919086 https://openalex.org/W3149838060 outside  
-      1151 https://openalex.org/W4293919086 https://openalex.org/W3158741648 outside  
-      1152 https://openalex.org/W4293919086 https://openalex.org/W3161803063 outside  
-      1153 https://openalex.org/W4293919086 https://openalex.org/W3191542556 outside  
-      1154 https://openalex.org/W4293919086 https://openalex.org/W3191795768 outside  
-      1155 https://openalex.org/W4293919086 https://openalex.org/W3198568883 outside  
-      1156 https://openalex.org/W4293919086 https://openalex.org/W3204699421 outside  
-      1157 https://openalex.org/W4293919086 https://openalex.org/W3205277887 outside  
-      1158 https://openalex.org/W4293919086 https://openalex.org/W3207384088 outside  
-      1159 https://openalex.org/W4293919086 https://openalex.org/W3210898815 outside  
-      1160 https://openalex.org/W4293919086 https://openalex.org/W3216112305 outside  
-      1161 https://openalex.org/W4293919086 https://openalex.org/W3216439547 outside  
-      1162 https://openalex.org/W4293919086 https://openalex.org/W4200063888 outside  
-      1163 https://openalex.org/W4293919086 https://openalex.org/W4200114414 outside  
-      1164 https://openalex.org/W4293919086 https://openalex.org/W4205561404 outside  
-      1165 https://openalex.org/W4293919086 https://openalex.org/W4206717770 outside  
-      1166 https://openalex.org/W4293919086 https://openalex.org/W4207081009 outside  
-      1167 https://openalex.org/W4293919086 https://openalex.org/W4210517230 outside  
-      1168 https://openalex.org/W4293919086 https://openalex.org/W4213208566 outside  
-      1169 https://openalex.org/W4293919086 https://openalex.org/W4214903816 outside  
-      1170 https://openalex.org/W4293919086 https://openalex.org/W4220909391 outside  
-      1171 https://openalex.org/W4293919086 https://openalex.org/W4221021402 outside  
-      1172 https://openalex.org/W4293919086 https://openalex.org/W4283070526 outside  
-      1173 https://openalex.org/W4293919086 https://openalex.org/W4297670668 outside  
-      1174 https://openalex.org/W4311043552 https://openalex.org/W1739787994 outside  
-      1175 https://openalex.org/W4311043552 https://openalex.org/W2007872832 outside  
-      1176 https://openalex.org/W4311043552 https://openalex.org/W2042084307 outside  
-      1177 https://openalex.org/W4311043552 https://openalex.org/W2089922390 outside  
-      1178 https://openalex.org/W4311043552 https://openalex.org/W2288823482 outside  
-      1179 https://openalex.org/W4311043552 https://openalex.org/W2785915606 outside  
-      1180 https://openalex.org/W4311043552 https://openalex.org/W2788730394 outside  
-      1181 https://openalex.org/W4311043552 https://openalex.org/W2804346410 outside  
-      1182 https://openalex.org/W4311043552 https://openalex.org/W2884069803 outside  
-      1183 https://openalex.org/W4311043552 https://openalex.org/W2887294148 outside  
-      1184 https://openalex.org/W4311043552 https://openalex.org/W2969805759 outside  
-      1185 https://openalex.org/W4311043552 https://openalex.org/W2969920179 outside  
-      1186 https://openalex.org/W4311043552 https://openalex.org/W3005831412 outside  
-      1187 https://openalex.org/W4311043552 https://openalex.org/W3013886637 outside  
-      1188 https://openalex.org/W4311043552 https://openalex.org/W3032952443 outside  
-      1189 https://openalex.org/W4311043552 https://openalex.org/W3034083433 outside  
-      1190 https://openalex.org/W4311043552 https://openalex.org/W3041998196 outside  
-      1191 https://openalex.org/W4311043552 https://openalex.org/W3111509751 outside  
-      1192 https://openalex.org/W4311043552 https://openalex.org/W3111616766 outside  
-      1193 https://openalex.org/W4311043552 https://openalex.org/W3112065274 outside  
-      1194 https://openalex.org/W4311043552 https://openalex.org/W3136182959 outside  
-      1195 https://openalex.org/W4311043552 https://openalex.org/W3147746548 outside  
-      1196 https://openalex.org/W4311043552 https://openalex.org/W3154161668 outside  
-      1197 https://openalex.org/W4311043552 https://openalex.org/W3158741648 outside  
-      1198 https://openalex.org/W4311043552 https://openalex.org/W3175946790 outside  
-      1199 https://openalex.org/W4311043552 https://openalex.org/W3191795768 outside  
-      1200 https://openalex.org/W4311043552 https://openalex.org/W3194028525 outside  
-      1201 https://openalex.org/W4311043552 https://openalex.org/W3200579686 outside  
-      1202 https://openalex.org/W4311043552 https://openalex.org/W3204517092 outside  
-      1203 https://openalex.org/W4311043552 https://openalex.org/W3205277887 outside  
-      1204 https://openalex.org/W4311043552 https://openalex.org/W3207384088 outside  
-      1205 https://openalex.org/W4311043552 https://openalex.org/W3208205279 outside  
-      1206 https://openalex.org/W4311043552 https://openalex.org/W3208886700 outside  
-      1207 https://openalex.org/W4311043552 https://openalex.org/W3210534219 outside  
-      1208 https://openalex.org/W4311043552 https://openalex.org/W3210898815 outside  
-      1209 https://openalex.org/W4311043552 https://openalex.org/W3215713008 outside  
-      1210 https://openalex.org/W4311043552 https://openalex.org/W3216112305 outside  
-      1211 https://openalex.org/W4311043552 https://openalex.org/W3216439547 outside  
-      1212 https://openalex.org/W4311043552 https://openalex.org/W4200063888 outside  
-      1213 https://openalex.org/W4311043552 https://openalex.org/W4200114414 outside  
-      1214 https://openalex.org/W4311043552 https://openalex.org/W4206717770 outside  
-      1215 https://openalex.org/W4311043552 https://openalex.org/W4210517230 outside  
-      1216 https://openalex.org/W4311043552 https://openalex.org/W4210694094 outside  
-      1217 https://openalex.org/W4311043552 https://openalex.org/W4210739828 outside  
-      1218 https://openalex.org/W4311043552 https://openalex.org/W4213208566 outside  
-      1219 https://openalex.org/W4311043552 https://openalex.org/W4213426336 outside  
-      1220 https://openalex.org/W4311043552 https://openalex.org/W4220780942 outside  
-      1221 https://openalex.org/W4311043552 https://openalex.org/W4220909391 outside  
-      1222 https://openalex.org/W4311043552 https://openalex.org/W4221034259 outside  
-      1223 https://openalex.org/W4311043552 https://openalex.org/W4226032329 outside  
-      1224 https://openalex.org/W4311043552 https://openalex.org/W4285612256 outside  
-      1225 https://openalex.org/W4311043552 https://openalex.org/W4295123433 outside  
-      1226 https://openalex.org/W4311043552 https://openalex.org/W4297198672 outside  
-      1227 https://openalex.org/W4311043552 https://openalex.org/W630157969  outside  
-      1228 https://openalex.org/W4387316167 https://openalex.org/W1968927634 outside  
-      1229 https://openalex.org/W4387316167 https://openalex.org/W1969442546 outside  
-      1230 https://openalex.org/W4387316167 https://openalex.org/W1988686126 outside  
-      1231 https://openalex.org/W4387316167 https://openalex.org/W2008883775 outside  
-      1232 https://openalex.org/W4387316167 https://openalex.org/W2018319765 outside  
-      1233 https://openalex.org/W4387316167 https://openalex.org/W2018695324 outside  
-      1234 https://openalex.org/W4387316167 https://openalex.org/W2018850751 outside  
-      1235 https://openalex.org/W4387316167 https://openalex.org/W2026032877 outside  
-      1236 https://openalex.org/W4387316167 https://openalex.org/W2031531534 outside  
-      1237 https://openalex.org/W4387316167 https://openalex.org/W2031565327 outside  
-      1238 https://openalex.org/W4387316167 https://openalex.org/W2059789020 outside  
-      1239 https://openalex.org/W4387316167 https://openalex.org/W2066766178 outside  
-      1240 https://openalex.org/W4387316167 https://openalex.org/W2069870183 outside  
-      1241 https://openalex.org/W4387316167 https://openalex.org/W2075140181 outside  
-      1242 https://openalex.org/W4387316167 https://openalex.org/W2076450330 outside  
-      1243 https://openalex.org/W4387316167 https://openalex.org/W2078396654 outside  
-      1244 https://openalex.org/W4387316167 https://openalex.org/W2080561126 outside  
-      1245 https://openalex.org/W4387316167 https://openalex.org/W2108883379 outside  
-      1246 https://openalex.org/W4387316167 https://openalex.org/W2109244020 outside  
-      1247 https://openalex.org/W4387316167 https://openalex.org/W2124949857 outside  
-      1248 https://openalex.org/W4387316167 https://openalex.org/W2148972377 outside  
-      1249 https://openalex.org/W4387316167 https://openalex.org/W2171622749 outside  
-      1250 https://openalex.org/W4387316167 https://openalex.org/W2416288882 outside  
-      1251 https://openalex.org/W4387316167 https://openalex.org/W2604418969 outside  
-      1252 https://openalex.org/W4387316167 https://openalex.org/W2615236232 outside  
-      1253 https://openalex.org/W4387316167 https://openalex.org/W2806865696 outside  
-      1254 https://openalex.org/W4387316167 https://openalex.org/W2886307757 outside  
-      1255 https://openalex.org/W4387316167 https://openalex.org/W2886693919 outside  
-      1256 https://openalex.org/W4387316167 https://openalex.org/W2887157521 outside  
-      1257 https://openalex.org/W4387316167 https://openalex.org/W2946979871 outside  
-      1258 https://openalex.org/W4387316167 https://openalex.org/W2947689917 outside  
-      1259 https://openalex.org/W4387316167 https://openalex.org/W2947920450 outside  
-      1260 https://openalex.org/W4387316167 https://openalex.org/W2953926227 outside  
-      1261 https://openalex.org/W4387316167 https://openalex.org/W2967722518 outside  
-      1262 https://openalex.org/W4387316167 https://openalex.org/W2968473406 outside  
-      1263 https://openalex.org/W4387316167 https://openalex.org/W3013322209 outside  
-      1264 https://openalex.org/W4387316167 https://openalex.org/W3013638393 outside  
-      1265 https://openalex.org/W4387316167 https://openalex.org/W3013793288 outside  
-      1266 https://openalex.org/W4387316167 https://openalex.org/W3015713034 outside  
-      1267 https://openalex.org/W4387316167 https://openalex.org/W3098543566 outside  
-      1268 https://openalex.org/W4387316167 https://openalex.org/W3098880357 outside  
-      1269 https://openalex.org/W4387316167 https://openalex.org/W3160543801 outside  
-      1270 https://openalex.org/W4387316167 https://openalex.org/W4200619326 outside  
-      1271 https://openalex.org/W4387316167 https://openalex.org/W4213009331 outside  
-      1272 https://openalex.org/W4387316167 https://openalex.org/W4225253269 outside  
-      1273 https://openalex.org/W4387316167 https://openalex.org/W4225575967 outside  
-      1274 https://openalex.org/W4387316167 https://openalex.org/W4229027214 outside  
-      1275 https://openalex.org/W4387316167 https://openalex.org/W4230856239 outside  
-      1276 https://openalex.org/W4387316167 https://openalex.org/W4242069725 outside  
-      1277 https://openalex.org/W4387316167 https://openalex.org/W4245785204 outside  
-      1278 https://openalex.org/W4387316167 https://openalex.org/W4245885733 outside  
-      1279 https://openalex.org/W4387316167 https://openalex.org/W4281653448 outside  
-      1280 https://openalex.org/W4387316167 https://openalex.org/W4306317389 outside  
-      1281 https://openalex.org/W4387316167 https://openalex.org/W60686164   outside  
-      1282 https://openalex.org/W4387316167 https://openalex.org/W63485078   outside  
-      1283 https://openalex.org/W91322025   https://openalex.org/W1559838295 outside  
-      1284 https://openalex.org/W91322025   https://openalex.org/W1605860798 outside  
-      1285 https://openalex.org/W91322025   https://openalex.org/W186897643  outside  
-      1286 https://openalex.org/W91322025   https://openalex.org/W1996250712 outside  
-      1287 https://openalex.org/W91322025   https://openalex.org/W2002664886 outside  
-      1288 https://openalex.org/W91322025   https://openalex.org/W2028473264 outside  
-      1289 https://openalex.org/W91322025   https://openalex.org/W2093506210 outside  
-      1290 https://openalex.org/W91322025   https://openalex.org/W2101390659 outside  
-      1291 https://openalex.org/W91322025   https://openalex.org/W2154498027 outside  
-      1292 https://openalex.org/W91322025   https://openalex.org/W2166706824 outside  
-      1293 https://openalex.org/W91322025   https://openalex.org/W2168190036 outside  
-      1294 https://openalex.org/W91322025   https://openalex.org/W2320766222 outside  
-      1295 https://openalex.org/W91322025   https://openalex.org/W2321621029 outside  
+      # A tibble: 45 x 3
+         from        to          edge_type
+         <chr>       <chr>       <chr>    
+       1 W3045921891 W1500530942 core     
+       2 W3045921891 W1516819724 core     
+       3 W3045921891 W1525595230 core     
+       4 W3045921891 W1572136682 core     
+       5 W3045921891 W1854214752 core     
+       6 W3045921891 W1909800943 core     
+       7 W3045921891 W205532704  core     
+       8 W3045921891 W2091406001 core     
+       9 W3045921891 W2096537696 core     
+      10 W3045921891 W2153579005 core     
+      11 W3045921891 W2166481425 core     
+      12 W3045921891 W2250539671 core     
+      13 W3045921891 W2251249502 core     
+      14 W3045921891 W2251861449 core     
+      15 W3045921891 W2251869843 core     
+      16 W3045921891 W2252212014 core     
+      17 W3045921891 W2442495973 core     
+      18 W3045921891 W2462443510 core     
+      19 W3045921891 W2525778437 core     
+      20 W3045921891 W2577479404 core     
+      21 W3045921891 W2593028313 core     
+      22 W3045921891 W2741809807 core     
+      23 W3045921891 W2807650837 core     
+      24 W3045921891 W2810053269 core     
+      25 W3045921891 W2849933844 core     
+      26 W3045921891 W2891066092 core     
+      27 W3045921891 W2896826974 core     
+      28 W3045921891 W2911997761 core     
+      29 W3045921891 W2936368166 core     
+      30 W3045921891 W2962739339 core     
+      31 W3045921891 W2963090765 core     
+      32 W3045921891 W2963118869 core     
+      33 W3045921891 W2963341956 core     
+      34 W3045921891 W296960487  core     
+      35 W3045921891 W3101913037 core     
+      36 W3045921891 W618607536  core     
+      37 W3045921891 W91322025   core     
+      38 W3046863325 W1996515099 core     
+      39 W3046863325 W2741809807 core     
+      40 W3046863325 W2766528118 core     
+      41 W3046863325 W2938946739 core     
+      42 W3046863325 W2965202507 core     
+      43 W4293919086 W3046863325 core     
+      44 W4311043552 W3046863325 core     
+      45 W4387316167 W3046863325 core     
     Code
-      print(nodes_diff)
+      print(nodes_diff, n = Inf)
     Output
       # A tibble: 0 x 2
       # i 2 variables: id <chr>, oa_input <lgl>
     Code
-      print(edges_diff)
+      print(edges_diff, n = Inf)
     Output
       # A tibble: 0 x 3
       # i 3 variables: from <chr>, to <chr>, edge_type <chr>

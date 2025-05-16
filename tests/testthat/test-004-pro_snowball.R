@@ -1,44 +1,44 @@
 library(testthat)
+library(vdiffr)
 suppressPackageStartupMessages(library(dplyr))
 
 output_dir <- file.path(tempdir(), "snowball")
 unlink(output_dir, recursive = TRUE, force = TRUE)
 
 test_that("pro_snowball", {
-  # Convert to parquet
+  # openalexPro
   output_dir <- pro_snowball(
     identifier = c("W3045921891", "W3046863325"),
     output = output_dir,
     verbose = FALSE
   )
 
+  results_openalexPro <- read_snowball(
+    file.path(output_dir),
+    return_data = TRUE,
+    shorten_ids = TRUE,
+    edge_type = "core"
+  )
+
+  # openalexR
   results_openalexR <- openalexR::oa_snowball(
     identifier = c("W3045921891", "W3046863325"),
     verbose = FALSE
   )
 
   results_openalexR$nodes <- results_openalexR$nodes |>
-    dplyr::arrange(id) |>
-    dplyr::mutate(
-      id = paste0("https://openalex.org/", id)
+    dplyr::arrange(
+      dplyr::desc(oa_input),
+      id
     )
 
   results_openalexR$edges <- results_openalexR$edges |>
-    dplyr::arrange(from, to) |>
-    dplyr::mutate(
-      from = paste0("https://openalex.org/", from),
-      to = paste0("https://openalex.org/", to)
+    dplyr::arrange(
+      from,
+      to
     )
 
-  results_openalexPro <- read_snowball(
-    file.path(output_dir),
-    return_data = FALSE
-  )
-
-  results_openalexPro <- read_snowball(
-    file.path(output_dir),
-    return_data = TRUE
-  )
+  # Comparison
 
   nodes_diff <- dplyr::anti_join(
     results_openalexPro$nodes |> dplyr::select(id, oa_input),
@@ -49,7 +49,7 @@ test_that("pro_snowball", {
   edges_diff <- dplyr::anti_join(
     results_openalexPro$edges |> dplyr::filter(edge_type == "core"),
     results_openalexR$edges,
-    by = join_by(from, to)
+    by = dplyr::join_by(from, to)
   )
 
   # Check that the output file contains the expected data structure
@@ -64,6 +64,34 @@ test_that("pro_snowball", {
     names(results_openalexPro$edges) |>
       sort()
 
+    read_snowball(
+      file.path(output_dir),
+      return_data = TRUE,
+      shorten_ids = TRUE,
+      edge_type = "core"
+    )
+
+    read_snowball(
+      file.path(output_dir),
+      return_data = TRUE,
+      shorten_ids = TRUE,
+      edge_type = "extended"
+    )
+
+    read_snowball(
+      file.path(output_dir),
+      return_data = TRUE,
+      shorten_ids = TRUE,
+      edge_type = c("extended", "core")
+    )
+
+    read_snowball(
+      file.path(output_dir),
+      return_data = TRUE,
+      shorten_ids = TRUE,
+      edge_type = "outside"
+    )
+
     results_openalexPro$nodes |>
       dplyr::select(id, oa_input, relation) |>
       dplyr::arrange(oa_input, relation) |>
@@ -75,8 +103,8 @@ test_that("pro_snowball", {
       dplyr::collect() |>
       print(n = Inf)
 
-    print(nodes_diff)
-    print(edges_diff)
+    print(nodes_diff, n = Inf)
+    print(edges_diff, n = Inf)
   })
 
   # Check nodes
@@ -91,6 +119,22 @@ test_that("pro_snowball", {
 
   # Check that the output file contains the expected data
   # expect_snapshot_file(file.path(output_dir, "results_page_1.json"))
+
+  # Compare plot_snowball
+
+  plot_pro <- plot_snowball(snowball = results_openalexPro)
+  plot_r <- plot_snowball(snowball = results_openalexR)
+
+  test_that("snowball plots have visually not changed", {
+    vdiffr::expect_doppelganger("Snowball-plot-Pro", plot_pro)
+    vdiffr::expect_doppelganger("Snowball-plot-R", plot_r)
+  })
+
+  # Assert that both plots look the same by giving them the same label
+  # test_that("snowball plots are visually the same", {
+  #   vdiffr::expect_doppelganger("Snowball-identical-plot", plot_pro)
+  #   vdiffr::expect_doppelganger("Snowball-identical-plot", plot_r)
+  # })
 })
 
 unlink(output_dir, recursive = TRUE, force = TRUE)

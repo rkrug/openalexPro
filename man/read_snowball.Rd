@@ -6,14 +6,21 @@
 \usage{
 read_snowball(
   snowball = NULL,
-  edge_type = c("core", "extended"),
-  return_data = FALSE
+  edge_type = c("core", "extended", "outside"),
+  return_data = FALSE,
+  shorten_ids = TRUE
 )
 }
 \arguments{
 \item{snowball}{The directory of the Parquet files as poppulater by \code{pro_snowball()}.}
 
-\item{edge_type}{description}
+\item{edge_type}{type of the returned edges. Possible values are:
+\itemize{
+\item \strong{\code{core}}: only edges from or to the keypapers are selected
+\item \strong{\code{extended}}, only edges between the \code{nodes} are selected (this includes \code{core} edges)
+\item \strong{\code{outside}}: only  edges where either the \code{from} ot=r the \code{to} is not in \code{nodes}
+multiple are allowed.
+}}
 
 \item{return_data}{Logical indicating whether to return an
 \code{ArrowObject} representing the corpus (default) or a

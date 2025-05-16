@@ -4,7 +4,11 @@
 #' nodes and edges, which can be either Arrow Datasets or `tibble`s.
 #'
 #' @param snowball The directory of the Parquet files as poppulater by `pro_snowball()`.
-#' @param edge_type description
+#' @param edge_type type of the returned edges. Possible values are:
+#'    - **`core`**: only edges from or to the keypapers are selected
+#'    - **`extended`**, only edges between the `nodes` are selected (this includes `core` edges)
+#'    - **`outside`**: only  edges where either the `from` ot=r the `to` is not in `nodes`
+#' multiple are allowed.
 #' @param return_data Logical indicating whether to return an
 #'   `ArrowObject` representing the corpus (default) or a
 #'   `tibble` containing the whole corpus shou,d be returned.
@@ -14,7 +18,7 @@
 #'
 #' @md
 #'
-#' @importFrom dplyr filter select collect
+#' @importFrom dplyr filter select collect arrange desc
 #'
 #' @export
 read_snowball <- function(
@@ -31,12 +35,19 @@ read_snowball <- function(
     stop("Directory `snowball` does not exist!")
   }
 
-  edge_type <- match.arg(edge_type)
+  edge_type <- match.arg(edge_type, several.ok = TRUE)
+
+  # Nodes ------------------------------------------------------------------
 
   nodes <- read_corpus(
     corpus = file.path(snowball, "nodes"),
     return_data = FALSE
-  )
+  ) |>
+    dplyr::arrange(
+      dplyr::desc(oa_input),
+      id
+    )
+
   if (shorten_ids) {
     nodes <- nodes |>
       dplyr::mutate(
@@ -44,13 +55,20 @@ read_snowball <- function(
       )
   }
 
+  # Edges ------------------------------------------------------------------
+
   edges <- read_corpus(
     corpus = file.path(snowball, "edges"),
     return_data = FALSE
   ) |>
     dplyr::filter(
-      edge_type == .env$edge_type
+      edge_type %in% .env$edge_type
+    ) |>
+    dplyr::arrange(
+      from,
+      to
     )
+
   if (shorten_ids) {
     edges <- edges |>
       dplyr::mutate(
@@ -59,10 +77,14 @@ read_snowball <- function(
       )
   }
 
+  # Collect or not ---------------------------------------------------------
+
   if (return_data) {
     nodes <- dplyr::collect(nodes)
     edges <- dplyr::collect(edges)
   }
+
+  # Return -----------------------------------------------------------------
 
   return(
     list(

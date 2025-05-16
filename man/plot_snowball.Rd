@@ -7,16 +7,14 @@
 plot_snowball(
   snowball,
   size = "cited_by_count_by_year",
-  name = "Snowball",
-  path = NULL
+  label = "citation",
+  title = "Snowball"
 )
 }
 \arguments{
 \item{snowball}{A snowball object containing the data to be plotted.}
 
 \item{name}{The name to be used in the plot titles and file names.}
-
-\item{path}{The path where the plot files will be saved. Default is "figures".}
 }
 \value{
 No return value, called for side effects.
