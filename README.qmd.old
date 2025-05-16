@@ -5,6 +5,10 @@ author: Rainer M Krug
 format: gfm
 ---
 
+# This does not apply to the branch `openalexPro_2`!
+
+==================
+
 # This Package is experimental - use at own risk, but please let me know if things do not work!
 
 # openalexPro
@@ -62,7 +66,6 @@ At the moment installation is opnly possible vi github:
 ```{r}
 #| eval: false
 
-
 #### If pak is not installed install it by running
 ## install.packages(pak)
 
@@ -99,7 +102,6 @@ If you do not need the json files, you can ommit the argument `json_dir` and a t
 
 ```{r}
 #| eval: false
-
 
 res <- oa_query(
   title_and_abstract.search = "biodiversity AND conservation AND IPBES",
