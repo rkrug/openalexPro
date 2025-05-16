@@ -14,7 +14,13 @@ plot_snowball(
 \arguments{
 \item{snowball}{A snowball object containing the data to be plotted.}
 
-\item{name}{The name to be used in the plot titles and file names.}
+\item{size}{The size of the nodes in the plot. Can be either a coumn name from snowball$nodes, "cited_by_count_by_year" or a numeric value.
+If "cited_by_count_by_year", the size is calculated by dividing the number of citations by the number of years.
+If numeric, the size of the nodes is set to the value.}
+
+\item{label}{The label of the nodes in the plot. If not specified, the id of the nodes is used.}
+
+\item{title}{The title of the plots.}
 }
 \value{
 No return value, called for side effects.

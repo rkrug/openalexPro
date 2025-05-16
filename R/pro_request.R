@@ -28,6 +28,8 @@
 #'
 #' @importFrom openalexR oa_request
 #' @importFrom utils tail
+#' @importFrom httr2 req_url_query req_perform resp_body_json resp_body_string
+#' @importFrom utils setTxtProgressBar txtProgressBar
 #'
 #' @export
 #'
@@ -187,38 +189,3 @@ pro_request <- function(
 
   return(output)
 }
-
-# TODO
-# This is the error handling from openalexR::api_request()
-# Something like this needs to be included!!!
-#
-# if (httr::status_code(res) == 400) {
-#     stop("HTTP status 400 Request Line is too large")
-# }
-# if (httr::status_code(res) == 429) {
-#     message("HTTP status 429 Too Many Requests")
-#     return(empty_res)
-# }
-# if (httr::status_code(res) == 503) {
-#     mssg <- regmatches(m, regexpr("(?<=<title>).*?(?=<\\/title>)",
-#         m, perl = TRUE))
-#     message(mssg, ". Please try setting `per_page = 25` in your function call!")
-#     return(empty_res)
-# }
-# if (httr::status_code(res) == 200) {
-#     if (httr::http_type(res) != "application/json") {
-#         stop("API did not return json", call. = FALSE)
-#     }
-#     return(m)
-# }
-# if (httr::http_error(res)) {
-#     parsed <- jsonlite::fromJSON(m, simplifyVector = FALSE)
-#     stop(sprintf("OpenAlex API request failed [%s]\n%s\n<%s>",
-#         httr::status_code(res), parsed$error, parsed$message),
-#         call. = FALSE)
-# }
-# if (httr::status_code(res) != 429 & httr::status_code(res) !=
-#     200) {
-#     message("HTTP status ", httr::status_code(res))
-#     return(empty_res)
-# }

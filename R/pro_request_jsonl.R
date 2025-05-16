@@ -3,14 +3,14 @@
 #'
 #' The function takes a directory of JSON files as written from a call to `pro_request(..., output = "FOLDER")`
 #' and is preparing the json files to be processed further using DuckDB. See
-#' @details See \link[jq_execute]{jq_execute} or the vignette\link[vignette:jq]{Expanding Abstracts and Adding Citations Using jq}
+#' @details See \code{\link{jq_execute}} or the vignette \link[vignette:jq]{Expanding Abstracts and Adding Citations Using jq}
 #'  for more information on the conversion of the JSON files.
 #'
 #' @param input_json The directory of JSON files returned from `pro_request(..., json_dir = "FOLDER")`.
 #' @param output output directory for the jsonl files as created by calls to `jq_execute().
 #' @param add_columns List of additional fields to be added to the output. They nave to be provided as a
 #'   named list, e./g. `list(column_1 = "value_1", column_2 = 2)`. Only Scalar values are supported.
-#' @param overwrite Logical indicating whether to overwrite `poutput_jsonl` and `output_nn`.
+#' @param overwrite Logical indicating whether to overwrite `output`.
 #' @param verbose Logical indicating whether to show a verbose information. Defaults to `TRUE`
 #' @param delete_input Determines if the `input_json` should be deleted afterwards. Defaults to `FALSE`.
 #' @param jq_path Path to the jq executable (default: "jq")
@@ -30,7 +30,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' source_to_parquet(input_json = "json", source_type = "snapshot", poutput_jsonl = "arrow")
+#' source_to_parquet(input_json = "json", source_type = "snapshot", output = "arrow")
 #' }
 #' @export
 
@@ -135,7 +135,7 @@ pro_request_jsonl <- function(
         jsonl <- file.path(output, basename(fn))
         jq_execute(
           input_json = fn,
-          output_json = jsonl,
+          output_jsonl = jsonl,
           add_columns = add_columns,
           jq_path = jq_path,
           jq_filter = NULL,

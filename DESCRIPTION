@@ -1,7 +1,7 @@
 Type: Package
 Package: openalexPro
 Title: Providing a more advanced access to OpenAlex for the power user
-Version: 0.6.99
+Version: 0.7.99
 Date: 2024-09-19
 Author: Rainer M Krug
 Maintainer: Rainer M Krug <Rainer@krugs.de>
@@ -13,23 +13,22 @@ Imports:
     arrow,
     DBI,
     dplyr,
-    DT,
     duckdb,
     ggplot2,
     ggraph,
+    httr, 
     httr2,
-    openalexR (>= 1.4.0),
-    RcppSimdJson,
+    openalexR (>= 1.4.0), httr, 
     rlang,
-    tibble,
     sys,
-    tictoc,
     tidygraph
 Suggests: 
     knitr,
     rmarkdown,
     testthat (>= 3.0.0),
-    quarto
+    jsonlite,
+    quarto,
+    vdiffr
 SystemRequirements: jq (https://stedolan.github.io/jq/)Config/testthat/edition: 3
 Encoding: UTF-8
 RoxygenNote: 7.3.2

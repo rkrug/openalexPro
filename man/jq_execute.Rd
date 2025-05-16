@@ -39,5 +39,5 @@ if type = "single"), reconstruct the abstract text, generate a citation string, 
 add a page field. It writes the result as newline-delimited JSON (.jsonl), suitable for Arrow or DuckDB.
 }
 \details{
-For details on the jq filter logic, see the vignette: `vignette("jq", package = "yourpackagename")`
+For details on the jq filter logic, see the vignette: \link[vignette:jq]{Expanding Abstracts and Adding Citations Using jq}`
 }

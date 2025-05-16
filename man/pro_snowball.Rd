@@ -20,8 +20,6 @@ pro_snowball(
 \item{output}{parquet dataset; default: temporary directory.}
 
 \item{verbose}{Logical indicating whether to show a verbose information. Defaults to \code{FALSE}}
-
-\item{partition}{The column which should be used to partition the datasets usoing hive partitioning.}
 }
 \value{
 A list containing 2 elements:

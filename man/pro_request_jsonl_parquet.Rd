@@ -32,11 +32,9 @@ named list, e./g. \code{list(column_1 = "value_1", column_2 = 2)}. Only Scalar v
 \item{delete_input}{Determines if the \code{input_jsonl} should be deleted afterwards. Defaults to \code{FALSE}.}
 
 \item{jq_path}{Path to the jq executable (default: "jq")}
-
-\item{output_jsonl}{output directory for the jsonl files as created by calls to `jq_execute().}
 }
 \value{
-The function does returns the output_jsonl invisibly.
+The function does returns the output invisibly.
 }
 \description{
 The function takes a directory of JSON files as written from a call to \code{pro_request(..., json_dir = "FOLDER")}

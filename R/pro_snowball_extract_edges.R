@@ -1,8 +1,8 @@
 #' A function to extract the edges from a parquet database containing the nodes
 #'
-#' @param identifier Character vector of openalex identifiers.
-#' @param doi Character vector of dois.
-#' @param output parquet dataset; default: temporary directory.
+#' @param nodes Path to the nodes parquet dataset
+#' @param output output folder, in which the parquet database containing the edges called `edges` will be savedp
+#'   default: temporary directory.
 #' @param verbose Logical indicating whether to show a verbose information. Defaults to `FALSE`
 #'
 #' @return A list containing 2 elements:

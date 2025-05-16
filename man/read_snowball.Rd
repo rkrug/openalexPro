@@ -18,13 +18,15 @@ read_snowball(
 \itemize{
 \item \strong{\code{core}}: only edges from or to the keypapers are selected
 \item \strong{\code{extended}}, only edges between the \code{nodes} are selected (this includes \code{core} edges)
-\item \strong{\code{outside}}: only  edges where either the \code{from} ot=r the \code{to} is not in \code{nodes}
+\item \strong{\code{outside}}: only  edges where either the \code{from} or the \code{to} is not in \code{nodes}
 multiple are allowed.
 }}
 
 \item{return_data}{Logical indicating whether to return an
 \code{ArrowObject} representing the corpus (default) or a
 \code{tibble} containing the whole corpus shou,d be returned.}
+
+\item{shorten_ids}{If \code{TRUE} the ids will be shortened, i.e. the part \verb{https://openalex.org/} will be removed}
 }
 \value{
 A list containing two elements: nodes and edges, which are either

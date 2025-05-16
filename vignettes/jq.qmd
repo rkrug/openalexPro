@@ -4,7 +4,7 @@ format:
   pdf:
     toc: false
 vignette: >
-  %\VignetteIndexEntry{Vignette's Title}
+  %\VignetteIndexEntry{Expanding Abstracts and Adding Citations Using jq}
   %\VignetteEngine{quarto::pdf}
   %\VignetteEncoding{UTF-8}
 execute: 

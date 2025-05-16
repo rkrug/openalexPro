@@ -3,7 +3,6 @@
 #' @param identifier Character vector of openalex identifiers.
 #' @param doi Character vector of dois.
 #' @param output parquet dataset; default: temporary directory.
-#' @param partition The column which should be used to partition the datasets usoing hive partitioning.
 #' @param verbose Logical indicating whether to show a verbose information. Defaults to `FALSE`
 #'
 #' @return A list containing 2 elements:

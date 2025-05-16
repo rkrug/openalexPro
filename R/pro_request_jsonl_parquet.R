@@ -5,7 +5,6 @@
 #' and converts it to a Apache Parquet dataset partitiond by the page.
 #'
 #' @param input_jsonl The directory of JSON files returned from `pro_request(..., json_dir = "FOLDER")`.
-#' @param output_jsonl output directory for the jsonl files as created by calls to `jq_execute().
 #' @param output output  directory for the parquet dataset; default: temporary directory.
 #' @param add_columns List of additional fields to be added to the output. They nave to be provided as a
 #'   named list, e./g. `list(column_1 = "value_1", column_2 = 2)`. Only Scalar values are supported.
@@ -15,7 +14,7 @@
 #' @param delete_input Determines if the `input_jsonl` should be deleted afterwards. Defaults to `FALSE`.
 #' @param jq_path Path to the jq executable (default: "jq")
 #'
-#' @return The function does returns the output_jsonl invisibly.
+#' @return The function does returns the output invisibly.
 #'
 #' @details The function uses DuckDB to read the JSON files and to create the
 #'   Apache Parquet files. The function creates a DuckDB connection in memory and

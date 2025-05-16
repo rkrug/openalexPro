@@ -11,13 +11,12 @@ pro_snowball_extract_edges(
 )
 }
 \arguments{
-\item{output}{parquet dataset; default: temporary directory.}
+\item{nodes}{Path to the nodes parquet dataset}
+
+\item{output}{output folder, in which the parquet database containing the edges called \code{edges} will be savedp
+default: temporary directory.}
 
 \item{verbose}{Logical indicating whether to show a verbose information. Defaults to \code{FALSE}}
-
-\item{identifier}{Character vector of openalex identifiers.}
-
-\item{doi}{Character vector of dois.}
 }
 \value{
 A list containing 2 elements:
