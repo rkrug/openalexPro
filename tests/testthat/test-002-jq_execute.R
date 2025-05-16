@@ -1,5 +1,4 @@
 library(testthat)
-library(jsonlite)
 
 testthat::test_that("jq_execute correctly applies jq filter and writes output to JSONL file", {
   skip_if_not(jq_check())

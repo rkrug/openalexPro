@@ -9,7 +9,6 @@
 #' @param add_columns List of additional fields to be added to the output. They nave to be provided as a
 #'   named list, e./g. `list(column_1 = "value_1", column_2 = 2)`. Only Scalar values are supported.
 #' @param overwrite Logical indicating whether to overwrite `output`.
-#' @param normalize_parquet If `normalize_parquet()` should be run at the end. Default: `TRUE`
 #' @param verbose Logical indicating whether to show a verbose information. Defaults to `TRUE`
 #' @param delete_input Determines if the `input_jsonl` should be deleted afterwards. Defaults to `FALSE`.
 #' @param jq_path Path to the jq executable (default: "jq")
@@ -38,7 +37,6 @@ pro_request_jsonl_parquet <- function(
   output = NULL,
   add_columns = list(),
   overwrite = FALSE,
-  normalize_parquet = TRUE,
   verbose = TRUE,
   delete_input = FALSE,
   jq_path = "jq"

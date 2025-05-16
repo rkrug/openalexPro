@@ -9,7 +9,6 @@ pro_request_jsonl_parquet(
   output = NULL,
   add_columns = list(),
   overwrite = FALSE,
-  normalize_parquet = TRUE,
   verbose = TRUE,
   delete_input = FALSE,
   jq_path = "jq"
@@ -24,8 +23,6 @@ pro_request_jsonl_parquet(
 named list, e./g. \code{list(column_1 = "value_1", column_2 = 2)}. Only Scalar values are supported.}
 
 \item{overwrite}{Logical indicating whether to overwrite \code{output}.}
-
-\item{normalize_parquet}{If \code{normalize_parquet()} should be run at the end. Default: \code{TRUE}}
 
 \item{verbose}{Logical indicating whether to show a verbose information. Defaults to \code{TRUE}}
 
