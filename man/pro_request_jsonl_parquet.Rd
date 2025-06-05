@@ -10,8 +10,7 @@ pro_request_jsonl_parquet(
   add_columns = list(),
   overwrite = FALSE,
   verbose = TRUE,
-  delete_input = FALSE,
-  jq_path = "jq"
+  delete_input = FALSE
 )
 }
 \arguments{
@@ -27,8 +26,6 @@ named list, e./g. \code{list(column_1 = "value_1", column_2 = 2)}. Only Scalar v
 \item{verbose}{Logical indicating whether to show a verbose information. Defaults to \code{TRUE}}
 
 \item{delete_input}{Determines if the \code{input_jsonl} should be deleted afterwards. Defaults to \code{FALSE}.}
-
-\item{jq_path}{Path to the jq executable (default: "jq")}
 }
 \value{
 The function does returns the output invisibly.

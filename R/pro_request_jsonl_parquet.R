@@ -11,7 +11,6 @@
 #' @param overwrite Logical indicating whether to overwrite `output`.
 #' @param verbose Logical indicating whether to show a verbose information. Defaults to `TRUE`
 #' @param delete_input Determines if the `input_jsonl` should be deleted afterwards. Defaults to `FALSE`.
-#' @param jq_path Path to the jq executable (default: "jq")
 #'
 #' @return The function does returns the output invisibly.
 #'
@@ -38,8 +37,7 @@ pro_request_jsonl_parquet <- function(
   add_columns = list(),
   overwrite = FALSE,
   verbose = TRUE,
-  delete_input = FALSE,
-  jq_path = "jq"
+  delete_input = FALSE
 ) {
   # Argument Checks --------------------------------------------------------
 

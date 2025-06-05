@@ -29,7 +29,7 @@ Suggests:
     testthat (>= 3.0.0),
     quarto,
     vdiffr
-SystemRequirements: jq (https://stedolan.github.io/jq/)Config/testthat/edition: 3
+SystemRequirements: jq (https://stedolan.github.io/jq/)
 Encoding: UTF-8
 RoxygenNote: 7.3.2
 VignetteBuilder: quarto
