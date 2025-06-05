@@ -85,12 +85,16 @@ test_that("pro_request_jsonl_parquet search `biodiversity AND finance`", {
       dplyr::select(id) |>
       dplyr::collect()
 
-    data.frame(
-      openalexR = (results_openalexR$id |>
-        sort()),
-      openalexPro = (results_openalexPro$id |>
-        sort())
-    ) |>
+    setdiff(results_openalexR$id, results_openalexPro$id) |>
+      sort() |>
+      print()
+
+    setdiff(results_openalexPro$id, results_openalexR$id) |>
+      sort() |>
+      print()
+
+    intersect(results_openalexPro$id, results_openalexR$id) |>
+      sort() |>
       print()
   })
 

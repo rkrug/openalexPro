@@ -94,6 +94,12 @@ jq_execute <- function(
     jq_filter <- paste0(jq_filter, " | . + {page: ", page, "}")
   }
 
+  # jqr::jq(
+  #   file(input_json),
+  #   jq_filter,
+  #   out = output_jsonl
+  # )
+
   res <- sys::exec_internal(
     jq_path,
     args = c("-c", jq_filter, input_json)

@@ -2,7 +2,7 @@
   # packageStartupMessage("Thank you for using mypackage! 🚀")
   packageStartupMessage(
     "
-      This package is in alpha phase and WILL change!
+      This package is in alpha phase (despite its version number...)and WILL change!
 
       Use at own risk (as usual)!
     "
