@@ -17,3 +17,5 @@
 ^snowball$
 ^inst/compatibility_cache$
 ^inst/compatibility$
+^doc$
+^Meta$

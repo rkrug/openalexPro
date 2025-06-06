@@ -17,6 +17,7 @@ Imports:
     ggplot2,
     ggraph,
     httr2,
+    jsonlite,
     openalexR (>= 1.4.0),
     rlang,
     sys,

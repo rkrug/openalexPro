@@ -90,7 +90,10 @@ pro_request <- function(
       mailto = mailto,
       api_key = api_key
     ) |>
-    httr2::req_user_agent("https://github.com/rkrug/openalexPro2")
+    httr2::req_user_agent(paste0(
+      "openalexPro2 v",
+      packageVersion("openalexPro2")
+    ))
 
   # Remove empty query parameters
   # req$url$query <- req$url$query[req$url$query != ""]
@@ -98,11 +101,12 @@ pro_request <- function(
   # Initialize results and page counter
   page <- 1
 
-  resp <- req |>
-    httr2::req_perform()
+  # resp <- httr2::req_perform(req)
+  resp <- api_call(req)
 
   data <- resp |>
     httr2::resp_body_json()
+
   if (is.null(data$meta)) {
     single_record <- TRUE
     page_prefix <- "single_"
@@ -144,7 +148,8 @@ pro_request <- function(
         setTxtProgressBar(pb, page) # Update progress bar
       }
 
-      resp <- httr2::req_perform(req)
+      # resp <- httr2::req_perform(req)
+      resp <- api_call(req)
 
       data <- httr2::resp_body_json(resp)
 
