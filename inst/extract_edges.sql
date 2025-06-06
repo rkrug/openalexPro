@@ -1,5 +1,6 @@
 --
 -- nodes table or view
+-- CREATE VIEW nodes AS SELECT * FROM read_parquet('FOLDER/**/*.parquet');
 -- NEEDS TO BE IN THE DATABASE ALREADY
 --
 CREATE OR REPLACE VIEW keypaper AS

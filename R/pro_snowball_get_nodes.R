@@ -148,14 +148,6 @@ pro_snowball_get_nodes <- function(
         relation = "citing"
       ),
       verbose = verbose
-    ) |>
-    pro_request_jsonl_parquet(
-      output = file.path(output, "citing_parquet"),
-      add_columns = list(
-        oa_input = FALSE,
-        relation = "citing"
-      ),
-      verbose = verbose
     )
 
   # fetching documents cited by the keypapers (outgoing - from: keypaper )-----------------------
@@ -181,14 +173,6 @@ pro_snowball_get_nodes <- function(
         relation = "cited"
       ),
       verbose = verbose
-    ) |>
-    pro_request_jsonl_parquet(
-      output = file.path(output, "cited_parquet"),
-      add_columns = list(
-        oa_input = FALSE,
-        relation = "citing"
-      ),
-      verbose = verbose
     )
 
   # Combine individualparquet databases to nodes_parquet -----------------------------------
@@ -199,7 +183,7 @@ pro_snowball_get_nodes <- function(
         SELECT 
           * REPLACE (CAST(oa_input AS BOOLEAN) AS oa_input)
         FROM 
-        read_parquet(
+        read_json_auto(
           ['%s', '%s','%s'],
           union_by_name = true
         )
@@ -207,9 +191,9 @@ pro_snowball_get_nodes <- function(
         '%s'
         (FORMAT PARQUET, COMPRESSION SNAPPY, APPEND, PARTITION_BY 'relation')
       ",
-    file.path(output, "keypaper_parquet", "**", "*.parquet"),
-    file.path(output, "cited_parquet", "**", "*.parquet"),
-    file.path(output, "citing_parquet", "**", "*.parquet"),
+    file.path(output, "keypaper_jsonl", "**", "*.json"),
+    file.path(output, "cited_jsonl", "**", "*.json"),
+    file.path(output, "citing_jsonl", "**", "*.json"),
     file.path(output, "nodes")
   ) |>
     DBI::dbExecute(conn = con)
