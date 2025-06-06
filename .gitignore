@@ -48,3 +48,4 @@ corpus.parquet
 inst/tca_corpus_complete.plantuml
 inst/doc
 tmp.txt
+tests/fixtures/vcr/vcr.log
