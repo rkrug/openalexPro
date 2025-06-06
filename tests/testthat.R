@@ -9,4 +9,4 @@
 library(testthat)
 library(openalexPro2)
 
-test_check("openalexPro")
+test_check("openalexPro2")

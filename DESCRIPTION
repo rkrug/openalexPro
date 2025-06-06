@@ -16,13 +16,12 @@ Imports:
     duckdb,
     ggplot2,
     ggraph,
-    httr, 
     httr2,
-    jqr,
-    openalexR (>= 1.4.0), httr, 
+    openalexR (>= 1.4.0),
     rlang,
     sys,
-    tidygraph
+    tidygraph,
+    tidyselect
 Suggests: 
     knitr,
     rmarkdown,

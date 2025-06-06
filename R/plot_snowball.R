@@ -18,6 +18,7 @@
 #' @importFrom ggplot2 aes after_stat scale_size scale_fill_manual theme element_rect guides ggtitle ggsave guide_legend
 #' @importFrom rlang sym
 #' @importFrom utils hasName
+#' @importFrom tidyselect all_of
 #'
 #' @examples
 #' \dontrun{
@@ -48,8 +49,8 @@ plot_snowball <- function(
             name = id,
             type,
             oa_input,
-            all_of(size),
-            all_of(label)
+            tidyselect::all_of(size),
+            tidyselect::all_of(label)
         )
 
     snowball$edges <- snowball$edges |>

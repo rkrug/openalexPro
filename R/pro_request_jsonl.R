@@ -3,7 +3,7 @@
 #'
 #' The function takes a directory of JSON files as written from a call to `pro_request(..., output = "FOLDER")`
 #' and is preparing the json files to be processed further using DuckDB. See
-#' @details See \code{\link{jq_execute}} or the vignette \link[vignette:jq]{Expanding Abstracts and Adding Citations Using jq}
+#' @details See \code{\link{jq_execute}} or the \code{\link{vignette}}("jq", package = "openalexPro2")
 #'  for more information on the conversion of the JSON files.
 #'
 #' @param input_json The directory of JSON files returned from `pro_request(..., json_dir = "FOLDER")`.

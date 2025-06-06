@@ -12,7 +12,7 @@ snapshot:
 arrow: clean_arrow
 	Rscript \
 	-e 'library(openalexPro)' \
-	-e 'openalexPro::snapshot_to_parquet(snapshot_dir = "'${SNAPSHOTDIR}'", arrow_dir = "'${ARROWDIR}'")'
+	-e 'openalexPro2::snapshot_to_parquet(snapshot_dir = "'${SNAPSHOTDIR}'", arrow_dir = "'${ARROWDIR}'")'
 
 clean_arrow:
 	rm -rf ${ARROWDIR}

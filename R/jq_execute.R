@@ -3,8 +3,7 @@
 #' This function runs a jq filter to extract records from the "results" array (or from the root
 #' if type = "single"), reconstruct the abstract text, generate a citation string, and optionally
 #' add a page field. It writes the result as newline-delimited JSON (.jsonl), suitable for Arrow or DuckDB.
-#'
-#' For details on the jq filter logic, see the vignette: \link[vignette:jq]{Expanding Abstracts and Adding Citations Using jq}`
+#' For details on the jq filter logic, see the \code{\link{vignette}}("jq", package = "openalexPro2").
 #'
 #' @param input_json Path to the input JSON file
 #' @param output_jsonl Path to the output .jsonl file

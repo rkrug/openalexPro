@@ -10,6 +10,7 @@
 ^invertedabstract.json$
 ^json_files$
 ^README.qmd$
+^README.qmd.old$
 ^TODO.md$
 ^corpus.parquet$
 ^.vscode$

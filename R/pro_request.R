@@ -90,7 +90,7 @@ pro_request <- function(
       mailto = mailto,
       api_key = api_key
     ) |>
-    httr2::req_user_agent("https://github.com/rkrug/openalexPro")
+    httr2::req_user_agent("https://github.com/rkrug/openalexPro2")
 
   # Remove empty query parameters
   # req$url$query <- req$url$query[req$url$query != ""]
@@ -162,9 +162,9 @@ pro_request <- function(
             )
         },
         "parquet" = {
-          stop("Not yet supported putput format!")
+          stop("Not yet supported output format!")
         },
-        stop("Unsupported putput format!")
+        stop("Unsupported output format!")
       )
 
       if (is.null(data$meta$next_cursor)) {

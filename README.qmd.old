@@ -35,7 +35,7 @@ Unfortunately, it is not easily possible to download the return values
 from the api calls in `openalexR`. Therefore, the approach used here at
 the moment, is to define new functions with a few changes to the original functions:
 
-- `openalexPro::pro_request()` (based on `openalexR::oa_request()`):
+- `openalexPro2::pro_request()` (based on `openalexR::oa_request()`):
   - add argument `json_dir` to which save the json files which is
     forwarded to `openalexR:::api_request()`. if `json_dir` is `NULL`
     the return values are identical to the ones from `openalexR`,
@@ -87,7 +87,7 @@ res <- oa_query(
   title_and_abstract.search = "biodiversity AND conservation AND IPBES",
   entity = "works"
 ) |>
-  openalexPro::pro_request(
+  openalexPro2::pro_request(
     verbose = TRUE,
     json_dir = "json_files"
   ) |>
@@ -107,7 +107,7 @@ res <- oa_query(
   title_and_abstract.search = "biodiversity AND conservation AND IPBES",
   entity = "works"
 ) |>
-  openalexPro::pro_request(
+  openalexPro2::pro_request(
     verbose = TRUE
   ) |>
   source_to_parquet(

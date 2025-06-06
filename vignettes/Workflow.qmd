@@ -1,10 +1,10 @@
 ---
-title: "Workflow using `openalexPro`"
+title: "Workflow using `openalexPro2`"
 format:
   pdf:
     toc: false
 vignette: >
-  %\VignetteIndexEntry{Workflow using `openalexPro`}
+  %\VignetteIndexEntry{Workflow using `openalexPro2`}
   %\VignetteEngine{quarto::pdf}
   %\VignetteEncoding{UTF-8}
 execute: 
@@ -21,18 +21,18 @@ knitr::opts_chunk$set(
 
 # Introduction
 
-The package `openalexPro` is an extension of the package `openalexR`. The main difference is that `openalexR` does all processing in memory and returns the result as an R object, while `openalexPro` will write the results to disk. This allows for processing very large corpora.
+The package `openalexPro2` is an extension of the package `openalexR`. The main difference is that `openalexR` does all processing in memory and returns the result as an R object, while `openalexPro2` will write the results to disk. This allows for processing very large corpora.
 
 Most of the processing is done using the `duckdb` package which makes it possible tro do complex queries of the corpora without the need to load the whole corpus into memory.
 
 # Workflow
 
-The workflow when using `openalexPro` is essentially as follows:
+The workflow when using `openalexPro2` is essentially as follows:
 
 1. the function `openalexR::oa_query()` is used to build the API query for the OpenAlex API
-2. the function `openalexPro::pro_request()` is used to retrieve the results from the OpenAlex API and to store them in a folder in the format oif `json` files as returned by OpenAlex.
-3. the function `openalexPro::pro_request_jsonl()` is doing some cleaning and editing of the json files into **Json Lines**, aka **NDJSON**, which is atext file where each line is a separate JSON object. For details [see](jq.qmd)
-4. the function `openalexPro::pro_request_jsonl_parquet()` is used to convert the `json` files to a parquet database
+2. the function `openalexPro2::pro_request()` is used to retrieve the results from the OpenAlex API and to store them in a folder in the format oif `json` files as returned by OpenAlex.
+3. the function `openalexPro2::pro_request_jsonl()` is doing some cleaning and editing of the json files into **Json Lines**, aka **NDJSON**, which is atext file where each line is a separate JSON object. For details [see](jq.qmd)
+4. the function `openalexPro2::pro_request_jsonl_parquet()` is used to convert the `json` files to a parquet database
 
 
 TODO: Add plantuml graph
@@ -40,5 +40,5 @@ TODO add more info and examles
 
 
 ```{r setup}
-library(openalexPro)
+library(openalexPro2)
 ```
