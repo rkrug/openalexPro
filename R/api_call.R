@@ -8,13 +8,14 @@
 #'
 #' @importFrom httr2 req_perform resp_status resp_body_string
 #' @importFrom jsonlite fromJSON
+#' @importFrom rlang caller_env
 #'
 #' @noRd
 api_call <- function(req) {
   # Perform the request and capture errors
   resp <- httr2::req_perform(
     req,
-    error_call = caller_env()
+    error_call = rlang::caller_env()
   )
 
   status <- httr2::resp_status(resp)
@@ -37,7 +38,7 @@ api_call <- function(req) {
 
   if (status == 429) {
     stop("HTTP status 429 Too Many Requests")
-    return(empty_res)
+    # return(empty_res)
   }
 
   if (status == 503) {
@@ -46,7 +47,7 @@ api_call <- function(req) {
       regexpr("(?<=<title>).*?(?=<\\/title>)", resp_string, perl = TRUE)
     )
     stop(mssg, ". Please try setting `per_page = 25` in your function call!")
-    return(empty_res)
+    # return(empty_res)
   }
 
   # Generic error handling

@@ -29,7 +29,7 @@
 #' @importFrom openalexR oa_request
 #' @importFrom utils tail
 #' @importFrom httr2 req_url_query req_perform resp_body_json resp_body_string
-#' @importFrom utils setTxtProgressBar txtProgressBar
+#' @importFrom utils setTxtProgressBar txtProgressBar packageVersion
 #'
 #' @export
 #'
