@@ -1,4 +1,5 @@
 library(testthat)
+library(vcr)
 # library(httptest)
 
 # single work ------------------------------------------------------------
@@ -12,6 +13,7 @@ unlink(output_jsonl, recursive = TRUE, force = TRUE)
 unlink(output_parquet, recursive = TRUE, force = TRUE)
 
 test_that("pro_request single identifier", {
+  vcr::local_cassette("pro_request_single_identifier")
   # Define the API request
   output_json <- oa_query(
     identifier = "W2162348455"

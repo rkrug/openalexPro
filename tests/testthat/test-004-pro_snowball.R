@@ -6,21 +6,8 @@ output_dir <- file.path(tempdir(), "snowball")
 unlink(output_dir, recursive = TRUE, force = TRUE)
 
 test_that("pro_snowball", {
-  # openalexPro
-  output_dir <- pro_snowball(
-    identifier = c("W3045921891", "W3046863325"),
-    output = output_dir,
-    verbose = FALSE
-  )
-
-  results_openalexPro <- read_snowball(
-    file.path(output_dir),
-    return_data = TRUE,
-    shorten_ids = TRUE,
-    edge_type = "core"
-  )
-
   # openalexR
+  vcr::local_cassette("oa_snowball")
   results_openalexR <- openalexR::oa_snowball(
     identifier = c("W3045921891", "W3046863325"),
     verbose = FALSE
@@ -37,6 +24,21 @@ test_that("pro_snowball", {
       from,
       to
     )
+
+  # openalexPro
+  vcr::local_cassette("pro_snowball")
+  output_dir <- pro_snowball(
+    identifier = c("W3045921891", "W3046863325"),
+    output = output_dir,
+    verbose = FALSE
+  )
+
+  results_openalexPro <- read_snowball(
+    file.path(output_dir),
+    return_data = TRUE,
+    shorten_ids = TRUE,
+    edge_type = "core"
+  )
 
   # Comparison
 

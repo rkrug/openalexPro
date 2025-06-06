@@ -26,8 +26,9 @@ Imports:
 Suggests: 
     knitr,
     rmarkdown,
-    testthat (>= 3.0.0),
     quarto,
+    testthat (>= 3.0.0),
+    vcr,
     vdiffr
 SystemRequirements: jq (https://stedolan.github.io/jq/)
 Encoding: UTF-8

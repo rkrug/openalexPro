@@ -7,6 +7,6 @@
 # * https://testthat.r-lib.org/articles/special-files.html
 
 library(testthat)
-library(openalexPro)
+library(openalexPro2)
 
 test_check("openalexPro")
