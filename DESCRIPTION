@@ -24,7 +24,8 @@ Imports:
     sys,
     tidygraph,
     tidyselect
-Remotes: ropensci.r-universe.dev/vcr
+Additional_repositories: 
+    ropensci.r-universe.dev/vcr
 Suggests: 
     knitr,
     rmarkdown,
