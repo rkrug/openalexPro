@@ -23,12 +23,13 @@ Imports:
     sys,
     tidygraph,
     tidyselect
+Remotes: ropensci.r-universe.dev/vcr
 Suggests: 
     knitr,
     rmarkdown,
     quarto,
     testthat (>= 3.0.0),
-    vcr,
+    vcr (> 1.7.0),
     vdiffr
 SystemRequirements: jq (https://stedolan.github.io/jq/)
 Encoding: UTF-8
