@@ -12,7 +12,7 @@ unlink(output_jsonl, recursive = TRUE, force = TRUE)
 unlink(output_parquet, recursive = TRUE, force = TRUE)
 
 test_that("pro_request `biodiversity` and group by `type`", {
-  vcr::local_cassette("pro_reques_biodiversity_and_group_by_type")
+  vcr::local_cassette("pro_request_biodiversity_and_group_by_type")
   # Define the API request
   output_json <- oa_query(
     title_and_abstract.search = "biodiversity",

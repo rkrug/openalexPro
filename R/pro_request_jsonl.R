@@ -13,7 +13,6 @@
 #' @param overwrite Logical indicating whether to overwrite `output`.
 #' @param verbose Logical indicating whether to show a verbose information. Defaults to `TRUE`
 #' @param delete_input Determines if the `input_json` should be deleted afterwards. Defaults to `FALSE`.
-#' @param jq_path Path to the jq executable (default: "jq")
 #'
 #' @return The function does returns the output invisibly.
 #'
@@ -40,8 +39,7 @@ pro_request_jsonl <- function(
   add_columns = list(),
   overwrite = FALSE,
   verbose = TRUE,
-  delete_input = FALSE,
-  jq_path = "jq"
+  delete_input = FALSE
 ) {
   # Argument checks --------------------------------------------------------
 
@@ -137,7 +135,6 @@ pro_request_jsonl <- function(
           input_json = fn,
           output_jsonl = jsonl,
           add_columns = add_columns,
-          jq_path = jq_path,
           jq_filter = NULL,
           page = pn,
           type = types

@@ -9,27 +9,24 @@
 #' @param output_jsonl Path to the output .jsonl file
 #' @param add_columns List of additional fields to be added to the output. They nave to be provided as a
 #'   named list, e./g. `list(column_1 = "value_1", column_2 = 2)`. Only Scalar values are supported.
-#' @param jq_path Path to the jq executable (default: "jq")
 #' @param jq_filter Optional custom jq filter string. If NULL, the default filter is used.
 #' @param page Optional integer to be added as a "page" field in each output record
 #' @param type Either "results" (default, expects a .results[] array) or "single" (treat input as array of records directly)
 #'
 #' @return Invisibly returns the output path
 #'
-#' @importFrom sys exec_internal
+#' @importFrom jqr  jq
 #'
 #' @export
 jq_execute <- function(
   input_json,
   output_jsonl,
   add_columns = list(),
-  jq_path = "jq",
   jq_filter = NULL,
   page = NULL,
   type = c("results", "single", "group_by")
 ) {
   type <- match.arg(type)
-  jq_check(jq_path)
 
   if (is.null(jq_filter)) {
     root <- switch(
@@ -81,7 +78,9 @@ jq_execute <- function(
             collapse = ", "
           )
         )
-      } else "",
+      } else {
+        ""
+      },
       '
       }
       | del(.abstract_inverted_index)
@@ -93,22 +92,11 @@ jq_execute <- function(
     jq_filter <- paste0(jq_filter, " | . + {page: ", page, "}")
   }
 
-  # jqr::jq(
-  #   file(input_json),
-  #   jq_filter,
-  #   out = output_jsonl
-  # )
-
-  res <- sys::exec_internal(
-    jq_path,
-    args = c("-c", jq_filter, input_json)
+  jqr::jq(
+    file(input_json),
+    jq_filter,
+    out = output_jsonl
   )
-
-  writeLines(rawToChar(res$stdout), con = output_jsonl)
-
-  if (res$status != 0) {
-    stop("jq failed with status ", res$status, "\n", rawToChar(res$stderr))
-  }
 
   invisible(output_jsonl)
 }

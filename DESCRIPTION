@@ -18,6 +18,7 @@ Imports:
     ggraph,
     httr2,
     jsonlite,
+    jqr,
     openalexR (>= 1.4.0),
     rlang,
     sys,

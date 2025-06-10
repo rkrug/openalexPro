@@ -1,8 +1,6 @@
 library(testthat)
 
 testthat::test_that("jq_execute correctly applies jq filter and writes output to JSONL file", {
-  skip_if_not(jq_check())
-
   # Create temporary output JSONL files
   output_jsonl_default <- file.path(tempdir(), "default.jsonl")
   output_jsonl_page <- file.path(tempdir(), "page.jsonl")
