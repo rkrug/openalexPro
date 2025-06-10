@@ -25,7 +25,7 @@ Imports:
     tidygraph,
     tidyselect
 Additional_repositories: 
-    ropensci.r-universe.dev/vcr
+    ropensci.r-universe.dev
 Suggests: 
     knitr,
     rmarkdown,
@@ -33,7 +33,6 @@ Suggests:
     testthat (>= 3.0.0),
     vcr (> 1.7.0),
     vdiffr
-SystemRequirements: jq (https://stedolan.github.io/jq/)
 Encoding: UTF-8
 RoxygenNote: 7.3.2
 VignetteBuilder: quarto
