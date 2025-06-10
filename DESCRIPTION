@@ -1,7 +1,7 @@
 Type: Package
 Package: openalexPro2
 Title: Providing a more advanced access to OpenAlex for the power user
-Version: 0.0.1
+Version: 0.0.2
 Date: 2024-09-19
 Author: Rainer M Krug
 Maintainer: Rainer M Krug <Rainer@krugs.de>
@@ -24,8 +24,9 @@ Imports:
     sys,
     tidygraph,
     tidyselect
+
 Additional_repositories: 
-    ropensci.r-universe.dev
+    https://ropensci.r-universe.dev
 Suggests: 
     knitr,
     rmarkdown,
