@@ -24,7 +24,6 @@ Imports:
     sys,
     tidygraph,
     tidyselect
-
 Additional_repositories: 
     https://ropensci.r-universe.dev
 Suggests: 
