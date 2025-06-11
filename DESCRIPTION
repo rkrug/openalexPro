@@ -21,7 +21,6 @@ Imports:
     jqr,
     openalexR (>= 1.4.0),
     rlang,
-    sys,
     tidygraph,
     tidyselect
 Additional_repositories: 
