@@ -111,7 +111,11 @@ pro_request_jsonl_parquet <- function(
   types <- jsons |>
     basename() |>
     strsplit(split = "_") |>
-    sapply(FUN = '[[', 1) |>
+    vapply(
+      FUN = '[[',
+      1,
+      FUN.VALUE = character(1)
+    ) |>
     unique()
 
   if (length(types) > 1) {
