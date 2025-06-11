@@ -2,7 +2,8 @@
 #' @param identifier Character vector of openalex identifiers.
 #' @param doi Character vector of dois.
 #' @param output parquet dataset; default: temporary directory.
-#' @param verbose Logical indicating whether to show a verbose information. Defaults to `FALSE`
+#' @param verbose Logical indicating whether to show a verbose information.
+#'   Defaults to `FALSE`
 #'
 #' @return Path to the nodes parquet dataset
 #'
@@ -15,24 +16,16 @@
 #'
 #' @md
 #'
-#' @examples
-#' \dontrun{
+#' @examples \dontrun{
 #'
-#' snowball_docs <- pro_snowball(
-#'   identifier = c("W2741809807", "W2755950973"),
-#'   citing_params = list(from_publication_date = "2022-01-01"),
-#'   cited_by_params = list(),
-#'   verbose = TRUE
-#' )
+#' snowball_docs <- pro_snowball( identifier = c("W2741809807", "W2755950973"),
+#' citing_params = list(from_publication_date = "2022-01-01"), cited_by_params =
+#' list(), verbose = TRUE )
 #'
-#' # Identical to above, but searches using paper DOIs
-#' snowball_docs_doi <- oa_snowball(
-#'   doi = c("10.1016/j.joi.2017.08.007", "10.7717/peerj.4375"),
-#'   citing_params = list(from_publication_date = "2022-01-01"),
-#'   cited_by_params = list(),
-#'   verbose = TRUE
-#' )
-#' }
+#' # Identical to above, but searches using paper DOIs snowball_docs_doi <-
+#' oa_snowball( doi = c("10.1016/j.joi.2017.08.007", "10.7717/peerj.4375"),
+#' citing_params = list(from_publication_date = "2022-01-01"), cited_by_params =
+#' list(), verbose = TRUE ) }
 pro_snowball_get_nodes <- function(
   identifier = NULL,
   doi = NULL,
@@ -124,7 +117,8 @@ pro_snowball_get_nodes <- function(
     unlist() |>
     as.vector()
 
-  # fetching documents citing the target keypapers (incoming - to: keypaper) ----
+  # fetching documents citing the target keypapers (incoming - to: keypaper)
+  # ----
 
   if (verbose) {
     message(
@@ -150,12 +144,14 @@ pro_snowball_get_nodes <- function(
       verbose = verbose
     )
 
-  # fetching documents cited by the keypapers (outgoing - from: keypaper )-----------------------
+  # fetching documents cited by the keypapers (outgoing - from: keypaper
+  # )-----------------------
 
-  if (verbose)
+  if (verbose) {
     message(
-      "Collecting all documents cited by the target keypapers (from = keypaper)..."
+      "Collecting all documents cited by the target keypapers ..."
     )
+  }
 
   cited_parquet <- oa_query(
     cited_by = keypaper_ids,
@@ -175,7 +171,7 @@ pro_snowball_get_nodes <- function(
       verbose = verbose
     )
 
-  # Combine individualparquet databases to nodes_parquet -----------------------------------
+  # Combine individualparquet databases to nodes_parquet ----------------------
 
   sprintf(
     "

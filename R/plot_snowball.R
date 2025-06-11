@@ -1,29 +1,33 @@
 #' Plot Snowball
 #'
-#' This function takes a snowball object and a name, and creates two plots: one sized by cited_by_count and the other by cited_by_count_by_year.
-#' The plots are saved as both PDF and PNG in the specified path.
+#' This function takes a snowball object and a name, and creates two plots: one
+#' sized by cited_by_count and the other by cited_by_count_by_year. The plots
+#' are saved as both PDF and PNG in the specified path.
 #'
 #' @param snowball A snowball object containing the data to be plotted.
-#' @param size The size of the nodes in the plot. Can be either a coumn name from snowball$nodes, "cited_by_count_by_year" or a numeric value.
-#' If "cited_by_count_by_year", the size is calculated by dividing the number of citations by the number of years.
-#' If numeric, the size of the nodes is set to the value.
-#' @param label The label of the nodes in the plot. If not specified, the id of the nodes is used.
+#' @param size The size of the nodes in the plot. Can be either a coumn name
+#'   from snowball$nodes, "cited_by_count_by_year" or a numeric value. If
+#'   "cited_by_count_by_year", the size is calculated by dividing the number of
+#'   citations by the number of years. If numeric, the size of the nodes is set
+#'   to the value.
+#' @param label The label of the nodes in the plot. If not specified, the id of
+#'   the nodes is used.
 #' @param title The title of the plots.
 #'
 #' @return No return value, called for side effects.
+#'
 #' @export
 #'
 #' @importFrom tidygraph as_tbl_graph
-#' @importFrom ggraph ggraph geom_edge_link geom_node_point geom_node_label theme_graph scale_edge_width
-#' @importFrom ggplot2 aes after_stat scale_size scale_fill_manual theme element_rect guides ggtitle ggsave guide_legend
+#' @importFrom ggraph ggraph geom_edge_link geom_node_point geom_node_label
+#'   theme_graph scale_edge_width
+#' @importFrom ggplot2 aes after_stat scale_size scale_fill_manual theme
+#'   element_rect guides ggtitle ggsave guide_legend
 #' @importFrom rlang sym
 #' @importFrom utils hasName
 #' @importFrom tidyselect all_of
 #'
-#' @examples
-#' \dontrun{
-#' plot_snowball(snowball, "example")
-#' }
+#' @examples \dontrun{ plot_snowball(snowball, "example") }
 plot_snowball <- function(
     snowball,
     size = "cited_by_count_by_year",

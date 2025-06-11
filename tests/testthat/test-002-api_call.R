@@ -35,7 +35,9 @@ test_that("api_call returns response object on success (200)", {
 #     })
 #     expect_error(
 #       api_call(req),
-#       "Service Unavailable. Please try setting `per_page = 25` in your function call!"
+#       paste0(
+#           "Service Unavailable.\n",
+#           "Please try setting `per_page = 25` in your function call!")
 #     )
 #     mockery::unstub(api_call, "httr2::req_perform")
 #   })

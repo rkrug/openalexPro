@@ -1,34 +1,39 @@
 #' Convert JSON files to Apache Parquet files
-
 #'
-#' The function takes a directory of JSON files as written from a call to `pro_request(..., json_dir = "FOLDER")`
-#' and converts it to a Apache Parquet dataset partitiond by the page.
 #'
-#' @param input_jsonl The directory of JSON files returned from `pro_request(..., json_dir = "FOLDER")`.
-#' @param output output  directory for the parquet dataset; default: temporary directory.
-#' @param add_columns List of additional fields to be added to the output. They nave to be provided as a
-#'   named list, e./g. `list(column_1 = "value_1", column_2 = 2)`. Only Scalar values are supported.
+#' The function takes a directory of JSON files as written from a call to
+#' `pro_request(..., json_dir = "FOLDER")` and converts it to a Apache Parquet
+#' dataset partitiond by the page.
+#'
+#' @param input_jsonl The directory of JSON files returned from
+#'   `pro_request(..., json_dir = "FOLDER")`.
+#' @param output output directory for the parquet dataset; default: temporary
+#'   directory.
+#' @param add_columns List of additional fields to be added to the output. They
+#'   nave to be provided as a named list, e./g. `list(column_1 = "value_1",
+#'   column_2 = 2)`. Only Scalar values are supported.
 #' @param overwrite Logical indicating whether to overwrite `output`.
-#' @param verbose Logical indicating whether to show a verbose information. Defaults to `TRUE`
-#' @param delete_input Determines if the `input_jsonl` should be deleted afterwards. Defaults to `FALSE`.
+#' @param verbose Logical indicating whether to show a verbose information.
+#'   Defaults to `TRUE`
+#' @param delete_input Determines if the `input_jsonl` should be deleted
+#'   afterwards. Defaults to `FALSE`.
 #'
 #' @return The function does returns the output invisibly.
 #'
 #' @details The function uses DuckDB to read the JSON files and to create the
-#'   Apache Parquet files. The function creates a DuckDB connection in memory and
-#'   readsds the JSON files into DuckDB when needed. Then it creates a SQL query to convert the
-#'   JSON files to Apache Parquet files and to copy the result to the specified
-#'   directory.
+#'   Apache Parquet files. The function creates a DuckDB connection in memory
+#'   and readsds the JSON files into DuckDB when needed. Then it creates a SQL
+#'   query to convert the JSON files to Apache Parquet files and to copy the
+#'   result to the specified directory.
 #'
 #' @importFrom duckdb duckdb
 #' @importFrom DBI dbConnect dbDisconnect dbExecute
 #'
 #' @md
 #'
-#' @examples
-#' \dontrun{
-#' source_to_parquet(input_jsonl = "json", source_type = "snapshot", output = "arrow")
-#' }
+#' @examples \dontrun{ source_to_parquet(input_jsonl = "json", source_type =
+#'   "snapshot", output = "arrow") }
+#'
 #' @export
 
 pro_request_jsonl_parquet <- function(

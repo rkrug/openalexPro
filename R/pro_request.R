@@ -1,28 +1,34 @@
 #' `openalexR::oa_request()` with additional argument
 #'
-#' This function adds one argument to `openalexR::oa_request()`, namely `output`.
-#' When specified, all return values from OpenAlex will be saved as jaon files in
-#' that directory and the return value is the directory of the json files.
+#' This function adds one argument to `openalexR::oa_request()`, namely
+#' `output`. When specified, all return values from OpenAlex will be saved as
+#' jaon files in that directory and the return value is the directory of the
+#' json files.
 #'
 #' For the documentation please see `openalexR::oa_request()`
 #'
 #' @param query_url The URL of the API query.
-#' @param pages The number of pages to be downloaded. The default is set to 1000, which would be 2,000,000 works.
-#'   It is recommended to not increase it beyond 1000 due to server load and to use the snapshot instead.
-#'   If `NULL`, all pages will be downloaded.
-#'   Default: 1000.
-#' @param output directory where the JSON files are saved. Default is a temporary directory. If `NULL`,
-#'   the return value from call to `openalexR::oa_request()` with all the arguments is returned
-#' @param format Format of the output files. At the moment, the following ones are supported:
-#'       - 'json': (default) saves the complete `json` response including metadata
-#' @param overwrite Logical. If `TRUE`, `output` will be deleted if it already exists.
+#' @param pages The number of pages to be downloaded. The default is set to
+#'   1000, which would be 2,000,000 works. It is recommended to not increase it
+#'   beyond 1000 due to server load and to use the snapshot instead. If `NULL`,
+#'   all pages will be downloaded. Default: 1000.
+#' @param output directory where the JSON files are saved. Default is a
+#'   temporary directory. If `NULL`, the return value from call to
+#'   `openalexR::oa_request()` with all the arguments is returned
+#' @param format Format of the output files. At the moment, the following ones
+#'   are supported:
+#' - 'json': (default) saves the complete `json` response including metadata
+#' @param overwrite Logical. If `TRUE`, `output` will be deleted if it already
+#'   exists.
 #' @param mailto The email address of the user. See `openalexR::oa_email()`.
 #' @param api_key The API key of the user. See `openalexR::oa_apikey()`.
 #' @param verbose Logical indicating whether to show verbose messages.
-#' @param progress Logical default `TRUE` indicating whether to show a progress bar.
+#' @param progress Logical default `TRUE` indicating whether to show a progress
+#'   bar.
 #'
-#' @return If `output` is `NULL`, the return value from call to `openalexR::oa_request()`,
-#'   otherwise the complete path to the expanded and normalized `output`.
+#' @return If `output` is `NULL`, the return value from call to
+#'   `openalexR::oa_request()`, otherwise the complete path to the expanded and
+#'   normalized `output`.
 #'
 #' @md
 #'
@@ -153,7 +159,8 @@ pro_request <- function(
 
       data <- httr2::resp_body_json(resp)
 
-      ## grouping returns at the moment a last page with no groups - this must not be saved!
+      ## grouping returns at the moment a last page with no groups - this must
+      ## not be saved!
       if (isTRUE(data$meta$groups_count == 0)) {
         break
       }
@@ -176,10 +183,9 @@ pro_request <- function(
         break
       }
 
-      # This is needed for groups as at the moment OpenAlex returns a final cursor page with no tresults
-      # if (isTRUE(data$meta$groups_count == 200)) {
-      #   break
-      # }
+      # This is needed for groups as at the moment OpenAlex returns a final
+      # cursor page with no tresults if (isTRUE(data$meta$groups_count == 200))
+      # { break }
 
       if (!is.null(pages)) {
         if (page > pages) break # Remove this to fetch all pages

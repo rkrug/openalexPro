@@ -67,7 +67,8 @@ test_that("pro_request_jsonl_parquet `biodiversity` and group by type", {
     length(list.files(output_parquet, recursive = TRUE)) >= 1
   )
 
-  # Get search results from openalexR::oa_fetch(output = "tibble") for comparison
+  # Get search results from openalexR::oa_fetch(output = "tibble") for
+  # comparison
 
   results_openalexR <- openalexR::oa_fetch(
     title_and_abstract.search = "biodiversity",

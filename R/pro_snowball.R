@@ -1,17 +1,18 @@
-#' A function to perform a snowball search
-#' and convert the result to a tibble/data frame.
+#' A function to perform a snowball search and convert the result to a
+#' tibble/data frame.
 #' @param identifier Character vector of openalex identifiers.
 #' @param doi Character vector of dois.
 #' @param output parquet dataset; default: temporary directory.
-#' @param verbose Logical indicating whether to show a verbose information. Defaults to `FALSE`
+#' @param verbose Logical indicating whether to show a verbose information.
+#'   Defaults to `FALSE`
 #'
 #' @return A list containing 2 elements:
 #' - nodes: dataframe with publication records.
-#' The last column `oa_input` indicates whether the work was
-#' one of the input `identifier`(s).
+#' The last column `oa_input` indicates whether the work was one of the input
+#'   `identifier`(s).
 #' - edges: publication link dataframe of 2 columns `from, to`
-#' such that a row `A, B` means A -> B means A cites B.
-#' In bibliometrics, the "citation action" comes from A to B.
+#' such that a row `A, B` means A -> B means A cites B. In bibliometrics, the
+#'   "citation action" comes from A to B.
 #'
 #' @export
 #'
@@ -22,24 +23,16 @@
 #'
 #' @md
 #'
-#' @examples
-#' \dontrun{
+#' @examples \dontrun{
 #'
-#' snowball_docs <- pro_snowball(
-#'   identifier = c("W2741809807", "W2755950973"),
-#'   citing_params = list(from_publication_date = "2022-01-01"),
-#'   cited_by_params = list(),
-#'   verbose = TRUE
-#' )
+#' snowball_docs <- pro_snowball( identifier = c("W2741809807", "W2755950973"),
+#' citing_params = list(from_publication_date = "2022-01-01"), cited_by_params =
+#' list(), verbose = TRUE )
 #'
-#' # Identical to above, but searches using paper DOIs
-#' snowball_docs_doi <- oa_snowball(
-#'   doi = c("10.1016/j.joi.2017.08.007", "10.7717/peerj.4375"),
-#'   citing_params = list(from_publication_date = "2022-01-01"),
-#'   cited_by_params = list(),
-#'   verbose = TRUE
-#' )
-#' }
+#' # Identical to above, but searches using paper DOIs snowball_docs_doi <-
+#' oa_snowball( doi = c("10.1016/j.joi.2017.08.007", "10.7717/peerj.4375"),
+#' citing_params = list(from_publication_date = "2022-01-01"), cited_by_params =
+#' list(), verbose = TRUE ) }
 pro_snowball <- function(
   identifier = NULL,
   doi = NULL,

@@ -1,6 +1,7 @@
 #' Perform an API call to the OpenAlex API
 #'
-#' This function performs a request to the OpenAlex API and handles different HTTP status codes.
+#' This function performs a request to the OpenAlex API and handles different
+#' HTTP status codes.
 #'
 #' @param req A request object created by \code{\link[httr2]{request}}.
 #'

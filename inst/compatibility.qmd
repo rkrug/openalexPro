@@ -218,7 +218,9 @@ The difference in the last colum should be the same.
 #### Edges Identified
 
 ```{r}
-snowballPro_comp_edges <- paste0(snowballPro_comp$edges$from, " -> ", snowballPro_comp$edges$to)
+snowballPro_comp_edges <- paste0(
+  snowballPro_comp$edges$from, " -> ", snowballPro_comp$edges$to
+)
 snowballR_edges <- paste0(snowballR$edges$from, " -> ", snowballR$edges$to)
 ```
 

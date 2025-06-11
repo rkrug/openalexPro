@@ -2,7 +2,7 @@ library(testthat)
 suppressPackageStartupMessages(library(openalexR))
 # library(httptest)
 
-# Normal Search `biodiversity AND finance`----------------------------------------------------------
+# Normal Search `biodiversity AND finance`-------------------------------------
 
 output_json <- file.path(tempdir(), "single_work")
 output_jsonl <- file.path(tempdir(), "single_work_jsonl")
@@ -63,7 +63,8 @@ test_that("pro_request_jsonl_parquet search `biodiversity AND finance`", {
     length(list.files(output_parquet, "*.parquet", recursive = TRUE)) >= 1
   )
 
-  # Get search results from openalexR::oa_fetch(output = "tibble") for comparison
+  # Get search results from openalexR::oa_fetch(output = "tibble") for
+  # comparison
 
   results_openalexR <- openalexR::oa_fetch(
     title_and_abstract.search = "biodiversity AND finance",
