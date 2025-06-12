@@ -4519,15 +4519,15 @@
 <circle cx='211.32' cy='128.13' r='3.84' style='stroke-width: 0.71; stroke: none; fill: #009E73;' />
 <circle cx='230.54' cy='452.32' r='3.85' style='stroke-width: 0.71; stroke: none; fill: #009E73;' />
 <circle cx='242.31' cy='234.05' r='3.98' style='stroke-width: 0.71; stroke: none; fill: #009E73;' />
-<circle cx='131.95' cy='233.85' r='3.75' style='stroke-width: 0.71; stroke: none; fill: #009E73;' />
+<circle cx='131.95' cy='233.85' r='3.76' style='stroke-width: 0.71; stroke: none; fill: #009E73;' />
 <circle cx='525.45' cy='307.20' r='3.80' style='stroke-width: 0.71; stroke: none; fill: #009E73;' />
-<circle cx='61.34' cy='372.04' r='7.60' style='stroke-width: 0.71; stroke: none; fill: #009E73;' />
+<circle cx='61.34' cy='372.04' r='7.61' style='stroke-width: 0.71; stroke: none; fill: #009E73;' />
 <circle cx='258.03' cy='467.42' r='4.07' style='stroke-width: 0.71; stroke: none; fill: #009E73;' />
 <circle cx='68.47' cy='189.03' r='4.59' style='stroke-width: 0.71; stroke: none; fill: #009E73;' />
 <circle cx='135.53' cy='95.55' r='11.02' style='stroke-width: 0.71; stroke: none; fill: #009E73;' />
 <circle cx='517.54' cy='394.54' r='3.67' style='stroke-width: 0.71; stroke: none; fill: #009E73;' />
 <circle cx='155.11' cy='403.44' r='3.71' style='stroke-width: 0.71; stroke: none; fill: #009E73;' />
-<circle cx='92.34' cy='242.34' r='4.58' style='stroke-width: 0.71; stroke: none; fill: #009E73;' />
+<circle cx='92.34' cy='242.34' r='4.57' style='stroke-width: 0.71; stroke: none; fill: #009E73;' />
 <circle cx='492.25' cy='460.28' r='3.67' style='stroke-width: 0.71; stroke: none; fill: #009E73;' />
 <circle cx='466.30' cy='516.40' r='3.72' style='stroke-width: 0.71; stroke: none; fill: #009E73;' />
 <circle cx='469.67' cy='95.61' r='3.56' style='stroke-width: 0.71; stroke: none; fill: #009E73;' />
@@ -4539,34 +4539,34 @@
 <text x='432.39' y='278.27' text-anchor='middle' style='font-size: 8.54px; font-family: sans;' textLength='11.86px' lengthAdjust='spacingAndGlyphs'>NA</text>
 </g>
 <g clip-path='url(#cpMC4wMHw3MjAuMDB8MC4wMHw1NzYuMDA=)'>
-<text x='565.36' y='158.28' style='font-size: 11.00px; font-family: sans;' textLength='119.28px' lengthAdjust='spacingAndGlyphs'>cited_by_count_by_year</text>
-<circle cx='579.35' cy='173.55' r='3.56' style='stroke-width: 0.71; fill: #000000;' />
-<circle cx='579.35' cy='192.06' r='7.79' style='stroke-width: 0.71; fill: #000000;' />
-<circle cx='579.35' cy='214.13' r='9.54' style='stroke-width: 0.71; fill: #000000;' />
-<circle cx='579.35' cy='240.32' r='10.88' style='stroke-width: 0.71; fill: #000000;' />
-<text x='598.81' y='176.57' style='font-size: 8.80px; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>0</text>
-<text x='598.81' y='195.09' style='font-size: 8.80px; font-family: sans;' textLength='19.58px' lengthAdjust='spacingAndGlyphs'>2000</text>
-<text x='598.81' y='217.16' style='font-size: 8.80px; font-family: sans;' textLength='19.58px' lengthAdjust='spacingAndGlyphs'>4000</text>
-<text x='598.81' y='243.35' style='font-size: 8.80px; font-family: sans;' textLength='19.58px' lengthAdjust='spacingAndGlyphs'>6000</text>
-<text x='565.36' y='284.94' style='font-size: 11.00px; font-family: sans;' textLength='81.33px' lengthAdjust='spacingAndGlyphs'>Publication Type</text>
-<circle cx='574.00' cy='300.20' r='1.95' style='stroke-width: 0.71; stroke: none; fill: #000000;' />
-<polygon points='574.00,314.44 576.63,319.00 571.36,319.00 ' style='stroke-width: 0.71; stroke: none; fill: #000000;' />
-<polygon points='572.04,336.72 575.95,336.72 575.95,332.81 572.04,332.81 ' style='stroke-width: 0.71; stroke: none; fill: #000000;' />
-<line x1='571.23' y1='352.04' x2='576.76' y2='352.04' style='stroke-width: 0.71;' />
-<line x1='574.00' y1='354.81' x2='574.00' y2='349.28' style='stroke-width: 0.71;' />
-<rect x='572.04' y='367.37' width='3.91' height='3.91' style='stroke-width: 0.71;' />
-<line x1='572.04' y1='371.28' x2='575.95' y2='367.37' style='stroke-width: 0.71;' />
-<line x1='572.04' y1='367.37' x2='575.95' y2='371.28' style='stroke-width: 0.71;' />
-<text x='588.12' y='303.23' style='font-size: 8.80px; font-family: sans;' textLength='23.47px' lengthAdjust='spacingAndGlyphs'>article</text>
-<text x='588.12' y='320.51' style='font-size: 8.80px; font-family: sans;' textLength='19.09px' lengthAdjust='spacingAndGlyphs'>book</text>
-<text x='588.12' y='337.79' style='font-size: 8.80px; font-family: sans;' textLength='51.37px' lengthAdjust='spacingAndGlyphs'>book-chapter</text>
-<text x='588.12' y='355.07' style='font-size: 8.80px; font-family: sans;' textLength='45.01px' lengthAdjust='spacingAndGlyphs'>dissertation</text>
-<text x='588.12' y='372.35' style='font-size: 8.80px; font-family: sans;' textLength='29.84px' lengthAdjust='spacingAndGlyphs'>preprint</text>
-<text x='565.36' y='408.59' style='font-size: 11.00px; font-family: sans;' textLength='51.37px' lengthAdjust='spacingAndGlyphs'>Key Paper</text>
-<circle cx='574.00' cy='423.85' r='1.95' style='stroke-width: 0.71; stroke: #009E73; fill: #009E73;' />
-<circle cx='574.00' cy='441.13' r='1.95' style='stroke-width: 0.71; stroke: #FFA500; fill: #FFA500;' />
-<text x='588.12' y='426.88' style='font-size: 8.80px; font-family: sans;' textLength='27.88px' lengthAdjust='spacingAndGlyphs'>FALSE</text>
-<text x='588.12' y='444.16' style='font-size: 8.80px; font-family: sans;' textLength='23.96px' lengthAdjust='spacingAndGlyphs'>TRUE</text>
+<text x='565.36' y='158.30' style='font-size: 11.00px; font-family: sans;' textLength='119.28px' lengthAdjust='spacingAndGlyphs'>cited_by_count_by_year</text>
+<circle cx='579.34' cy='173.56' r='3.56' style='stroke-width: 0.71; fill: #000000;' />
+<circle cx='579.34' cy='192.07' r='7.79' style='stroke-width: 0.71; fill: #000000;' />
+<circle cx='579.34' cy='214.14' r='9.54' style='stroke-width: 0.71; fill: #000000;' />
+<circle cx='579.34' cy='240.32' r='10.88' style='stroke-width: 0.71; fill: #000000;' />
+<text x='598.80' y='176.58' style='font-size: 8.80px; font-family: sans;' textLength='4.89px' lengthAdjust='spacingAndGlyphs'>0</text>
+<text x='598.80' y='195.10' style='font-size: 8.80px; font-family: sans;' textLength='19.58px' lengthAdjust='spacingAndGlyphs'>2000</text>
+<text x='598.80' y='217.16' style='font-size: 8.80px; font-family: sans;' textLength='19.58px' lengthAdjust='spacingAndGlyphs'>4000</text>
+<text x='598.80' y='243.35' style='font-size: 8.80px; font-family: sans;' textLength='19.58px' lengthAdjust='spacingAndGlyphs'>6000</text>
+<text x='565.36' y='284.93' style='font-size: 11.00px; font-family: sans;' textLength='81.33px' lengthAdjust='spacingAndGlyphs'>Publication Type</text>
+<circle cx='574.00' cy='300.19' r='1.95' style='stroke-width: 0.71; stroke: none; fill: #000000;' />
+<polygon points='574.00,314.43 576.63,318.99 571.36,318.99 ' style='stroke-width: 0.71; stroke: none; fill: #000000;' />
+<polygon points='572.04,336.71 575.95,336.71 575.95,332.80 572.04,332.80 ' style='stroke-width: 0.71; stroke: none; fill: #000000;' />
+<line x1='571.23' y1='352.03' x2='576.76' y2='352.03' style='stroke-width: 0.71;' />
+<line x1='574.00' y1='354.80' x2='574.00' y2='349.27' style='stroke-width: 0.71;' />
+<rect x='572.04' y='367.36' width='3.91' height='3.91' style='stroke-width: 0.71;' />
+<line x1='572.04' y1='371.27' x2='575.95' y2='367.36' style='stroke-width: 0.71;' />
+<line x1='572.04' y1='367.36' x2='575.95' y2='371.27' style='stroke-width: 0.71;' />
+<text x='588.12' y='303.22' style='font-size: 8.80px; font-family: sans;' textLength='23.47px' lengthAdjust='spacingAndGlyphs'>article</text>
+<text x='588.12' y='320.50' style='font-size: 8.80px; font-family: sans;' textLength='19.09px' lengthAdjust='spacingAndGlyphs'>book</text>
+<text x='588.12' y='337.78' style='font-size: 8.80px; font-family: sans;' textLength='51.37px' lengthAdjust='spacingAndGlyphs'>book-chapter</text>
+<text x='588.12' y='355.06' style='font-size: 8.80px; font-family: sans;' textLength='45.01px' lengthAdjust='spacingAndGlyphs'>dissertation</text>
+<text x='588.12' y='372.34' style='font-size: 8.80px; font-family: sans;' textLength='29.84px' lengthAdjust='spacingAndGlyphs'>preprint</text>
+<text x='565.36' y='408.58' style='font-size: 11.00px; font-family: sans;' textLength='51.37px' lengthAdjust='spacingAndGlyphs'>Key Paper</text>
+<circle cx='574.00' cy='423.84' r='1.95' style='stroke-width: 0.71; stroke: #009E73; fill: #009E73;' />
+<circle cx='574.00' cy='441.12' r='1.95' style='stroke-width: 0.71; stroke: #FFA500; fill: #FFA500;' />
+<text x='588.12' y='426.87' style='font-size: 8.80px; font-family: sans;' textLength='27.88px' lengthAdjust='spacingAndGlyphs'>FALSE</text>
+<text x='588.12' y='444.15' style='font-size: 8.80px; font-family: sans;' textLength='23.96px' lengthAdjust='spacingAndGlyphs'>TRUE</text>
 <text x='32.63' y='42.28' style='font-size: 18.00px; font-weight: bold; font-family: sans;' textLength='73.05px' lengthAdjust='spacingAndGlyphs'>Snowball</text>
 </g>
 </svg>
