@@ -10,9 +10,12 @@
 ^invertedabstract.json$
 ^json_files$
 ^README.qmd$
+^README.qmd.old$
 ^TODO.md$
 ^corpus.parquet$
 ^.vscode$
 ^snowball$
 ^inst/compatibility_cache$
 ^inst/compatibility$
+^doc$
+^Meta$

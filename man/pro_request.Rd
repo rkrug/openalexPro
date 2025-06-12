@@ -6,42 +6,46 @@
 \usage{
 pro_request(
   query_url,
-  per_page = 200,
-  paging = "cursor",
-  pages = NULL,
-  count_only = FALSE,
+  pages = 1000,
+  output = NULL,
+  format = "json",
+  overwrite = FALSE,
   mailto = oa_email(),
   api_key = oa_apikey(),
   verbose = FALSE,
-  json_dir = tempfile(fileext = ".json_dir")
+  progress = TRUE
 )
 }
 \arguments{
 \item{query_url}{The URL of the API query.}
 
-\item{per_page}{The number of items to be returned per page. Defaults to 200.}
+\item{pages}{The number of pages to be downloaded. The default is set to 1000, which would be 2,000,000 works.
+It is recommended to not increase it beyond 1000 due to server load and to use the snapshot instead.
+If \code{NULL}, all pages will be downloaded.
+Default: 1000.}
 
-\item{paging}{The type of paging. Possible values are "page" and "cursor".}
+\item{output}{directory where the JSON files are saved. Default is a temporary directory. If \code{NULL},
+the return value from call to \code{openalexR::oa_request()} with all the arguments is returned}
 
-\item{pages}{The number of pages to be downloaded. If \code{NULL}, all pages will be downloaded.}
+\item{format}{Format of the output files. At the moment, the following ones are supported:
+- 'json': (default) saves the complete \code{json} response including metadata}
 
-\item{count_only}{Logical indicating whether to return only the count of the items returned by the query.}
+\item{overwrite}{Logical. If \code{TRUE}, \code{output} will be deleted if it already exists.}
 
 \item{mailto}{The email address of the user. See \code{openalexR::oa_email()}.}
 
 \item{api_key}{The API key of the user. See \code{openalexR::oa_apikey()}.}
 
-\item{verbose}{Logical indicating whether to show a progress bar.}
+\item{verbose}{Logical indicating whether to show verbose messages.}
 
-\item{json_dir}{directory where the JSON files are saved. Default is a temporary directory. If \code{NULL},
-the return value from call to \code{openalexR::oa_request()} with all the arguments is returned.}
+\item{progress}{Logical default \code{TRUE} indicating whether to show a progress bar.}
 }
 \value{
-If \code{json_dir} is \code{NULL}, the return value from call to \code{openalexR::oa_request()},
-otherwise the complete path to the expanded and normalized \code{json_dir}.
+If \code{output} is \code{NULL}, the return value from call to \code{openalexR::oa_request()},
+otherwise the complete path to the expanded and normalized \code{output}.
 }
 \description{
-This function adds one argument to \code{openalexR::oa_request()}, namely \code{json_dir}.
+This function adds one argument to \code{openalexR::oa_request()}, namely \code{output}.
 When specified, all return values from OpenAlex will be saved as jaon files in
 that directory and the return value is the directory of the json files.
 }

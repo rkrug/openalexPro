@@ -1,0 +1,130 @@
+---
+title: "openalexPro README"
+date: today
+author: Rainer M Krug
+format: gfm
+---
+
+# This does not apply to the branch `openalexPro_2`!
+
+==================
+
+# This Package is experimental - use at own risk, but please let me know if things do not work!
+
+# openalexPro
+
+## Introduction
+
+This package aims to enhance [openalexR](https://github.com/openalex/openalexR) by providing a more advanced access to OpenAlex for the power user.
+It will use the logic of `openalexR` and add some new features which will be used in acompanying packages building on `openalexPro` to fulfill specific tasks.
+
+The core idea of this package is to not load all results in memory and convert them (which causes memory bottlenecks in `oepenalexR` but is very useful for smaller return corpi) but rather save each page returned, including all headers, as json files in a directory.
+
+These json files are processed further by additional functions and it is planned to make resulting oblects compatible with `openalexR` objects. These are
+
+<!-- - `openalexR` `list` type result from `oa_fetch()` -->
+- `openalexR` `tibble` / `data.frame` type result from `oa_fetch()`
+- `openalexR` snowball `list` as returned by `oa_snowball()`
+
+In addition, additional packages building on `openalexR` which will utilise features from `openalexPro` and will address specific needs, for example graphing (`openalexGraph`).
+TODO: add ideas
+
+### Changes from `openalexR`
+
+Unfortunately, it is not easily possible to download the return values
+from the api calls in `openalexR`. Therefore, the approach used here at
+the moment, is to define new functions with a few changes to the original functions:
+
+- `openalexPro2::pro_request()` (based on `openalexR::oa_request()`):
+  - add argument `json_dir` to which save the json files which is
+    forwarded to `openalexR:::api_request()`. if `json_dir` is `NULL`
+    the return values are identical to the ones from `openalexR`,
+    otherwise the return value is the complete path to the expanded and
+    normalized `json_dir`.
+- `openalexR:::api_request()` (based on `openalexR::oa_request()`):
+  - add argument `json_dir` to which save the json files. json files are
+    saved per call to the OpenAlex API when appropriate. when the API is
+    called to get the overall number of works in the results, these are
+    not saved. The complete response is saved, not only the result.
+  - Replace of `jsonlite` with `RcppSimdJson` as it is much faster.  
+    TODO: detailed tests to follow this statement.
+
+### Additional core functionality
+
+Doe to the requirement of `openalexPro` to handle huge corpi with several millions of works, an efficient storage format needs to be used as a backend. Fir download the json files are the easiest to use, but fo retrieval other formats are more suitable.
+
+The format which is used in this package is the `parquet` format which is small and very efficient in the retrieve=al of data (see https://parquet.apache.org/docs/ for a detailed description of the format).
+
+In addition, as a link between json files, the parquet dataset, and the retrieval of works from the dataset, the `duckdb` package is used. [DuckDB](https://duckdb.org) 'DuckDB is a fast in-process analytical database' as described on their database and it integrates peferfectly with `dplyr` pipelines. The functions here are `source_to_parquet()`
+
+In the same light of efficiency, the conversion of the abstracts from the inverted index format returned by OpenAlex as well as the creation of short citations (Author, et al (2020)) is also done in `duckdb`. The functions here are `get_abstract()` and `get_abbreviated_authors()`
+
+## Installation
+
+At the moment installation is opnly possible vi github:
+
+```{r}
+#| eval: false
+
+#### If pak is not installed install it by running
+## install.packages(pak)
+
+pak::pak("rkrug/openalexPro")
+```
+
+When the package has reached a stable state, it will be published on R-Universe (https://r-universe.dev) and can be installed from there. Details will follow.
+
+## Central functions
+
+To download a corpus as a number of json files in the directory `corpus_json` and convert it a parquet dataset in the directory `corpus` you can run
+
+```{r}
+#| eval: false
+
+library(openalexPro)
+
+res <- oa_query(
+  title_and_abstract.search = "biodiversity AND conservation AND IPBES",
+  entity = "works"
+) |>
+  openalexPro2::pro_request(
+    verbose = TRUE,
+    json_dir = "json_files"
+  ) |>
+  source_to_parquet(
+    corpus = "corpus"
+  )
+```
+
+which will create a by `publication_year` partitioned parquet dataset located in the folder `corpus` or
+
+If you do not need the json files, you can ommit the argument `json_dir` and a temporaty directory will be used and which will be deleted after the conversion:
+
+```{r}
+#| eval: false
+
+res <- oa_query(
+  title_and_abstract.search = "biodiversity AND conservation AND IPBES",
+  entity = "works"
+) |>
+  openalexPro2::pro_request(
+    verbose = TRUE
+  ) |>
+  source_to_parquet(
+    corpus = "corpus"
+  )
+```
+
+
+
+```{r}
+#| eval: false
+
+source_to_parquet(
+  json_dir = "json_files",
+  corpus = "corpus.parquet",
+  partition = NULL
+)
+```
+
+to save the corpus in a single `parquet` file.

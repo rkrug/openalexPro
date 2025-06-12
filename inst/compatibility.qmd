@@ -25,7 +25,7 @@ One of the aims of this package is compatibility with `openalexR::oa_fetch(outpu
 Here we will demonstrte how this can be achieved annd what the differences are. 
 
 
-## Comparison `openalexR::fetch()` and `openalexPro::pro_request()`
+## Comparison `openalexR::fetch()` and `openalexPro2::pro_request()`
 
 First we fetch the works using `openalexR::oa_fetch()`:
 
@@ -49,7 +49,7 @@ if (file.exists(fn)) {
 }
 ```
 
-Now we will do the same using `openalexPro::pro_request()`. This involves more steps, but the result should be com[patible:
+Now we will do the same using `openalexPro2::pro_request()`. This involves more steps, but the result should be com[patible:
 
 ```{r}
 #| label: openalexPro_fetch
@@ -85,13 +85,13 @@ oaPro_comp <- read_corpus(
 
 ### Works retrieved (`id`s)
 
-Works retrieved using `openalexR::oa_fetch()` and not in `openalexPro::pro_request()`:
+Works retrieved using `openalexR::oa_fetch()` and not in `openalexPro2::pro_request()`:
 
 ```{r}
   setdiff(oaR$id, oaPro_comp$id)
 ```
 
-Works retrieved using  `openalexPro::pro_request()` and not in `openalexR::oa_fetch()`:
+Works retrieved using  `openalexPro2::pro_request()` and not in `openalexR::oa_fetch()`:
 
 ```{r}
   setdiff(oaPro_comp$id, oaR$id)
@@ -125,7 +125,7 @@ setdiff(names(oaPro_comp), names(oaR))
 ```
 
 
-## Comparison `openalexR::oa_snowball()` and `openalexPro::pro_snowball()`
+## Comparison `openalexR::oa_snowball()` and `openalexPro2::pro_snowball()`
 
 ```{r}
 
@@ -152,7 +152,7 @@ if (file.exists(fn)) {
 
 ```
 
-Now we will do the same using `openalexPro::pro_snowball()`.
+Now we will do the same using `openalexPro2::pro_snowball()`.
 
 ```{r}
 #| label: openalexPro_pro_snowball
@@ -183,14 +183,14 @@ snowballPro_comp <- read_snowball(
 
 First we check if the same papers are retrieved:.
 
-The following works are in `openalexR::oa_snowball()` but not in `openalexPro::pro_snowball()`:
+The following works are in `openalexR::oa_snowball()` but not in `openalexPro2::pro_snowball()`:
 
 ```{r}
 
 setdiff(snowballR$nodes$id, snowballPro_comp$nodes$id)
 ```
 
-The following works are in `openalexR::oa_snowball()` but not in `openalexPro::pro_snowball()`:
+The following works are in `openalexR::oa_snowball()` but not in `openalexPro2::pro_snowball()`:
 
 ```{r}
 setdiff(snowballPro_comp$nodes$id, snowballR$nodes$id)
@@ -218,18 +218,20 @@ The difference in the last colum should be the same.
 #### Edges Identified
 
 ```{r}
-snowballPro_comp_edges <- paste0(snowballPro_comp$edges$from, " -> ", snowballPro_comp$edges$to)
+snowballPro_comp_edges <- paste0(
+  snowballPro_comp$edges$from, " -> ", snowballPro_comp$edges$to
+)
 snowballR_edges <- paste0(snowballR$edges$from, " -> ", snowballR$edges$to)
 ```
 
-The following edges are in `openalexR::oa_snowball()` but not in `openalexPro::pro_snowball()`:
+The following edges are in `openalexR::oa_snowball()` but not in `openalexPro2::pro_snowball()`:
 
 ```{r}
 
 setdiff(snowballR_edges, snowballPro_comp_edges)
 ```
 
-The following works are in `openalexR::oa_snowball()` but not in `openalexPro::pro_snowball()`:
+The following works are in `openalexR::oa_snowball()` but not in `openalexPro2::pro_snowball()`:
 
 ```{r}
 setdiff(snowballPro_comp_edges, snowballR_edges)

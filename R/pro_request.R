@@ -1,196 +1,203 @@
 #' `openalexR::oa_request()` with additional argument
 #'
-#' This function adds one argument to `openalexR::oa_request()`, namely `json_dir`.
-#' When specified, all return values from OpenAlex will be saved as jaon files in
-#' that directory and the return value is the directory of the json files.
+#' This function adds one argument to `openalexR::oa_request()`, namely
+#' `output`. When specified, all return values from OpenAlex will be saved as
+#' jaon files in that directory and the return value is the directory of the
+#' json files.
 #'
 #' For the documentation please see `openalexR::oa_request()`
 #'
 #' @param query_url The URL of the API query.
-#' @param per_page The number of items to be returned per page. Defaults to 200.
-#' @param paging The type of paging. Possible values are "page" and "cursor".
-#' @param pages The number of pages to be downloaded. If `NULL`, all pages will be downloaded.
-#' @param count_only Logical indicating whether to return only the count of the items returned by the query.
+#' @param pages The number of pages to be downloaded. The default is set to
+#'   1000, which would be 2,000,000 works. It is recommended to not increase it
+#'   beyond 1000 due to server load and to use the snapshot instead. If `NULL`,
+#'   all pages will be downloaded. Default: 1000.
+#' @param output directory where the JSON files are saved. Default is a
+#'   temporary directory. If `NULL`, the return value from call to
+#'   `openalexR::oa_request()` with all the arguments is returned
+#' @param format Format of the output files. At the moment, the following ones
+#'   are supported:
+#' - 'json': (default) saves the complete `json` response including metadata
+#' @param overwrite Logical. If `TRUE`, `output` will be deleted if it already
+#'   exists.
 #' @param mailto The email address of the user. See `openalexR::oa_email()`.
 #' @param api_key The API key of the user. See `openalexR::oa_apikey()`.
-#' @param verbose Logical indicating whether to show a progress bar.
-#' @param json_dir directory where the JSON files are saved. Default is a temporary directory. If `NULL`,
-#'   the return value from call to `openalexR::oa_request()` with all the arguments is returned.
+#' @param verbose Logical indicating whether to show verbose messages.
+#' @param progress Logical default `TRUE` indicating whether to show a progress
+#'   bar.
 #'
-#' @return If `json_dir` is `NULL`, the return value from call to `openalexR::oa_request()`,
-#'   otherwise the complete path to the expanded and normalized `json_dir`.
+#' @return If `output` is `NULL`, the return value from call to
+#'   `openalexR::oa_request()`, otherwise the complete path to the expanded and
+#'   normalized `output`.
 #'
 #' @md
 #'
 #' @importFrom openalexR oa_request
 #' @importFrom utils tail
+#' @importFrom httr2 req_url_query req_perform resp_body_json resp_body_string
+#' @importFrom utils setTxtProgressBar txtProgressBar packageVersion
 #'
 #' @export
 #'
 pro_request <- function(
-    query_url,
-    per_page = 200,
-    paging = "cursor",
-    pages = NULL,
-    count_only = FALSE,
-    mailto = oa_email(),
-    api_key = oa_apikey(),
-    verbose = FALSE,
-    json_dir = tempfile(fileext = ".json_dir")) {
-  if (is.null(json_dir)) {
-    return(
-      openalexR::oa_request(
-        query_url = query_url,
-        per_page = per_page,
-        paging = paging,
-        pages = pages,
-        count_only = count_only,
-        mailto = mailto,
-        api_key = api_key,
-        verbose = verbose
+  query_url,
+  pages = 1000,
+  output = NULL,
+  format = "json",
+  overwrite = FALSE,
+  mailto = oa_email(),
+  api_key = oa_apikey(),
+  verbose = FALSE,
+  progress = TRUE
+) {
+  # Argument Checks --------------------------------------------------------
+
+  if (is.null(output)) {
+    stop("No `output` output specified!")
+  }
+
+  if (dir.exists(output)) {
+    if (!overwrite) {
+      stop(
+        "Directory ",
+        output,
+        " exists.\n",
+        "Either specify `overwrite = TRUE` or delete it."
       )
-    )
-  }
-  #
-  #
-  #
-
-  if (!is.null(json_dir)) {
+    }
     if (verbose) {
-      message("Deleting and recreating `", json_dir, "` to avoid inconsistencies.")
+      message(
+        "Deleting and recreating `",
+        output,
+        "` to avoid inconsistencies."
+      )
     }
-
-    if (dir.exists(json_dir)) {
-      unlink(json_dir, recursive = TRUE)
-    }
-    dir.create(json_dir, recursive = TRUE)
+    unlink(output, recursive = TRUE)
   }
 
+  # Preparations -----------------------------------------------------------
 
-  # https://httr.r-lib.org/articles/api-packages.html#set-a-user-agent
-  ua <- httr::user_agent("https://github.com/ropensci/openalexR/")
+  dir.create(output, recursive = TRUE)
 
-  # building query...
-  is_group_by <- grepl("group_by", query_url)
-  if (is_group_by) {
-    result_name <- "group_by"
-    query_ls <- list()
+  output <- normalizePath(output)
+
+  if (grepl("group_by=", query_url)) {
+    page_prefix <- "group_by_page_"
   } else {
-    result_name <- "results"
-    query_ls <- list("per-page" = 1)
+    page_prefix <- "results_page_"
   }
 
-  if (!is.null(mailto)) {
-    if (isValidEmail(mailto)) {
-      query_ls[["mailto"]] <- mailto
-    } else {
-      message(mailto, " is not a valid email address")
-    }
-  }
+  # Created with help from chatGPT
+  # Base request with query and custom user agent
+  req <- httr2::request(query_url) |>
+    httr2::req_url_query(
+      per_page = 200,
+      cursor = "*",
+      mailto = mailto,
+      api_key = api_key
+    ) |>
+    httr2::req_user_agent(paste0(
+      "openalexPro2 v",
+      packageVersion("openalexPro2")
+    ))
 
-  # first, download info about n. of items returned by the query
-  res <- api_request(query_url, ua, query = query_ls, api_key = api_key)
+  # Remove empty query parameters
+  # req$url$query <- req$url$query[req$url$query != ""]
 
-  if (!is.null(res$meta)) {
-    ## return only item counting
-    if (count_only) {
-      return(res$meta)
-    }
+  # Initialize results and page counter
+  page <- 1
+
+  # resp <- httr2::req_perform(req)
+  resp <- api_call(req)
+
+  data <- resp |>
+    httr2::resp_body_json()
+
+  if (is.null(data$meta)) {
+    single_record <- TRUE
+    page_prefix <- "single_"
+    progress <- FALSE
   } else {
-    return(res)
-  }
-
-  # Setting items per page
-  query_ls[["per-page"]] <- per_page
-
-  if (is_group_by) {
-    data <- vector("list")
-    res <- NULL
-    i <- 1
-    next_page <- get_next_page("cursor", i, res)
-    if (verbose) cat("\nDownloading groups...\n|")
-    while (!is.null(next_page)) {
-      if (verbose) cat("=")
-      Sys.sleep(1 / 10)
-      query_ls[[paging]] <- next_page
-      res <- api_request(query_url, ua, query = query_ls, json_dir = json_dir)
-      if (is.null(json_dir)) {
-        data <- c(data, res[[result_name]])
-      }
-      i <- i + 1
-      next_page <- get_next_page("cursor", i, res)
+    single_record <- FALSE
+    if (progress) {
+      max_pages <- ceiling(data$meta$count / data$meta$per_page)
+      # Create a progress bar
+      pb <- txtProgressBar(min = 0, max = max_pages, style = 3)
     }
-    cat("\n")
-    return(data)
   }
 
-  n_items <- res$meta$count
-  n_pages <- ceiling(n_items / per_page)
-
-  ## number of pages
-  if (is.null(pages)) {
-    pages <- seq.int(n_pages)
-  } else {
-    pages <- pages[pages <= n_pages]
-    n_pages <- length(pages)
-    n_items <- min(n_items - per_page * (utils::tail(pages, 1) - n_pages), per_page * n_pages)
-    message("Using basic paging...")
-    paging <- "page"
-  }
-
-  if (n_items <= 0 || n_pages <= 0) {
-    warning("No records found!")
-    return(list())
-  }
-
-  pg_plural <- if (n_pages > 1) " pages" else " page"
-
-  if (verbose) {
-    message(
-      "Getting ", n_pages, pg_plural, " of results",
-      " with a total of ", n_items, " records..."
+  if (single_record) {
+    page <- 1
+    switch(
+      format,
+      "json" = {
+        resp |>
+          httr2::resp_body_string() |>
+          writeLines(
+            con = file.path(output, paste0(page_prefix, page, ".json"))
+          )
+      },
+      "parquet" = {
+        stop("Not yet supported putput format!")
+      },
+      stop("Unsupported putput format!")
     )
-    pb <- oa_progress(n = n_pages, text = "OpenAlex downloading")
+  } else {
+    # Pagination loop
+    repeat {
+      if (verbose) {
+        message("\nDownloading page ", page)
+        message("URL: ", req$url)
+      }
+
+      if (progress) {
+        setTxtProgressBar(pb, page) # Update progress bar
+      }
+
+      # resp <- httr2::req_perform(req)
+      resp <- api_call(req)
+
+      data <- httr2::resp_body_json(resp)
+
+      ## grouping returns at the moment a last page with no groups - this must
+      ## not be saved!
+      if (isTRUE(data$meta$groups_count == 0)) {
+        break
+      }
+      switch(
+        format,
+        "json" = {
+          resp |>
+            httr2::resp_body_string() |>
+            writeLines(
+              con = file.path(output, paste0(page_prefix, page, ".json"))
+            )
+        },
+        "parquet" = {
+          stop("Not yet supported output format!")
+        },
+        stop("Unsupported output format!")
+      )
+
+      if (is.null(data$meta$next_cursor)) {
+        break
+      }
+
+      # This is needed for groups as at the moment OpenAlex returns a final
+      # cursor page with no tresults if (isTRUE(data$meta$groups_count == 200))
+      # { break }
+
+      if (!is.null(pages)) {
+        if (page > pages) break # Remove this to fetch all pages
+      }
+
+      req <- req |>
+        httr2::req_url_query(cursor = data$meta$next_cursor)
+
+      page <- page + 1
+    }
   }
+  ###
 
-  # Activation of cursor pagination
-  data <- vector("list", length = n_pages)
-  res <- NULL
-  for (i in pages) {
-    if (verbose) pb$tick()
-    Sys.sleep(1 / 10)
-    next_page <- get_next_page(paging, i, res)
-    query_ls[[paging]] <- next_page
-    res <- api_request(query_url, ua, query = query_ls, json_dir = json_dir)
-    # if (is.null(json_dir)) {
-    #   if (!is.null(res[[result_name]])) data[[i]] <- res[[result_name]]
-    # }
-  }
-
-  # if (is.null(json_dir)) {
-  #   data <- unlist(data, recursive = FALSE)
-
-  #   if (grepl("filter", query_url) && grepl("works", query_url)) {
-  #     truncated <- unlist(truncated_authors(data))
-  #     if (length(truncated)) {
-  #       truncated <- shorten_oaid(truncated)
-  #       warning(
-  #         "\nThe following work(s) have truncated lists of authors: ",
-  #         paste(truncated, collapse = ", "),
-  #         ".\nQuery each work separately by its identifier to get full list of authors.\n",
-  #         "For example:\n  ",
-  #         paste0(
-  #           "lapply(c(\"",
-  #           paste(utils::head(truncated, 2), collapse = "\", \""),
-  #           "\"), \\(x) oa_fetch(identifier = x))"
-  #         ),
-  #         "\nDetails at https://docs.openalex.org/api-entities/authors/limitations."
-  #       )
-  #     }
-  #   }
-  # } else {
-  data <- normalizePath(json_dir)
-  # }
-  ##
-  return(data)
+  return(output)
 }

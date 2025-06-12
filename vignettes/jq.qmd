@@ -1,0 +1,91 @@
+---
+title: "Expanding Abstracts and Adding Citations Using jq"
+format:
+  pdf:
+    toc: false
+vignette: >
+  %\VignetteIndexEntry{Expanding Abstracts and Adding Citations Using jq}
+  %\VignetteEngine{quarto::pdf}
+  %\VignetteEncoding{UTF-8}
+execute: 
+  cache: false
+---
+
+## Goal
+
+Transform an OpenAlex-style `results_page_1.json` file to:
+
+* Reconstruct abstracts from `abstract_inverted_index`
+* Add a citation string
+* Output the result as **newline-delimited JSON** (.jsonl) for use with Arrow or DuckDB
+
+## Full `jq` Command
+
+```bash
+jq -c '
+  .results[]
+  | (
+      if .abstract_inverted_index == null then
+        .
+      else
+        . + {
+          abstract: (
+            [
+              .abstract_inverted_index
+              | to_entries
+              | map(.value[] as $i | {pos: $i, word: .key})
+              | .[]
+            ]
+            | sort_by(.pos)
+            | map(.word)
+            | join(" ")
+          )
+        }
+      end
+    )
+  | . + {
+      citation:
+        (if (.authorships | length) == 1 then
+          .authorships[0].author.display_name + " (" + (.publication_year|tostring) + ")"
+        elif (.authorships | length) == 2 then
+          .authorships[0].author.display_name + " & " + .authorships[1].author.display_name + " (" + (.publication_year|tostring) + ")"
+        elif (.authorships | length) > 2 then
+          .authorships[0].author.display_name + " et al. (" + (.publication_year|tostring) + ")"
+        else null end)
+    }
+' results_page_1.json > results_with_abstracts_and_citations.jsonl
+```
+
+## Line-by-Line Explanation
+
+### `.results[]`
+
+* Iterates over each entry in the top-level array of works
+
+### `if .abstract_inverted_index == null then . else ... end`
+
+* Skips processing if no abstract is present
+
+### `. + { abstract: ... }`
+
+* Adds a new field `abstract` if applicable
+
+### Reconstructing the Abstract
+
+* `to_entries`: converts the word-position map to key-value pairs
+* `map(.value[] as $i | {pos: $i, word: .key})`: flattens to {pos, word} pairs
+* `sort_by(.pos)`: ensures word order is correct
+* `map(.word) | join(" ")`: reconstructs the abstract as a single string
+
+### Adding the Citation
+
+* Uses a conditional to mimic DuckDB's CASE statement:
+
+  * 1 author → `Last (Year)`
+  * 2 authors → `A & B (Year)`
+  * 3+ authors → `A et al. (Year)`
+* `tostring`: safely casts `publication_year` to a string
+
+### Output
+
+* `-c` option produces NDJSON (new

@@ -1,59 +1,95 @@
 #' Read snowball from Parquet Dataset
 #'
-#' This function reads a snowball from Apache Parquet format and returns a list containing
-#' nodes and edges, which can be either Arrow Datasets or `tibble`s.
+#' This function reads a snowball from Apache Parquet format and returns a list
+#' containing nodes and edges, which can be either Arrow Datasets or `tibble`s.
 #'
-#' @param snowball The directory of the Parquet files as poppulater by `pro_snowball()`.
-#' @param return_data Logical indicating whether to return Arrow Datasets (`FALSE`, default)
-#'   or `tibble`s.
-#' @param comp_mode Compatibility mode with `openalexR::oa_snowball()`. If `TRUE`, the
-#'   format of the returned values is identical to the return value from `openalexR::oa_snowball()`,
-#'   if `FALSE`, the nodes are in the format as downloaded from `openalexRro::pro_snowball()`. `edges
-#'   contains all edges from the snowball, including citations between the identified paper as well as
-#'   citations of papers not included in `nodes`. `edges` also contains two additional columns, namely
-#'   `source_from` and `source_to`, indicating if the id in the `from`` or `to` respectively are from a
-#'   `"keypaper"`, `"nodes"` or `"oa"`, i.e. not in nodes.
-#'   Defaults to `FALSE`.
+#' @param snowball The directory of the Parquet files as poppulater by
+#'   `pro_snowball()`.
+#' @param edge_type type of the returned edges. Possible values are:
+#' - **`core`**: only edges from or to the keypapers are selected
+#' - **`extended`**, only edges between the `nodes` are selected
+#'     (this includes `core` edges)
+#' - **`outside`**: only  edges where either the `from` or the `to`
+#'     is not in `nodes`
+#' multiple are allowed.
+#' @param return_data Logical indicating whether to return an `ArrowObject`
+#'   representing the corpus (default) or a `tibble` containing the whole corpus
+#'   shou,d be returned.
+#' @param shorten_ids If `TRUE` the ids will be shortened, i.e. the part
+#'   `https://openalex.org/` will be removed
 #'
-#' @return A list containing two elements: nodes and edges, which are either Arrow Datasets or `tibble`s.
+#' @return A list containing two elements: nodes and edges, which are either
+#'   `ArrowObject` representing the corpus or `tibble`s containing the data.
 #'
 #' @md
 #'
-#' @importFrom dplyr filter select collect
+#' @importFrom dplyr filter select collect arrange desc
 #'
 #' @export
 read_snowball <- function(
-    snowball,
-    return_data = FALSE,
-    comp_mode = FALSE) {
+  snowball = NULL,
+  edge_type = c("core", "extended", "outside"),
+  return_data = FALSE,
+  shorten_ids = TRUE
+) {
+  if (is.null(snowball)) {
+    stop("Directory `snowball` missing!")
+  }
+
+  if (!dir.exists(snowball)) {
+    stop("Directory `snowball` does not exist!")
+  }
+
+  edge_type <- match.arg(edge_type, several.ok = TRUE)
+
+  # Nodes ------------------------------------------------------------------
+
   nodes <- read_corpus(
-    corpus = file.path(snowball, "nodes.parquet"),
-    return_data = return_data,
-    comp_mode = comp_mode
-  )
+    corpus = file.path(snowball, "nodes"),
+    return_data = FALSE
+  ) |>
+    dplyr::arrange(
+      dplyr::desc(oa_input),
+      id
+    )
 
-  edges <- read_corpus(
-    corpus = file.path(snowball, "edges.parquet"),
-    return_data = FALSE,
-    comp_mode = FALSE
-  )
-
-  if (comp_mode) {
-    edges <- edges |>
-      dplyr::filter(
-        from_source != "oa",
-        to_source != "oa",
-        from_source == "keypaper" | to_source == "keypaper"
-      ) |>
-      dplyr::select(
-        -from_source,
-        -to_source
+  if (shorten_ids) {
+    nodes <- nodes |>
+      dplyr::mutate(
+        id = gsub("^https://openalex.org/", "", id)
       )
   }
 
-  if (return_data) {
-    edges <- collect(edges)
+  # Edges ------------------------------------------------------------------
+
+  edges <- read_corpus(
+    corpus = file.path(snowball, "edges"),
+    return_data = FALSE
+  ) |>
+    dplyr::filter(
+      edge_type %in% .env$edge_type
+    ) |>
+    dplyr::arrange(
+      from,
+      to
+    )
+
+  if (shorten_ids) {
+    edges <- edges |>
+      dplyr::mutate(
+        from = gsub("^https://openalex.org/", "", from),
+        to = gsub("^https://openalex.org/", "", to)
+      )
   }
+
+  # Collect or not ---------------------------------------------------------
+
+  if (return_data) {
+    nodes <- dplyr::collect(nodes)
+    edges <- dplyr::collect(edges)
+  }
+
+  # Return -----------------------------------------------------------------
 
   return(
     list(
@@ -62,10 +98,3 @@ read_snowball <- function(
     )
   )
 }
-
-globalVariables(
-  c(
-    "from_source",
-    "to_source"
-  )
-)

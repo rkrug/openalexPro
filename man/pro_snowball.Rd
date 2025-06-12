@@ -7,17 +7,17 @@ and convert the result to a tibble/data frame.}
 \usage{
 pro_snowball(
   identifier = NULL,
-  snowball = tempfile(fileext = ".snowball"),
-  partition = NULL,
+  doi = NULL,
+  output = tempfile(fileext = ".snowball"),
   verbose = FALSE
 )
 }
 \arguments{
 \item{identifier}{Character vector of openalex identifiers.}
 
-\item{snowball}{parquet dataset; default: temporary directory.}
+\item{doi}{Character vector of dois.}
 
-\item{partition}{The column which should be used to partition the table. Hive partitioning is used.}
+\item{output}{parquet dataset; default: temporary directory.}
 
 \item{verbose}{Logical indicating whether to show a verbose information. Defaults to \code{FALSE}}
 }
@@ -39,7 +39,7 @@ and convert the result to a tibble/data frame.
 \examples{
 \dontrun{
 
-snowball_docs <- oa_snowball(
+snowball_docs <- pro_snowball(
   identifier = c("W2741809807", "W2755950973"),
   citing_params = list(from_publication_date = "2022-01-01"),
   cited_by_params = list(),

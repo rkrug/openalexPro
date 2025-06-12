@@ -1,11 +1,12 @@
 Type: Package
-Package: openalexPro
+Package: openalexPro2
 Title: Providing a more advanced access to OpenAlex for the power user
-Version: 0.6.4
-Date: 2024-09-19
+Version: 0.0.2
 Author: Rainer M Krug
 Maintainer: Rainer M Krug <Rainer@krugs.de>
 Description: More about what it does (maybe more than one line).
+URL: https://github.com/rkrug/openalexPro
+BugReports: https://github.com/rkrug/openalexPro/issues
 License: GPL (>= 2)
 Depends:
     R (>= 4.1.0)
@@ -14,14 +15,25 @@ Imports:
     DBI,
     dplyr,
     duckdb,
-    httr,
+    ggplot2,
+    ggraph,
+    httr2,
+    jsonlite,
+    jqr,
     openalexR (>= 1.4.0),
-    RcppSimdJson,
-    tictoc
+    rlang,
+    tidygraph,
+    tidyselect
+Additional_repositories: 
+    https://ropensci.r-universe.dev
 Suggests: 
     knitr,
     rmarkdown,
-    testthat (>= 3.0.0)
-Config/testthat/edition: 3
+    quarto,
+    testthat (>= 3.0.0),
+    vcr (> 1.7.0),
+    vdiffr
 Encoding: UTF-8
 RoxygenNote: 7.3.2
+VignetteBuilder: quarto
+Config/testthat/edition: 3

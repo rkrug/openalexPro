@@ -4,27 +4,20 @@
 \alias{read_corpus}
 \title{Read corpus from Parquet Dataset}
 \usage{
-read_corpus(
-  corpus,
-  return_data = FALSE,
-  comp_mode = FALSE,
-  duplicate_ids = TRUE
-)
+read_corpus(corpus, return_data = FALSE)
 }
 \arguments{
 \item{corpus}{The directory of the Parquet files.}
 
-\item{return_data}{Logical indicating whether to return an Arrow Dataset
-(default) or a \code{tibble}.}
-
-\item{comp_mode}{Compatibility mode with \code{openalexR} return values from  \code{openalexR::fetch( output = "tibble")} (default: \code{FALSE}).
-If \verb{TRUE,}, the format of the returned values is identical to \code{openalexR::fetch( output = "tibble")},
-if \code{FALSE}, the format may be functionally identical, but not structurally.}
+\item{return_data}{Logical indicating whether to return an
+\code{ArrowObject} representing the corpus (default) or a
+\code{tibble} containing the whole corpus shou,d be returned.}
 }
 \value{
-An Arrow Dataset or a \code{tibble}.
+An \code{ArrowObject} representing the corpus or a \code{tibble}.
 }
 \description{
-This function reads a corpus in Apache Parquet format and returns an Arrow
-Dataset or a \code{tibble}.
+This function reads a corpus in Apache Parquet format and returns an
+\code{ArrowObject} representing the corpus which can be fed into a \code{dplyr} pipeline
+or a \code{tibble} which contains all the data.
 }

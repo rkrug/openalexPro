@@ -5,7 +5,8 @@
 #'
 #' @param sql_file The path to the SQL file.
 #'
-#' @return A string containing the SQL code which c an be executed in e.g. `DBI::dbExecute(conn, sql)`
+#' @return A string containing the SQL code which c an be executed in e.g.
+#'   `DBI::dbExecute(conn, sql)`
 #'
 #' @export
 load_sql_file <- function(sql_file = NULL) {
