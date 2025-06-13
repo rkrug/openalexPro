@@ -5,7 +5,7 @@ Version: 0.0.2
 Author: Rainer M Krug
 Maintainer: Rainer M Krug <Rainer@krugs.de>
 Description: More about what it does (maybe more than one line).
-URL: https://github.com/rkrug/openalexPro
+URL: https://github.com/rkrug/openalexPro, https://rkrug.github.io/openalexPro/
 BugReports: https://github.com/rkrug/openalexPro/issues
 License: GPL (>= 2)
 Depends:

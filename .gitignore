@@ -51,3 +51,4 @@ tmp.txt
 tests/fixtures/vcr/vcr.log
 /doc/
 /Meta/
+docs
