@@ -50,7 +50,11 @@ query to convert the JSON files to Apache Parquet files and to copy the
 result to the specified directory.
 }
 \examples{
-\dontrun{ source_to_parquet(input_json = "json", source_type =
-  "snapshot", output = "arrow") }
+\dontrun{
+  source_to_parquet(
+  input_json = "json",
+  source_type = "snapshot",
+  output = "parquet"
+) }
 
 }

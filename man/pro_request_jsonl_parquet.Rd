@@ -46,8 +46,3 @@ and readsds the JSON files into DuckDB when needed. Then it creates a SQL
 query to convert the JSON files to Apache Parquet files and to copy the
 result to the specified directory.
 }
-\examples{
-\dontrun{ source_to_parquet(input_jsonl = "json", source_type =
-  "snapshot", output = "arrow") }
-
-}

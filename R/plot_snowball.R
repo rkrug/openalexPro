@@ -27,7 +27,10 @@
 #' @importFrom utils hasName
 #' @importFrom tidyselect all_of
 #'
-#' @examples \dontrun{ plot_snowball(snowball, "example") }
+#' @examples
+#' \dontrun{
+#'   plot_snowball(snowball, "example")
+#' }
 plot_snowball <- function(
     snowball,
     size = "cited_by_count_by_year",

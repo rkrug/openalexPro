@@ -37,15 +37,3 @@ such that a row \verb{A, B} means A -> B means A cites B. In bibliometrics, the
 A function to perform a snowball search and convert the result to a
 tibble/data frame.
 }
-\examples{
-\dontrun{
-
-snowball_docs <- pro_snowball( identifier = c("W2741809807", "W2755950973"),
-citing_params = list(from_publication_date = "2022-01-01"), cited_by_params =
-list(), verbose = TRUE )
-
-# Identical to above, but searches using paper DOIs snowball_docs_doi <-
-oa_snowball( doi = c("10.1016/j.joi.2017.08.007", "10.7717/peerj.4375"),
-citing_params = list(from_publication_date = "2022-01-01"), cited_by_params =
-list(), verbose = TRUE ) }
-}
