@@ -11,7 +11,10 @@ execute:
   cache: false
 ---
 
-```{r, include = FALSE}
+```{r}
+#| include: false
+#|
+
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
@@ -47,13 +50,16 @@ The last wheel in the puzzle is the extraction of the actual references from the
 
 The "stable" version is available via [r-universe](https://rkrug.r-universe.dev/openalexPro2)
 
-```r
-install.packages('openalexPro2', repos = c('https://rkrug.r-universe.dev', 'https://cloud.r-project.org'))
+```{r}
+install.packages(
+  'openalexPro2',
+  repos = c('https://rkrug.r-universe.dev', 'https://cloud.r-project.org')
+)
 ```
 
 The "development" version can be installed from github using
 
-```r
+```{r}
 remotes::install_github("rkrug/openalexPro", ref = "openalexPro2")
 ```
 
@@ -67,7 +73,7 @@ This workflow can be stoped at any of the stages, and the json files can be proc
 
 The query is defined using the function `openalexR:oa_query()`. For details about arguments and how to use it, please see there. For convenience, it is re-published in the `openalexPro2` package.
 
-```r
+```{r}
 library(openalexPro2)
 
 res <- oa_query(
@@ -81,14 +87,14 @@ res <- oa_query(
 The returned jsons are saved as jsons on the disk in the folder provided by the argument `output`.
 They contain metadata from the request as well as the results.
 
-```r
+```{r}
 json_raw <- "./json_raw"
 openalexPro2::pro_request(
   query_url = query_url,
   output = json_raw,
   verbose = TRUE,
   json_dir = "json_files"
-  )
+)
 ```
 
 ## 3. Process `json` files
@@ -101,7 +107,7 @@ The processing of the json files is doing the following:
 
 The results are saved in the folder provided by the argument `output`.
 
-```r
+```{r}
 json_extracted <- "./json_extracted"
 openalex_jsonl_folder <- openalexPoro2::pro_request_jsonl(
   json_dir = "json_files",
@@ -114,7 +120,7 @@ openalex_jsonl_folder <- openalexPoro2::pro_request_jsonl(
 
 Here the files are converted into a parquet dataset saved as individual `parquet` files in the folder provided by the argument `output`.
 
-```r
+```{r}
 parquet <- "./parquet"
 openalexPro2::pro_request_jsonl_parquet(
   json_dir = json_extracted,
@@ -157,7 +163,7 @@ These contain the following files:
 
 ### Use OpenAlex ids
 
-```r
+```{r}
 snowball_dir <- "./snowball_ids"
 snowball_docs <- pro_snowball(
   identifier = c("W2741809807", "W2755950973"),
@@ -168,7 +174,7 @@ snowball_docs <- pro_snowball(
 
 ### Use DOIs
 
-```r
+```{r}
 snowball_dir_dois <- "./snowball_dois"
 oa_snowball(
   doi = c("10.1016/j.joi.2017.08.007", "10.7717/peerj.4375"),
