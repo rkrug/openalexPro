@@ -10,7 +10,8 @@ load_sql_file(sql_file = NULL)
 \item{sql_file}{The path to the SQL file.}
 }
 \value{
-A string containing the SQL code which c an be executed in e.g. `DBI::dbExecute(conn, sql)`
+A string containing the SQL code which c an be executed in e.g.
+  `DBI::dbExecute(conn, sql)`
 }
 \description{
 Load a SQL file, remove all comments starting with "--" and return the SQL as

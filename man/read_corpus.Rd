@@ -9,15 +9,15 @@ read_corpus(corpus, return_data = FALSE)
 \arguments{
 \item{corpus}{The directory of the Parquet files.}
 
-\item{return_data}{Logical indicating whether to return an
-\code{ArrowObject} representing the corpus (default) or a
-\code{tibble} containing the whole corpus shou,d be returned.}
+\item{return_data}{Logical indicating whether to return an \code{ArrowObject}
+representing the corpus (default) or a \code{tibble} containing the whole corpus
+shou,d be returned.}
 }
 \value{
 An \code{ArrowObject} representing the corpus or a \code{tibble}.
 }
 \description{
 This function reads a corpus in Apache Parquet format and returns an
-\code{ArrowObject} representing the corpus which can be fed into a \code{dplyr} pipeline
-or a \code{tibble} which contains all the data.
+\code{ArrowObject} representing the corpus which can be fed into a \code{dplyr}
+pipeline or a \code{tibble} which contains all the data.
 }

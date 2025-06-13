@@ -18,21 +18,27 @@ jq_execute(
 
 \item{output_jsonl}{Path to the output .jsonl file}
 
-\item{add_columns}{List of additional fields to be added to the output. They nave to be provided as a
-named list, e./g. `list(column_1 = "value_1", column_2 = 2)`. Only Scalar values are supported.}
+\item{add_columns}{List of additional fields to be added to the output. They
+nave to be provided as a named list, e./g. `list(column_1 = "value_1",
+column_2 = 2)`. Only Scalar values are supported.}
 
-\item{jq_filter}{Optional custom jq filter string. If NULL, the default filter is used.}
+\item{jq_filter}{Optional custom jq filter string. If NULL, the default
+filter is used.}
 
-\item{page}{Optional integer to be added as a "page" field in each output record}
+\item{page}{Optional integer to be added as a "page" field in each output
+record}
 
-\item{type}{Either "results" (default, expects a .results[] array) or "single" (treat input as array of records directly)}
+\item{type}{Either "results" (default, expects a .results[] array) or
+"single" (treat input as array of records directly)}
 }
 \value{
 Invisibly returns the output path
 }
 \description{
-This function runs a jq filter to extract records from the "results" array (or from the root
-if type = "single"), reconstruct the abstract text, generate a citation string, and optionally
-add a page field. It writes the result as newline-delimited JSON (.jsonl), suitable for Arrow or DuckDB.
-For details on the jq filter logic, see the \code{\link{vignette}}("jq", package = "openalexPro2").
+This function runs a jq filter to extract records from the "results" array
+(or from the root if type = "single"), reconstruct the abstract text,
+generate a citation string, and optionally add a page field. It writes the
+result as newline-delimited JSON (.jsonl), suitable for Arrow or DuckDB. For
+details on the jq filter logic, see the \code{\link{vignette}}("jq", package
+= "openalexPro2").
 }

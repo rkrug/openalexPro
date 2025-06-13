@@ -14,35 +14,40 @@ pro_request_jsonl_parquet(
 )
 }
 \arguments{
-\item{input_jsonl}{The directory of JSON files returned from \code{pro_request(..., json_dir = "FOLDER")}.}
+\item{input_jsonl}{The directory of JSON files returned from
+\code{pro_request(..., json_dir = "FOLDER")}.}
 
-\item{output}{output  directory for the parquet dataset; default: temporary directory.}
+\item{output}{output directory for the parquet dataset; default: temporary
+directory.}
 
-\item{add_columns}{List of additional fields to be added to the output. They nave to be provided as a
-named list, e./g. \code{list(column_1 = "value_1", column_2 = 2)}. Only Scalar values are supported.}
+\item{add_columns}{List of additional fields to be added to the output. They
+nave to be provided as a named list, e./g. \code{list(column_1 = "value_1", column_2 = 2)}. Only Scalar values are supported.}
 
 \item{overwrite}{Logical indicating whether to overwrite \code{output}.}
 
-\item{verbose}{Logical indicating whether to show a verbose information. Defaults to \code{TRUE}}
+\item{verbose}{Logical indicating whether to show a verbose information.
+Defaults to \code{TRUE}}
 
-\item{delete_input}{Determines if the \code{input_jsonl} should be deleted afterwards. Defaults to \code{FALSE}.}
+\item{delete_input}{Determines if the \code{input_jsonl} should be deleted
+afterwards. Defaults to \code{FALSE}.}
 }
 \value{
 The function does returns the output invisibly.
 }
 \description{
-The function takes a directory of JSON files as written from a call to \code{pro_request(..., json_dir = "FOLDER")}
-and converts it to a Apache Parquet dataset partitiond by the page.
+The function takes a directory of JSON files as written from a call to
+\code{pro_request(..., json_dir = "FOLDER")} and converts it to a Apache Parquet
+dataset partitiond by the page.
 }
 \details{
 The function uses DuckDB to read the JSON files and to create the
-Apache Parquet files. The function creates a DuckDB connection in memory and
-readsds the JSON files into DuckDB when needed. Then it creates a SQL query to convert the
-JSON files to Apache Parquet files and to copy the result to the specified
-directory.
+Apache Parquet files. The function creates a DuckDB connection in memory
+and readsds the JSON files into DuckDB when needed. Then it creates a SQL
+query to convert the JSON files to Apache Parquet files and to copy the
+result to the specified directory.
 }
 \examples{
-\dontrun{
-source_to_parquet(input_jsonl = "json", source_type = "snapshot", output = "arrow")
-}
+\dontrun{ source_to_parquet(input_jsonl = "json", source_type =
+  "snapshot", output = "arrow") }
+
 }

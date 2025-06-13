@@ -16,19 +16,24 @@ normalize_parquet(
 \arguments{
 \item{input_dir}{The directory with the parquet files or a parquet dataset.}
 
-\item{output_dir}{parquet dataset with the normalized schemata. Non partitioned, but split into several files.}
+\item{output_dir}{parquet dataset with the normalized schemata. Non
+partitioned, but split into several files.}
 
-\item{overwrite}{Determines if the uputput parquet database shlud be overwritten if it exists. Defauls to \code{FALSE}.}
+\item{overwrite}{Determines if the uputput parquet database shlud be
+overwritten if it exists. Defauls to \code{FALSE}.}
 
-\item{ROW_GROUP_SIZE}{Maximum number of rows per row group. Smaller sizes reduce memory
-usage, larger sizes improve compression. Defaults to \code{10000}.
-See: \url{https://duckdb.org/docs/sql/statements/copy#row_group_size} for details.}
+\item{ROW_GROUP_SIZE}{Maximum number of rows per row group. Smaller sizes
+reduce memory usage, larger sizes improve compression. Defaults to \code{10000}.
+See: \url{https://duckdb.org/docs/sql/statements/copy#row_group_size} for
+details.}
 
-\item{ROW_GROUPS_PER_FILE}{Number of row groups to include in each output Parquet file.
-Controls file size and write frequency. Defaults to \code{1}
-See: \url{https://duckdb.org/docs/sql/statements/copy#row_groups_per_file} for details.}
+\item{ROW_GROUPS_PER_FILE}{Number of row groups to include in each output
+Parquet file. Controls file size and write frequency. Defaults to \code{1} See:
+\url{https://duckdb.org/docs/sql/statements/copy#row_groups_per_file} for
+details.}
 
-\item{delete_input}{Determines if the \code{inputdir} should be deleted afterwards. Defaults to \code{FALSE}.}
+\item{delete_input}{Determines if the \code{inputdir} should be deleted
+afterwards. Defaults to \code{FALSE}.}
 }
 \value{
 The function does return the \code{output_dir}.
@@ -38,7 +43,8 @@ The function takes a directory of parquet files and normalizes the schemata.
 \strong{NB: All partitioning in the input parquet dataset will be lost!}
 }
 \details{
-The function uses DuckDB to normalize the schemata. The function creates a DuckDB
-connection in memory and reads the parquet files into DuckDB when needed and re-writes
-it in a non-partitioned parquet database with a normalized schemata.
+The function uses DuckDB to normalize the schemata. The function
+creates a DuckDB connection in memory and reads the parquet files into
+DuckDB when needed and re-writes it in a non-partitioned parquet database
+with a normalized schemata.
 }

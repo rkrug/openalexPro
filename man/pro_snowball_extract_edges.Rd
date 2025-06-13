@@ -13,20 +13,21 @@ pro_snowball_extract_edges(
 \arguments{
 \item{nodes}{Path to the nodes parquet dataset}
 
-\item{output}{output folder, in which the parquet database containing the edges called \code{edges} will be savedp
-default: temporary directory.}
+\item{output}{output folder, in which the parquet database containing the
+edges called \code{edges} will be savedp default: temporary directory.}
 
-\item{verbose}{Logical indicating whether to show a verbose information. Defaults to \code{FALSE}}
+\item{verbose}{Logical indicating whether to show a verbose information.
+Defaults to \code{FALSE}}
 }
 \value{
 A list containing 2 elements:
 \itemize{
 \item nodes: dataframe with publication records.
-The last column \code{oa_input} indicates whether the work was
-one of the input \code{identifier}(s).
+The last column \code{oa_input} indicates whether the work was one of the input
+\code{identifier}(s).
 \item edges: publication link dataframe of 2 columns \verb{from, to}
-such that a row \verb{A, B} means A -> B means A cites B.
-In bibliometrics, the "citation action" comes from A to B.
+such that a row \verb{A, B} means A -> B means A cites B. In bibliometrics, the
+"citation action" comes from A to B.
 }
 }
 \description{
@@ -35,19 +36,12 @@ A function to extract the edges from a parquet database containing the nodes
 \examples{
 \dontrun{
 
-snowball_docs <- pro_snowball(
-   = c("W2741809807", "W2755950973"),
-  citing_params = list(from_publication_date = "2022-01-01"),
-  cited_by_params = list(),
-  verbose = TRUE
-)
+snowball_docs <- pro_snowball( = c("W2741809807", "W2755950973"),
+citing_params = list(from_publication_date = "2022-01-01"), cited_by_params =
+list(), verbose = TRUE )
 
-# Identical to above, but searches using paper DOIs
-snowball_docs_doi <- oa_snowball(
-  doi = c("10.1016/j.joi.2017.08.007", "10.7717/peerj.4375"),
-  citing_params = list(from_publication_date = "2022-01-01"),
-  cited_by_params = list(),
-  verbose = TRUE
-)
-}
+# Identical to above, but searches using paper DOIs snowball_docs_doi <-
+oa_snowball( doi = c("10.1016/j.joi.2017.08.007", "10.7717/peerj.4375"),
+citing_params = list(from_publication_date = "2022-01-01"), cited_by_params =
+list(), verbose = TRUE ) }
 }

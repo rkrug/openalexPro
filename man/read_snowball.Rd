@@ -12,27 +12,31 @@ read_snowball(
 )
 }
 \arguments{
-\item{snowball}{The directory of the Parquet files as poppulater by \code{pro_snowball()}.}
+\item{snowball}{The directory of the Parquet files as poppulater by
+\code{pro_snowball()}.}
 
 \item{edge_type}{type of the returned edges. Possible values are:
 \itemize{
 \item \strong{\code{core}}: only edges from or to the keypapers are selected
-\item \strong{\code{extended}}, only edges between the \code{nodes} are selected (this includes \code{core} edges)
-\item \strong{\code{outside}}: only  edges where either the \code{from} or the \code{to} is not in \code{nodes}
+\item \strong{\code{extended}}, only edges between the \code{nodes} are selected
+(this includes \code{core} edges)
+\item \strong{\code{outside}}: only  edges where either the \code{from} or the \code{to}
+is not in \code{nodes}
 multiple are allowed.
 }}
 
-\item{return_data}{Logical indicating whether to return an
-\code{ArrowObject} representing the corpus (default) or a
-\code{tibble} containing the whole corpus shou,d be returned.}
+\item{return_data}{Logical indicating whether to return an \code{ArrowObject}
+representing the corpus (default) or a \code{tibble} containing the whole corpus
+shou,d be returned.}
 
-\item{shorten_ids}{If \code{TRUE} the ids will be shortened, i.e. the part \verb{https://openalex.org/} will be removed}
+\item{shorten_ids}{If \code{TRUE} the ids will be shortened, i.e. the part
+\verb{https://openalex.org/} will be removed}
 }
 \value{
 A list containing two elements: nodes and edges, which are either
 \code{ArrowObject} representing the corpus or \code{tibble}s containing the data.
 }
 \description{
-This function reads a snowball from Apache Parquet format and returns a list containing
-nodes and edges, which can be either Arrow Datasets or \code{tibble}s.
+This function reads a snowball from Apache Parquet format and returns a list
+containing nodes and edges, which can be either Arrow Datasets or \code{tibble}s.
 }
