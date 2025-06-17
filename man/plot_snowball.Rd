@@ -14,11 +14,14 @@ plot_snowball(
 \arguments{
 \item{snowball}{A snowball object containing the data to be plotted.}
 
-\item{size}{The size of the nodes in the plot. Can be either a coumn name from snowball$nodes, "cited_by_count_by_year" or a numeric value.
-If "cited_by_count_by_year", the size is calculated by dividing the number of citations by the number of years.
-If numeric, the size of the nodes is set to the value.}
+\item{size}{The size of the nodes in the plot. Can be either a coumn name
+from snowball$nodes, "cited_by_count_by_year" or a numeric value. If
+"cited_by_count_by_year", the size is calculated by dividing the number of
+citations by the number of years. If numeric, the size of the nodes is set
+to the value.}
 
-\item{label}{The label of the nodes in the plot. If not specified, the id of the nodes is used.}
+\item{label}{The label of the nodes in the plot. If not specified, the id of
+the nodes is used.}
 
 \item{title}{The title of the plots.}
 }
@@ -26,11 +29,10 @@ If numeric, the size of the nodes is set to the value.}
 No return value, called for side effects.
 }
 \description{
-This function takes a snowball object and a name, and creates two plots: one sized by cited_by_count and the other by cited_by_count_by_year.
-The plots are saved as both PDF and PNG in the specified path.
+This function takes a snowball object and a name, and creates two plots: one
+sized by cited_by_count and the other by cited_by_count_by_year. The plots
+are saved as both PDF and PNG in the specified path.
 }
 \examples{
-\dontrun{
-plot_snowball(snowball, "example")
-}
+\dontrun{ plot_snowball(snowball, "example") }
 }
