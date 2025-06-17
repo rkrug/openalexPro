@@ -1,18 +1,30 @@
-#' Perform an API call to the OpenAlex API
+#' Perform an API call to the OpenAlex API with retry logic
 #'
 #' This function performs a request to the OpenAlex API and handles different
-#' HTTP status codes.
+#' HTTP status codes with retry for transient errors.
 #'
 #' @param req A request object created by \code{\link[httr2]{request}}.
-#'
-#' @return A response object or an error message.
-#'
-#' @importFrom httr2 req_perform resp_status resp_body_string
-#' @importFrom jsonlite fromJSON
+#' @param max_tries Maximum number of retry attempts (default: 5)
+#' @return A response object or error.
+#' @importFrom httr2 req_perform resp_status
 #' @importFrom rlang caller_env
-#'
 #' @noRd
-api_call <- function(req) {
+
+api_call <- function(
+  req,
+  max_retries = 5
+) {
+  # Add  retry logic for potentially transient errors ---
+  req <- req |>
+    httr2::req_retry(
+      max_tries = 5,
+      backoff = ~ 2^.x, # exponential backoff
+      is_transient = function(resp) {
+        status <- httr2::resp_status(resp)
+        status %in% c(500, 502, 503, 504, 429)
+      }
+    )
+
   # Perform the request and capture errors
   resp <- httr2::req_perform(
     req,
