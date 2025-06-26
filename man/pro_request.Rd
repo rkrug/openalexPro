@@ -8,7 +8,6 @@ pro_request(
   query_url,
   pages = 1000,
   output = NULL,
-  format = "json",
   overwrite = FALSE,
   mailto = oa_email(),
   api_key = oa_apikey(),
@@ -27,12 +26,6 @@ all pages will be downloaded. Default: 1000.}
 \item{output}{directory where the JSON files are saved. Default is a
 temporary directory. If \code{NULL}, the return value from call to
 \code{openalexR::oa_request()} with all the arguments is returned}
-
-\item{format}{Format of the output files. At the moment, the following ones
-are supported:
-\itemize{
-\item 'json': (default) saves the complete \code{json} response including metadata
-}}
 
 \item{overwrite}{Logical. If \code{TRUE}, \code{output} will be deleted if it already
 exists.}

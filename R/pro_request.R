@@ -15,9 +15,6 @@
 #' @param output directory where the JSON files are saved. Default is a
 #'   temporary directory. If `NULL`, the return value from call to
 #'   `openalexR::oa_request()` with all the arguments is returned
-#' @param format Format of the output files. At the moment, the following ones
-#'   are supported:
-#' - 'json': (default) saves the complete `json` response including metadata
 #' @param overwrite Logical. If `TRUE`, `output` will be deleted if it already
 #'   exists.
 #' @param mailto The email address of the user. See `openalexR::oa_email()`.
@@ -43,7 +40,6 @@ pro_request <- function(
   query_url,
   pages = 1000,
   output = NULL,
-  format = "json",
   overwrite = FALSE,
   mailto = oa_email(),
   api_key = oa_apikey(),
@@ -108,7 +104,10 @@ pro_request <- function(
   page <- 1
 
   # resp <- httr2::req_perform(req)
-  resp <- api_call(req)
+  resp <- api_call(
+    req,
+    error_log = file.path(output, "error.log")
+  )
 
   data <- resp |>
     httr2::resp_body_json()
@@ -128,20 +127,11 @@ pro_request <- function(
 
   if (single_record) {
     page <- 1
-    switch(
-      format,
-      "json" = {
-        resp |>
-          httr2::resp_body_string() |>
-          writeLines(
-            con = file.path(output, paste0(page_prefix, page, ".json"))
-          )
-      },
-      "parquet" = {
-        stop("Not yet supported putput format!")
-      },
-      stop("Unsupported putput format!")
-    )
+    resp |>
+      httr2::resp_body_string() |>
+      writeLines(
+        con = file.path(output, paste0(page_prefix, page, ".json"))
+      )
   } else {
     # Pagination loop
     repeat {
@@ -155,7 +145,10 @@ pro_request <- function(
       }
 
       # resp <- httr2::req_perform(req)
-      resp <- api_call(req)
+      resp <- api_call(
+        req,
+        error_log = file.path(output, "error.log")
+      )
 
       data <- httr2::resp_body_json(resp)
 
@@ -164,20 +157,11 @@ pro_request <- function(
       if (isTRUE(data$meta$groups_count == 0)) {
         break
       }
-      switch(
-        format,
-        "json" = {
-          resp |>
-            httr2::resp_body_string() |>
-            writeLines(
-              con = file.path(output, paste0(page_prefix, page, ".json"))
-            )
-        },
-        "parquet" = {
-          stop("Not yet supported output format!")
-        },
-        stop("Unsupported output format!")
-      )
+      resp |>
+        httr2::resp_body_string() |>
+        writeLines(
+          con = file.path(output, paste0(page_prefix, page, ".json"))
+        )
 
       if (is.null(data$meta$next_cursor)) {
         break
