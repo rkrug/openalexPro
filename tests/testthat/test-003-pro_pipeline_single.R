@@ -15,8 +15,9 @@ unlink(output_parquet, recursive = TRUE, force = TRUE)
 test_that("pro_request single identifier", {
   vcr::local_cassette("pro_request_single_identifier")
   # Define the API request
-  output_json <- oa_query(
-    identifier = "W2162348455"
+  output_json <- pro_query(
+    entity = "works",
+    id = "W2162348455"
   ) |>
     pro_request(
       pages = 1,

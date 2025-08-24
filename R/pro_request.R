@@ -89,12 +89,14 @@ pro_request <- function(
     httr2::req_url_query(
       per_page = 200,
       cursor = "*",
-      mailto = mailto,
       api_key = api_key
     ) |>
-    httr2::req_user_agent(paste0(
+    httr2::req_user_agent(paste(
       "openalexPro2 v",
-      packageVersion("openalexPro2")
+      packageVersion("openalexPro2"),
+      " (mailto:",
+      mailto,
+      ")"
     ))
 
   # Remove empty query parameters

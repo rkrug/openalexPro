@@ -21,10 +21,17 @@ api_call <- function(
 ) {
   # Define a simple file logger --------------------------------------------
 
-  log_fun <- function(msg) {
+  log_fun <- function(
+    msg,
+    log_file
+  ) {
     timestamp <- format(Sys.time(), "%Y-%m-%d %H:%M:%S")
     full_msg <- paste0("[", timestamp, "] ", msg, "\n")
-    cat(full_msg, file = log_file, append = TRUE)
+    if (!is.null(log_file)) {
+      cat(full_msg, file = log_file, append = TRUE)
+    } else {
+      message(full_msg)
+    }
   }
 
   # Add retry logic for potentially transient errors -----------------------
@@ -45,12 +52,15 @@ api_call <- function(
       httr2::req_perform(req, error_call = rlang::caller_env())
     },
     error = function(e) {
-      log_fun(paste0(
-        "❌ API call failed after ",
-        max_retries,
-        " attempts: ",
-        e$message
-      ))
+      log_fun(
+        paste0(
+          "❌ API call failed after ",
+          max_retries,
+          " attempts: ",
+          e$message
+        ),
+        error_log
+      )
       rlang::abort(message = e$message, class = "api_call_error", parent = e)
     }
   )
@@ -62,7 +72,10 @@ api_call <- function(
   if (status == 200) {
     return(resp)
   } else {
-    log_fun(paste0("⚠️ Unexpected HTTP status ", status))
+    log_fun(
+      paste0("⚠️ Unexpected HTTP status ", status),
+      error_log
+    )
     rlang::abort(
       paste0("Unexpected HTTP status ", status, "\n  Aborting!"),
       class = "unexpected_http_status"
