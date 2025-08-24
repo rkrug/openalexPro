@@ -34,8 +34,13 @@
 #'
 #' @md
 #'
-#' @examples \dontrun{ source_to_parquet(input_json = "json", source_type =
-#'   "snapshot", output = "arrow") }
+#' @examples
+#' \dontrun{
+#'   source_to_parquet(
+#'   input_json = "json",
+#'   source_type = "snapshot",
+#'   output = "parquet"
+#' ) }
 #'
 #' @export
 

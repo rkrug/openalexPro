@@ -33,6 +33,7 @@ such that a row \verb{A, B} means A -> B means A cites B. In bibliometrics, the
 \description{
 A function to extract the edges from a parquet database containing the nodes
 }
+
 \examples{
 \dontrun{
 
@@ -53,3 +54,4 @@ snowball_docs_doi <- oa_snowball(
 )
 }
 }
+
