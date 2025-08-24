@@ -33,6 +33,7 @@ such that a row \verb{A, B} means A -> B means A cites B. In bibliometrics, the
 \description{
 A function to extract the edges from a parquet database containing the nodes
 }
+
 \examples{
 \dontrun{
 
@@ -45,3 +46,4 @@ oa_snowball( doi = c("10.1016/j.joi.2017.08.007", "10.7717/peerj.4375"),
 citing_params = list(from_publication_date = "2022-01-01"), cited_by_params =
 list(), verbose = TRUE ) }
 }
+

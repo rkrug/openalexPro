@@ -31,9 +31,6 @@
 #'
 #' @md
 #'
-#' @examples \dontrun{ source_to_parquet(input_jsonl = "json", source_type =
-#'   "snapshot", output = "arrow") }
-#'
 #' @export
 
 pro_request_jsonl_parquet <- function(
