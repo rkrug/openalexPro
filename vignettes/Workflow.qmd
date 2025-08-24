@@ -29,7 +29,7 @@ Most of the processing is done using the `duckdb` package which makes it possibl
 
 The workflow when using `openalexPro2` is essentially as follows:
 
-1. the function `openalexR::oa_query()` is used to build the API query for the OpenAlex API
+1. the function `openalexPro2::pro_query()` is used to build the API query for the OpenAlex API
 2. the function `openalexPro2::pro_request()` is used to retrieve the results from the OpenAlex API and to store them in a folder in the format oif `json` files as returned by OpenAlex.
 3. the function `openalexPro2::pro_request_jsonl()` is doing some cleaning and editing of the json files into **Json Lines**, aka **NDJSON**, which is atext file where each line is a separate JSON object. For details [see](jq.qmd)
 4. the function `openalexPro2::pro_request_jsonl_parquet()` is used to convert the `json` files to a parquet database

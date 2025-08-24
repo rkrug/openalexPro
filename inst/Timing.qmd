@@ -15,7 +15,7 @@ library(openalexR)
 #| label: get_1000_openalexR
 
 system.time({
-  res <- oa_query(
+  res <- pro_query(
     topics.id = "T10091",
     entity = "works",
     options = list(sample = 1000, seed = 1)
@@ -33,7 +33,7 @@ system.time({
 #| label: get_10000_openalexR
 
 system.time({
-  res <- oa_query(
+  res <- pro_query(
     topics.id = "T10091",
     entity = "works",
     options = list(sample = 10000, seed = 1)
@@ -61,7 +61,7 @@ library(openalexPro)
 unlink("json_1000", recursive = TRUE)
 
 system.time({
-  res <- oa_query(
+  res <- pro_query(
     topics.id = "T10091",
     entity = "works",
     options = list(sample = 1000, seed = 1)
@@ -83,7 +83,7 @@ unlink("json_10000", recursive = TRUE)
 
 
 system.time({
-  res <- oa_query(
+  res <- pro_query(
     topics.id = "T10091",
     entity = "works",
     options = list(sample = 10000, seed = 1)

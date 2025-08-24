@@ -57,7 +57,7 @@ Now we will do the same using `openalexPro2::pro_request()`. This involves more 
 
 corpus <- file.path("compatibility", "data", "works", "corpus")
 if (!dir.exists(corpus)) {
-  corpus <- oa_query(
+  corpus <- pro_query(
     title_and_abstract.search = "biodiversity AND conservation AND IPBES",
     entity = "works"
   ) |>
