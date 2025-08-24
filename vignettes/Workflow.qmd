@@ -38,7 +38,3 @@ The workflow when using `openalexPro2` is essentially as follows:
 TODO: Add plantuml graph
 TODO add more info and examles
 
-
-```{r setup}
-library(openalexPro2)
-```
