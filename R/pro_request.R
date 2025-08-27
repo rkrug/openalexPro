@@ -89,12 +89,14 @@ pro_request <- function(
     httr2::req_url_query(
       per_page = 200,
       cursor = "*",
-      mailto = mailto,
       api_key = api_key
     ) |>
-    httr2::req_user_agent(paste0(
+    httr2::req_user_agent(paste(
       "openalexPro2 v",
-      packageVersion("openalexPro2")
+      packageVersion("openalexPro2"),
+      " (mailto:",
+      mailto,
+      ")"
     ))
 
   # Remove empty query parameters
@@ -104,7 +106,10 @@ pro_request <- function(
   page <- 1
 
   # resp <- httr2::req_perform(req)
-  resp <- api_call(req)
+  resp <- api_call(
+    req,
+    error_log = file.path(output, "error.log")
+  )
 
   data <- resp |>
     httr2::resp_body_json()
@@ -142,7 +147,10 @@ pro_request <- function(
       }
 
       # resp <- httr2::req_perform(req)
-      resp <- api_call(req)
+      resp <- api_call(
+        req,
+        error_log = file.path(output, "error.log")
+      )
 
       data <- httr2::resp_body_json(resp)
 

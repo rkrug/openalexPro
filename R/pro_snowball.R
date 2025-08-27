@@ -16,7 +16,6 @@
 #'
 #' @export
 #'
-#' @importFrom openalexR oa_query
 #' @importFrom duckdb duckdb duckdb_register_arrow
 #' @importFrom DBI dbConnect dbDisconnect dbExecute
 #' @importFrom arrow write_parquet

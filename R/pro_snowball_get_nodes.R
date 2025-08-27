@@ -9,7 +9,6 @@
 #'
 #' @export
 #'
-#' @importFrom openalexR oa_query
 #' @importFrom duckdb duckdb duckdb_register_arrow
 #' @importFrom DBI dbConnect dbDisconnect dbExecute
 #' @importFrom arrow write_parquet
@@ -61,11 +60,11 @@ pro_snowball_get_nodes <- function(
 
   ifelse(
     !is.null(identifier),
-    oa_query(
+    pro_query(
       openalex = identifier,
       entity = "works"
     ),
-    oa_query(
+    pro_query(
       doi = doi,
       entity = "works"
     )
@@ -116,7 +115,7 @@ pro_snowball_get_nodes <- function(
     )
   }
 
-  oa_query(
+  pro_query(
     cites = keypaper_ids,
     entity = "works"
   ) |>
@@ -143,7 +142,7 @@ pro_snowball_get_nodes <- function(
     )
   }
 
-  cited_parquet <- oa_query(
+  cited_parquet <- pro_query(
     cited_by = keypaper_ids,
     entity = "works"
   ) |>

@@ -14,7 +14,8 @@ unlink(output_parquet, recursive = TRUE, force = TRUE)
 test_that("pro_request `biodiversity` and group by `type`", {
   vcr::local_cassette("pro_request_biodiversity_and_group_by_type")
   # Define the API request
-  output_json <- oa_query(
+  output_json <- pro_query(
+    entity = "works",
     title_and_abstract.search = "biodiversity",
     to_publication_date = "2010-01-01",
     group_by = "type"

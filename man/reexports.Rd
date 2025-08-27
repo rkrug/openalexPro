@@ -5,7 +5,6 @@
 \alias{reexports}
 \alias{oa_apikey}
 \alias{oa_email}
-\alias{oa_query}
 \title{Objects exported from other packages}
 \keyword{internal}
 \description{
@@ -13,6 +12,6 @@ These objects are imported from other packages. Follow the links
 below to see their documentation.
 
 \describe{
-  \item{openalexR}{\code{\link[openalexR]{oa_apikey}}, \code{\link[openalexR]{oa_email}}, \code{\link[openalexR]{oa_query}}}
+  \item{openalexR}{\code{\link[openalexR]{oa_apikey}}, \code{\link[openalexR]{oa_email}}}
 }}
 

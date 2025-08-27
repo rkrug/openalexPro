@@ -33,3 +33,23 @@ such that a row \verb{A, B} means A -> B means A cites B. In bibliometrics, the
 \description{
 A function to extract the edges from a parquet database containing the nodes
 }
+\examples{
+\dontrun{
+
+snowball_docs <- pro_snowball(
+   identifier = c("W2741809807", "W2755950973"),
+   citing_params = list(from_publication_date = "2022-01-01"),
+   cited_by_params = list(),
+   verbose = TRUE
+)
+
+# Identical to above, but searches using paper DOIs
+
+snowball_docs_doi <- oa_snowball(
+   doi = c("10.1016/j.joi.2017.08.007", "10.7717/peerj.4375"),
+   citing_params = list(from_publication_date = "2022-01-01"),
+   cited_by_params = list(),
+   verbose = TRUE
+)
+}
+}
