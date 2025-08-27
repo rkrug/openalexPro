@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-library(openalexPro)
+library(openalexPro2)
 ```
 
 # Compatibility between `opelalexR` and `openalexPro`

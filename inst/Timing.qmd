@@ -50,7 +50,7 @@ system.time({
 #| lable: setup_openalexR
 #|
 
-library(openalexPro)
+library(openalexPro2)
 ```
 
 

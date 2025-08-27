@@ -34,5 +34,7 @@ sized by cited_by_count and the other by cited_by_count_by_year. The plots
 are saved as both PDF and PNG in the specified path.
 }
 \examples{
-\dontrun{ plot_snowball(snowball, "example") }
+\dontrun{
+  plot_snowball(snowball, "example")
+}
 }
