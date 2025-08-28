@@ -7,7 +7,7 @@
 # It is unlikely that you need to modify this file manually.
 
 name: R-hub
-run-name: "${{ github.event.inputs.id }}: ${{ github.event.inputs.name || format('Manually run by {0}', github.triggering_actor) }}"
+run-name: "${{ github.event_name == 'pull_request' && format('R-hub PR #{0}: {1}', github.event.pull_request.number, github.event.pull_request.title) || github.event_name == 'workflow_dispatch' && format('{0}: {1}', github.event.inputs.id, github.event.inputs.name || format('Manually run by {0}', github.triggering_actor)) || format('R-hub {0} @ {1}', github.ref_name, github.sha) }}"
 
 env:
   QUARTO_VERSION: '1.5.53'
@@ -25,6 +25,7 @@ on:
       id:
         description: 'Unique ID. You can leave this empty now.'
         type: string
+  pull_request:
 
 jobs:
 
