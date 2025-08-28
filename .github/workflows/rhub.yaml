@@ -9,6 +9,9 @@
 name: R-hub
 run-name: "${{ github.event.inputs.id }}: ${{ github.event.inputs.name || format('Manually run by {0}', github.triggering_actor) }}"
 
+env:
+  QUARTO_VERSION: '1.5.53'
+
 on:
   workflow_dispatch:
     inputs:
@@ -52,6 +55,9 @@ jobs:
 
     steps:
       - uses: r-hub/actions/checkout@v1
+      - uses: quarto-dev/quarto-actions/setup@v2
+        with:
+          version: ${{ env.QUARTO_VERSION }}
       - uses: r-hub/actions/platform-info@v1
         with:
           token: ${{ secrets.RHUB_TOKEN }}
@@ -77,6 +83,9 @@ jobs:
 
     steps:
       - uses: r-hub/actions/checkout@v1
+      - uses: quarto-dev/quarto-actions/setup@v2
+        with:
+          version: ${{ env.QUARTO_VERSION }}
       - uses: r-hub/actions/setup-r@v1
         with:
           job-config: ${{ matrix.config.job-config }}
