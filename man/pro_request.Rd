@@ -9,8 +9,8 @@ pro_request(
   pages = 1000,
   output = NULL,
   overwrite = FALSE,
-  mailto = oa_email(),
-  api_key = oa_apikey(),
+  mailto = oap_mail(),
+  api_key = oap_apikey,
   verbose = FALSE,
   progress = TRUE
 )
@@ -30,9 +30,9 @@ temporary directory. If \code{NULL}, the return value from call to
 \item{overwrite}{Logical. If \code{TRUE}, \code{output} will be deleted if it already
 exists.}
 
-\item{mailto}{The email address of the user. See \code{openalexR::oa_email()}.}
+\item{mailto}{The email address of the user. See \code{oap_mail()}.}
 
-\item{api_key}{The API key of the user. See \code{openalexR::oa_apikey()}.}
+\item{api_key}{The API key of the user. See \code{oap_apikey}.}
 
 \item{verbose}{Logical indicating whether to show verbose messages.}
 

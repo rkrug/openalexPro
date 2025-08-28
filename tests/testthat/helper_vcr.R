@@ -12,9 +12,9 @@ invisible(vcr::vcr_configure(
   filter_query_parameters = list(api_key = "<api-key>")
 ))
 
-if (is.null(oa_apikey())) {
+if (is.null(oap_apikey)) {
   options(openalexR.apikey = "<api-key>")
 }
-if (is.null(oa_email())) {
+if (is.null(oap_mail())) {
   options(openalexR.mailto = "rainer@krugs.de")
 }

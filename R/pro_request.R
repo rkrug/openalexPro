@@ -17,8 +17,8 @@
 #'   `openalexR::oa_request()` with all the arguments is returned
 #' @param overwrite Logical. If `TRUE`, `output` will be deleted if it already
 #'   exists.
-#' @param mailto The email address of the user. See `openalexR::oa_email()`.
-#' @param api_key The API key of the user. See `openalexR::oa_apikey()`.
+#' @param mailto The email address of the user. See `oap_mail()`.
+#' @param api_key The API key of the user. See `oap_apikey`.
 #' @param verbose Logical indicating whether to show verbose messages.
 #' @param progress Logical default `TRUE` indicating whether to show a progress
 #'   bar.
@@ -41,8 +41,8 @@ pro_request <- function(
   pages = 1000,
   output = NULL,
   overwrite = FALSE,
-  mailto = oa_email(),
-  api_key = oa_apikey(),
+  mailto = oap_mail(),
+  api_key = oap_apikey,
   verbose = FALSE,
   progress = TRUE
 ) {
