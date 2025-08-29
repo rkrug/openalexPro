@@ -1,3 +1,15 @@
+utils::globalVariables(
+    c(
+        ".env",
+        "from",
+        "id",
+        "index",
+        "oa_input",
+        "to",
+        "type"
+    )
+)
+
 #' Plot Snowball
 #'
 #' This function takes a snowball object and a name, and creates two plots: one

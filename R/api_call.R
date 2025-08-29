@@ -54,7 +54,7 @@ api_call <- function(
     error = function(e) {
       log_fun(
         paste0(
-          "❌ API call failed after ",
+          "\u274C API call failed after ",
           max_retries,
           " attempts: ",
           e$message
@@ -73,7 +73,7 @@ api_call <- function(
     return(resp)
   } else {
     log_fun(
-      paste0("⚠️ Unexpected HTTP status ", status),
+      paste0("\u26A0 Unexpected HTTP status ", status),
       error_log
     )
     rlang::abort(

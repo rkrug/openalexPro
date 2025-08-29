@@ -29,7 +29,6 @@
 #'
 #' @md
 #'
-#' @importFrom openalexR oa_request
 #' @importFrom utils tail
 #' @importFrom httr2 req_url_query req_perform resp_body_json resp_body_string
 #' @importFrom utils setTxtProgressBar txtProgressBar packageVersion
@@ -76,6 +75,10 @@ pro_request <- function(
   dir.create(output, recursive = TRUE)
 
   output <- normalizePath(output)
+
+  if (is.function(api_key)) {
+    api_key <- api_key()
+  }
 
   if (grepl("group_by=", query_url)) {
     page_prefix <- "group_by_page_"

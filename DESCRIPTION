@@ -18,7 +18,6 @@ Imports:
     ggplot2,
     ggraph,
     httr2,
-    jsonlite,
     jqr,
     rlang,
     tidygraph,

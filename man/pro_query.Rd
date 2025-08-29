@@ -61,10 +61,6 @@ Filter names are validated via \code{.validate_filter()} using
 }
 \examples{
 \dontrun{
-options(openalexPro = list(
-  select_fields = c("id","title","publication_year","cited_by_count","type","language"),
-  filter_names = c("from_publication_date","to_publication_date","language","type","concepts","ids.openalex")
-))
 
 req <- oa_build_req(
   entity = "works",

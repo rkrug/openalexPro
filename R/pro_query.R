@@ -105,7 +105,7 @@
     if (any(have)) {
       paste0(
         "\nDid you mean: ",
-        paste(paste0(bad[have], " → ", sug[have]), collapse = ", "),
+        paste(paste0(bad[have], " \u2192 ", sug[have]), collapse = ", "),
         "?"
       )
     } else {
@@ -141,7 +141,7 @@
     if (any(have)) {
       paste0(
         "\nDid you mean: ",
-        paste(paste0(bad[have], "→", sug[have]), collapse = ", "),
+        paste(paste0(bad[have], " \u2192 ", sug[have]), collapse = ", "),
         "?"
       )
     } else {
@@ -184,10 +184,6 @@
 #'
 #' @examples
 #' \dontrun{
-#' options(openalexPro = list(
-#'   select_fields = c("id","title","publication_year","cited_by_count","type","language"),
-#'   filter_names = c("from_publication_date","to_publication_date","language","type","concepts","ids.openalex")
-#' ))
 #'
 #' req <- oa_build_req(
 #'   entity = "works",
