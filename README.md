@@ -171,7 +171,7 @@ oa_snowball(
 
 The package provides two convenience function for reading obtained data:
 
-- `**read_corpus()**` which reads the corpus either as a `Dataset` object if `rearn_data = FALSE` or a `data.frame`, i.e. a data table, if `rearn_data = TRUE`.
-- `**read_snowball()**` which reads the snowball search. The function returns a `list` which contains to elemends, `nodes` and `edges`. Depending on `return_data` argument these are each a `Dataset` or a `data.frame`. The format resulting from `read_snowball(read_data = TRUE)` is in most practical purposes compatible to the `openalexR` `data.frame` or `tibble` output.
+- **`read_corpus()`** which reads the corpus either as a `Dataset` object if `rearn_data = FALSE` or a `data.frame`, i.e. a data table, if `rearn_data = TRUE`.
+- **`read_snowball()`** which reads the snowball search. The function returns a `list` which contains to elemends, `nodes` and `edges`. Depending on `return_data` argument these are each a `Dataset` or a `data.frame`. The format resulting from `read_snowball(read_data = TRUE)` is in most practical purposes compatible to the `openalexR` `data.frame` or `tibble` output.
 
 The `Dataset` can be processed further using `dplyr` functions withiut actually reading the data. You can read the data finally with `dplyr::collect()`.
