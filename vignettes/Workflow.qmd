@@ -1,8 +1,9 @@
 ---
 title: "Workflow using `openalexPro2`"
 format:
-  pdf:
+  html:
     toc: false
+    embed-resources: true
 vignette: >
   %\VignetteIndexEntry{Workflow using `openalexPro2`}
   %\VignetteEngine{quarto::html}
@@ -37,4 +38,3 @@ The workflow when using `openalexPro2` is essentially as follows:
 
 TODO: Add plantuml graph
 TODO add more info and examles
-
