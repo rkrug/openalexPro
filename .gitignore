@@ -36,9 +36,7 @@ vignettes/*.pdf
 *.knit.md
 
 ## test directories
-corpus/
-corpus_authors/
-corpus_json/
+corpus*/
 inst/json_1000
 inst/json_10000
 corpus.parquet
