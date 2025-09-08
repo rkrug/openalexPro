@@ -67,6 +67,7 @@ test_that("pro_request_jsonl_parquet search `biodiversity AND finance`", {
   # Get search results from openalexR::oa_fetch(output = "tibble") for
   # comparison
 
+  vcr::local_cassette("oa_fetch_biodiversity_AND_finance")
   results_openalexR <- openalexR::oa_fetch(
     title_and_abstract.search = "biodiversity AND finance",
     to_publication_date = "2010-01-01",

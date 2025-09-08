@@ -79,6 +79,9 @@ pro_request <- function(
   if (is.function(api_key)) {
     api_key <- api_key()
   }
+  if (is.null(api_key)) {
+    api_key <- ""
+  }
 
   if (grepl("group_by=", query_url)) {
     page_prefix <- "group_by_page_"

@@ -36,7 +36,7 @@
       19                https://openalex.org/types/standard                standard
       20 https://openalex.org/types/supplementary-materials supplementary-materials
          count
-      1  41462
+      1  41465
       2   2223
       3   3269
       4    231
@@ -62,7 +62,7 @@
       # A tibble: 20 x 3
          key                                                key_display_name     count
          <chr>                                              <chr>                <int>
-       1 https://openalex.org/types/article                 article              41462
+       1 https://openalex.org/types/article                 article              41465
        2 https://openalex.org/types/book                    book                  2223
        3 https://openalex.org/types/book-chapter            book-chapter          3269
        4 https://openalex.org/types/dataset                 dataset                231

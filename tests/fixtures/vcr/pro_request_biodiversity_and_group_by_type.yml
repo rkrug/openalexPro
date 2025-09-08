@@ -5,12 +5,12 @@ http_interactions:
   response:
     status: 403
     headers:
-      Report-To: '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1756460076&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=D4%2BAUFBpr4W%2B9Iaf%2F66vN1zkjFYwgiV6NhybrqRfIAw%3D"}]}'
-      Reporting-Endpoints: heroku-nel=https://nel.heroku.com/reports?ts=1756460076&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=D4%2BAUFBpr4W%2B9Iaf%2F66vN1zkjFYwgiV6NhybrqRfIAw%3D
+      Report-To: '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1757320581&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=JyoS6HYUZtHyYbXuy5%2BLpq%2FXB1boW4P1VJtEVCdfGk4%3D"}]}'
+      Reporting-Endpoints: heroku-nel=https://nel.heroku.com/reports?ts=1757320581&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=JyoS6HYUZtHyYbXuy5%2BLpq%2FXB1boW4P1VJtEVCdfGk4%3D
       Nel: '{"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}'
       Connection: keep-alive
       Server: gunicorn
-      Date: Fri, 29 Aug 2025 09:34:36 GMT
+      Date: Mon, 08 Sep 2025 08:36:21 GMT
       Content-Type: application/json
       Content-Length: '4475'
       Access-Control-Allow-Origin: '*'
@@ -30,19 +30,19 @@ http_interactions:
     body:
       string: |
         {"error":"Invalid query parameters error.","message":"DOESNTEXIST is not a valid field. Valid fields are underscore or hyphenated versions of: abstract.search, abstract.search.no_stem, apc_list.currency, apc_list.provenance, apc_list.value, apc_list.value_usd, apc_paid.currency, apc_paid.provenance, apc_paid.value, apc_paid.value_usd, author.id, author.orcid, authors_count, authorships.affiliations.institution_ids, authorships.author.id, authorships.author.orcid, authorships.countries, authorships.institutions.continent, authorships.institutions.country_code, authorships.institutions.id, authorships.institutions.is_global_south, authorships.institutions.lineage, authorships.institutions.ror, authorships.institutions.type, authorships.is_corresponding, best_oa_location.is_accepted, best_oa_location.is_oa, best_oa_location.is_published, best_oa_location.landing_page_url, best_oa_location.license, best_oa_location.license_id, best_oa_location.source.host_organization, best_oa_location.source.host_organization_lineage, best_oa_location.source.id, best_oa_location.source.is_in_doaj, best_oa_location.source.is_oa, best_oa_location.source.issn, best_oa_location.source.type, best_oa_location.version, best_open_version, biblio.first_page, biblio.issue, biblio.last_page, biblio.volume, citation_normalized_percentile.is_in_top_10_percent, citation_normalized_percentile.is_in_top_1_percent, citation_normalized_percentile.value, cited_by, cited_by_count, cited_by_percentile_year.max, cited_by_percentile_year.min, cites, concept.id, concepts.id, concepts.wikidata, concepts_count, corresponding_author_ids, corresponding_institution_ids, countries_distinct_count, datasets, default.search, display_name, display_name.search, display_name.search.no_stem, doi, doi_starts_with, from_created_date, from_publication_date, fulltext.search, fulltext_origin, fwci, grants.award_id, grants.funder, has_abstract, has_doi, has_embeddings, has_fulltext, has_oa_accepted_or_published_version, has_oa_submitted_version, has_old_authors, has_orcid, has_pdf_url, has_pmcid, has_pmid, has_raw_affiliation_strings, has_references, ids.mag, ids.openalex, ids.pmcid, ids.pmid, indexed_in, institution.id, institution_assertions.country_code, institution_assertions.id, institution_assertions.lineage, institution_assertions.ror, institution_assertions.type, institutions.continent, institutions.country_code, institutions.id, institutions.is_global_south, institutions.ror, institutions.type, institutions_distinct_count, is_corresponding, is_oa, is_paratext, is_retracted, journal, keyword.search, keywords.id, language, locations.is_accepted, locations.is_oa, locations.is_published, locations.landing_page_url, locations.license, locations.license_id, locations.source.has_issn, locations.source.host_institution_lineage, locations.source.host_organization, locations.source.host_organization_lineage, locations.source.id, locations.source.is_core, locations.source.is_in_doaj, locations.source.is_oa, locations.source.issn, locations.source.publisher_lineage, locations.source.type, locations.version, locations_count, mag, mag_only, oa_status, open_access.any_repository_has_fulltext, open_access.is_oa, open_access.oa_status, openalex, openalex_id, pmcid, pmid, primary_location.is_accepted, primary_location.is_oa, primary_location.is_published, primary_location.landing_page_url, primary_location.license, primary_location.license_id, primary_location.source.has_issn, primary_location.source.host_institution_lineage, primary_location.source.host_organization, primary_location.source.host_organization_lineage, primary_location.source.id, primary_location.source.is_core, primary_location.source.is_in_doaj, primary_location.source.is_oa, primary_location.source.issn, primary_location.source.publisher_lineage, primary_location.source.type, primary_location.version, primary_topic.domain.id, primary_topic.field.id, primary_topic.id, primary_topic.subfield.id, publication_date, publication_year, raw_affiliation_strings.search, raw_author_name.search, referenced_works, referenced_works_count, related_to, repository, semantic.search, sustainable_development_goals.id, sustainable_development_goals.score, title.search, title.search.no_stem, title_and_abstract.search, title_and_abstract.search.no_stem, to_created_date, to_publication_date, to_updated_date, topics.domain.id, topics.field.id, topics.id, topics.subfield.id, topics_count, type, type_crossref, version"}
-  recorded_at: 2025-08-29 09:34:36
+  recorded_at: 2025-09-08 08:36:21
 - request:
     method: GET
     uri: https://api.openalex.org/works/W1775749144?select=DOESNTEXIST
   response:
     status: 403
     headers:
-      Report-To: '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1756460076&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=D4%2BAUFBpr4W%2B9Iaf%2F66vN1zkjFYwgiV6NhybrqRfIAw%3D"}]}'
-      Reporting-Endpoints: heroku-nel=https://nel.heroku.com/reports?ts=1756460076&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=D4%2BAUFBpr4W%2B9Iaf%2F66vN1zkjFYwgiV6NhybrqRfIAw%3D
+      Report-To: '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1757320581&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=JyoS6HYUZtHyYbXuy5%2BLpq%2FXB1boW4P1VJtEVCdfGk4%3D"}]}'
+      Reporting-Endpoints: heroku-nel=https://nel.heroku.com/reports?ts=1757320581&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=JyoS6HYUZtHyYbXuy5%2BLpq%2FXB1boW4P1VJtEVCdfGk4%3D
       Nel: '{"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}'
       Connection: keep-alive
       Server: gunicorn
-      Date: Fri, 29 Aug 2025 09:34:36 GMT
+      Date: Mon, 08 Sep 2025 08:36:22 GMT
       Content-Type: application/json
       Content-Length: '960'
       Access-Control-Allow-Origin: '*'
@@ -62,21 +62,21 @@ http_interactions:
     body:
       string: |
         {"error":"Invalid query parameters error.","message":"DOESNTEXIST is not a valid select field. Valid fields for select are: id, doi, title, display_name, relevance_score, publication_year, publication_date, ids, language, primary_location, sources, type, type_crossref, indexed_in, open_access, authorships, institution_assertions, countries_distinct_count, institutions_distinct_count, corresponding_author_ids, corresponding_institution_ids, apc_list, apc_paid, fwci, is_authors_truncated, has_fulltext, fulltext_origin, cited_by_count, citation_normalized_percentile, cited_by_percentile_year, biblio, is_retracted, is_paratext, primary_topic, topics, keywords, concepts, mesh, locations_count, locations, best_oa_location, sustainable_development_goals, grants, datasets, versions, referenced_works_count, referenced_works, related_works, abstract_inverted_index, abstract_inverted_index_v3, cited_by_api_url, counts_by_year, updated_date, created_date."}
-  recorded_at: 2025-08-29 09:34:36
+  recorded_at: 2025-09-08 08:36:21
 - request:
     method: GET
     uri: https://api.openalex.org/works?filter=title_and_abstract.search%3Abiodiversity%2Cto_publication_date%3A2010-01-01&group_by=type&per_page=200&cursor=%2A&api_key=<api-key>
   response:
     status: 200
     headers:
-      Report-To: '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1756460076&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=D4%2BAUFBpr4W%2B9Iaf%2F66vN1zkjFYwgiV6NhybrqRfIAw%3D"}]}'
-      Reporting-Endpoints: heroku-nel=https://nel.heroku.com/reports?ts=1756460076&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=D4%2BAUFBpr4W%2B9Iaf%2F66vN1zkjFYwgiV6NhybrqRfIAw%3D
+      Report-To: '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1757320582&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=xE5EGAb6n2mb5PcSvjQOffOhzbJFI0na7MOEMadzoNg%3D"}]}'
+      Reporting-Endpoints: heroku-nel=https://nel.heroku.com/reports?ts=1757320582&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=xE5EGAb6n2mb5PcSvjQOffOhzbJFI0na7MOEMadzoNg%3D
       Nel: '{"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}'
       Connection: keep-alive
       Server: gunicorn
-      Date: Fri, 29 Aug 2025 09:34:37 GMT
+      Date: Mon, 08 Sep 2025 08:36:22 GMT
       Content-Type: application/json
-      Content-Length: '467'
+      Content-Length: '468'
       Access-Control-Allow-Origin: '*'
       Access-Control-Allow-Methods: POST, GET, OPTIONS, PUT, DELETE, PATCH
       Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept,
@@ -95,22 +95,22 @@ http_interactions:
       Via: 1.1 vegur
     body:
       string: |
-        {"meta":{"count":52232,"db_response_time_ms":61,"page":null,"per_page":200,"next_cursor":"InN0YW5kYXJkIg==","groups_count":17},"group_by":[{"key":"https://openalex.org/types/article","key_display_name":"article","count":41462},{"key":"https://openalex.org/types/book","key_display_name":"book","count":2223},{"key":"https://openalex.org/types/book-chapter","key_display_name":"book-chapter","count":3269},{"key":"https://openalex.org/types/dataset","key_display_name":"dataset","count":231},{"key":"https://openalex.org/types/dissertation","key_display_name":"dissertation","count":1426},{"key":"https://openalex.org/types/editorial","key_display_name":"editorial","count":144},{"key":"https://openalex.org/types/erratum","key_display_name":"erratum","count":42},{"key":"https://openalex.org/types/grant","key_display_name":"grant","count":24},{"key":"https://openalex.org/types/letter","key_display_name":"letter","count":218},{"key":"https://openalex.org/types/libguides","key_display_name":"libguides","count":22},{"key":"https://openalex.org/types/other","key_display_name":"other","count":345},{"key":"https://openalex.org/types/paratext","key_display_name":"paratext","count":102},{"key":"https://openalex.org/types/preprint","key_display_name":"preprint","count":1438},{"key":"https://openalex.org/types/reference-entry","key_display_name":"reference-entry","count":24},{"key":"https://openalex.org/types/report","key_display_name":"report","count":244},{"key":"https://openalex.org/types/review","key_display_name":"review","count":1017},{"key":"https://openalex.org/types/standard","key_display_name":"standard","count":1},{"key":"https://openalex.org/types/peer-review","key_display_name":"peer-review","count":0},{"key":"https://openalex.org/types/supplementary-materials","key_display_name":"supplementary-materials","count":0},{"key":"https://openalex.org/types/retraction","key_display_name":"retraction","count":0}]}
-  recorded_at: 2025-08-29 09:34:37
+        {"meta":{"count":52235,"db_response_time_ms":206,"page":null,"per_page":200,"next_cursor":"InN0YW5kYXJkIg==","groups_count":17},"group_by":[{"key":"https://openalex.org/types/article","key_display_name":"article","count":41465},{"key":"https://openalex.org/types/book","key_display_name":"book","count":2223},{"key":"https://openalex.org/types/book-chapter","key_display_name":"book-chapter","count":3269},{"key":"https://openalex.org/types/dataset","key_display_name":"dataset","count":231},{"key":"https://openalex.org/types/dissertation","key_display_name":"dissertation","count":1426},{"key":"https://openalex.org/types/editorial","key_display_name":"editorial","count":144},{"key":"https://openalex.org/types/erratum","key_display_name":"erratum","count":42},{"key":"https://openalex.org/types/grant","key_display_name":"grant","count":24},{"key":"https://openalex.org/types/letter","key_display_name":"letter","count":218},{"key":"https://openalex.org/types/libguides","key_display_name":"libguides","count":22},{"key":"https://openalex.org/types/other","key_display_name":"other","count":345},{"key":"https://openalex.org/types/paratext","key_display_name":"paratext","count":102},{"key":"https://openalex.org/types/preprint","key_display_name":"preprint","count":1438},{"key":"https://openalex.org/types/reference-entry","key_display_name":"reference-entry","count":24},{"key":"https://openalex.org/types/report","key_display_name":"report","count":244},{"key":"https://openalex.org/types/review","key_display_name":"review","count":1017},{"key":"https://openalex.org/types/standard","key_display_name":"standard","count":1},{"key":"https://openalex.org/types/peer-review","key_display_name":"peer-review","count":0},{"key":"https://openalex.org/types/supplementary-materials","key_display_name":"supplementary-materials","count":0},{"key":"https://openalex.org/types/retraction","key_display_name":"retraction","count":0}]}
+  recorded_at: 2025-09-08 08:36:22
 - request:
     method: GET
     uri: https://api.openalex.org/works?filter=title_and_abstract.search%3Abiodiversity%2Cto_publication_date%3A2010-01-01&group_by=type&per_page=200&cursor=%2A&api_key=<api-key>
   response:
     status: 200
     headers:
-      Report-To: '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1756460077&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=DERpBPGSl8XNymK%2FvqrNReQl7f4gkYBVesKZYNbtMVo%3D"}]}'
-      Reporting-Endpoints: heroku-nel=https://nel.heroku.com/reports?ts=1756460077&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=DERpBPGSl8XNymK%2FvqrNReQl7f4gkYBVesKZYNbtMVo%3D
+      Report-To: '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1757320582&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=xE5EGAb6n2mb5PcSvjQOffOhzbJFI0na7MOEMadzoNg%3D"}]}'
+      Reporting-Endpoints: heroku-nel=https://nel.heroku.com/reports?ts=1757320582&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=xE5EGAb6n2mb5PcSvjQOffOhzbJFI0na7MOEMadzoNg%3D
       Nel: '{"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}'
       Connection: keep-alive
       Server: gunicorn
-      Date: Fri, 29 Aug 2025 09:34:37 GMT
+      Date: Mon, 08 Sep 2025 08:36:22 GMT
       Content-Type: application/json
-      Content-Length: '467'
+      Content-Length: '468'
       Access-Control-Allow-Origin: '*'
       Access-Control-Allow-Methods: POST, GET, OPTIONS, PUT, DELETE, PATCH
       Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept,
@@ -129,22 +129,22 @@ http_interactions:
       Via: 1.1 vegur
     body:
       string: |
-        {"meta":{"count":52232,"db_response_time_ms":61,"page":null,"per_page":200,"next_cursor":"InN0YW5kYXJkIg==","groups_count":17},"group_by":[{"key":"https://openalex.org/types/article","key_display_name":"article","count":41462},{"key":"https://openalex.org/types/book","key_display_name":"book","count":2223},{"key":"https://openalex.org/types/book-chapter","key_display_name":"book-chapter","count":3269},{"key":"https://openalex.org/types/dataset","key_display_name":"dataset","count":231},{"key":"https://openalex.org/types/dissertation","key_display_name":"dissertation","count":1426},{"key":"https://openalex.org/types/editorial","key_display_name":"editorial","count":144},{"key":"https://openalex.org/types/erratum","key_display_name":"erratum","count":42},{"key":"https://openalex.org/types/grant","key_display_name":"grant","count":24},{"key":"https://openalex.org/types/letter","key_display_name":"letter","count":218},{"key":"https://openalex.org/types/libguides","key_display_name":"libguides","count":22},{"key":"https://openalex.org/types/other","key_display_name":"other","count":345},{"key":"https://openalex.org/types/paratext","key_display_name":"paratext","count":102},{"key":"https://openalex.org/types/preprint","key_display_name":"preprint","count":1438},{"key":"https://openalex.org/types/reference-entry","key_display_name":"reference-entry","count":24},{"key":"https://openalex.org/types/report","key_display_name":"report","count":244},{"key":"https://openalex.org/types/review","key_display_name":"review","count":1017},{"key":"https://openalex.org/types/standard","key_display_name":"standard","count":1},{"key":"https://openalex.org/types/peer-review","key_display_name":"peer-review","count":0},{"key":"https://openalex.org/types/supplementary-materials","key_display_name":"supplementary-materials","count":0},{"key":"https://openalex.org/types/retraction","key_display_name":"retraction","count":0}]}
-  recorded_at: 2025-08-29 09:34:37
+        {"meta":{"count":52235,"db_response_time_ms":206,"page":null,"per_page":200,"next_cursor":"InN0YW5kYXJkIg==","groups_count":17},"group_by":[{"key":"https://openalex.org/types/article","key_display_name":"article","count":41465},{"key":"https://openalex.org/types/book","key_display_name":"book","count":2223},{"key":"https://openalex.org/types/book-chapter","key_display_name":"book-chapter","count":3269},{"key":"https://openalex.org/types/dataset","key_display_name":"dataset","count":231},{"key":"https://openalex.org/types/dissertation","key_display_name":"dissertation","count":1426},{"key":"https://openalex.org/types/editorial","key_display_name":"editorial","count":144},{"key":"https://openalex.org/types/erratum","key_display_name":"erratum","count":42},{"key":"https://openalex.org/types/grant","key_display_name":"grant","count":24},{"key":"https://openalex.org/types/letter","key_display_name":"letter","count":218},{"key":"https://openalex.org/types/libguides","key_display_name":"libguides","count":22},{"key":"https://openalex.org/types/other","key_display_name":"other","count":345},{"key":"https://openalex.org/types/paratext","key_display_name":"paratext","count":102},{"key":"https://openalex.org/types/preprint","key_display_name":"preprint","count":1438},{"key":"https://openalex.org/types/reference-entry","key_display_name":"reference-entry","count":24},{"key":"https://openalex.org/types/report","key_display_name":"report","count":244},{"key":"https://openalex.org/types/review","key_display_name":"review","count":1017},{"key":"https://openalex.org/types/standard","key_display_name":"standard","count":1},{"key":"https://openalex.org/types/peer-review","key_display_name":"peer-review","count":0},{"key":"https://openalex.org/types/supplementary-materials","key_display_name":"supplementary-materials","count":0},{"key":"https://openalex.org/types/retraction","key_display_name":"retraction","count":0}]}
+  recorded_at: 2025-09-08 08:36:22
 - request:
     method: GET
     uri: https://api.openalex.org/works?filter=title_and_abstract.search%3Abiodiversity%2Cto_publication_date%3A2010-01-01&group_by=type&per_page=200&api_key=<api-key>&cursor=InN0YW5kYXJkIg%3D%3D
   response:
     status: 200
     headers:
-      Report-To: '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1756460077&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=DERpBPGSl8XNymK%2FvqrNReQl7f4gkYBVesKZYNbtMVo%3D"}]}'
-      Reporting-Endpoints: heroku-nel=https://nel.heroku.com/reports?ts=1756460077&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=DERpBPGSl8XNymK%2FvqrNReQl7f4gkYBVesKZYNbtMVo%3D
+      Report-To: '{"group":"heroku-nel","max_age":3600,"endpoints":[{"url":"https://nel.heroku.com/reports?ts=1757320582&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=xE5EGAb6n2mb5PcSvjQOffOhzbJFI0na7MOEMadzoNg%3D"}]}'
+      Reporting-Endpoints: heroku-nel=https://nel.heroku.com/reports?ts=1757320582&sid=1b10b0ff-8a76-4548-befa-353fc6c6c045&s=xE5EGAb6n2mb5PcSvjQOffOhzbJFI0na7MOEMadzoNg%3D
       Nel: '{"report_to":"heroku-nel","max_age":3600,"success_fraction":0.005,"failure_fraction":0.05,"response_headers":["Via"]}'
       Connection: keep-alive
       Server: gunicorn
-      Date: Fri, 29 Aug 2025 09:34:37 GMT
+      Date: Mon, 08 Sep 2025 08:36:22 GMT
       Content-Type: application/json
-      Content-Length: '377'
+      Content-Length: '378'
       Access-Control-Allow-Origin: '*'
       Access-Control-Allow-Methods: POST, GET, OPTIONS, PUT, DELETE, PATCH
       Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept,
@@ -163,6 +163,6 @@ http_interactions:
       Via: 1.1 vegur
     body:
       string: |
-        {"meta":{"count":52232,"db_response_time_ms":67,"page":null,"per_page":200,"next_cursor":null,"groups_count":0},"group_by":[{"key":"https://openalex.org/types/article","key_display_name":"article","count":0},{"key":"https://openalex.org/types/book-chapter","key_display_name":"book-chapter","count":0},{"key":"https://openalex.org/types/dataset","key_display_name":"dataset","count":0},{"key":"https://openalex.org/types/preprint","key_display_name":"preprint","count":0},{"key":"https://openalex.org/types/dissertation","key_display_name":"dissertation","count":0},{"key":"https://openalex.org/types/book","key_display_name":"book","count":0},{"key":"https://openalex.org/types/review","key_display_name":"review","count":0},{"key":"https://openalex.org/types/paratext","key_display_name":"paratext","count":0},{"key":"https://openalex.org/types/libguides","key_display_name":"libguides","count":0},{"key":"https://openalex.org/types/letter","key_display_name":"letter","count":0},{"key":"https://openalex.org/types/other","key_display_name":"other","count":0},{"key":"https://openalex.org/types/reference-entry","key_display_name":"reference-entry","count":0},{"key":"https://openalex.org/types/report","key_display_name":"report","count":0},{"key":"https://openalex.org/types/editorial","key_display_name":"editorial","count":0},{"key":"https://openalex.org/types/peer-review","key_display_name":"peer-review","count":0},{"key":"https://openalex.org/types/erratum","key_display_name":"erratum","count":0},{"key":"https://openalex.org/types/standard","key_display_name":"standard","count":0},{"key":"https://openalex.org/types/grant","key_display_name":"grant","count":0},{"key":"https://openalex.org/types/supplementary-materials","key_display_name":"supplementary-materials","count":0},{"key":"https://openalex.org/types/retraction","key_display_name":"retraction","count":0}]}
-  recorded_at: 2025-08-29 09:34:37
+        {"meta":{"count":52235,"db_response_time_ms":209,"page":null,"per_page":200,"next_cursor":null,"groups_count":0},"group_by":[{"key":"https://openalex.org/types/article","key_display_name":"article","count":0},{"key":"https://openalex.org/types/book-chapter","key_display_name":"book-chapter","count":0},{"key":"https://openalex.org/types/dataset","key_display_name":"dataset","count":0},{"key":"https://openalex.org/types/preprint","key_display_name":"preprint","count":0},{"key":"https://openalex.org/types/dissertation","key_display_name":"dissertation","count":0},{"key":"https://openalex.org/types/book","key_display_name":"book","count":0},{"key":"https://openalex.org/types/review","key_display_name":"review","count":0},{"key":"https://openalex.org/types/paratext","key_display_name":"paratext","count":0},{"key":"https://openalex.org/types/libguides","key_display_name":"libguides","count":0},{"key":"https://openalex.org/types/letter","key_display_name":"letter","count":0},{"key":"https://openalex.org/types/other","key_display_name":"other","count":0},{"key":"https://openalex.org/types/reference-entry","key_display_name":"reference-entry","count":0},{"key":"https://openalex.org/types/report","key_display_name":"report","count":0},{"key":"https://openalex.org/types/editorial","key_display_name":"editorial","count":0},{"key":"https://openalex.org/types/peer-review","key_display_name":"peer-review","count":0},{"key":"https://openalex.org/types/erratum","key_display_name":"erratum","count":0},{"key":"https://openalex.org/types/standard","key_display_name":"standard","count":0},{"key":"https://openalex.org/types/grant","key_display_name":"grant","count":0},{"key":"https://openalex.org/types/supplementary-materials","key_display_name":"supplementary-materials","count":0},{"key":"https://openalex.org/types/retraction","key_display_name":"retraction","count":0}]}
+  recorded_at: 2025-09-08 08:36:22
 recorded_with: vcr/1.7.0.91, webmockr/2.0.0
