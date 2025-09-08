@@ -17,8 +17,8 @@
 #'   `openalexR::oa_request()` with all the arguments is returned
 #' @param overwrite Logical. If `TRUE`, `output` will be deleted if it already
 #'   exists.
-#' @param mailto The email address of the user. See `openalexR::oa_email()`.
-#' @param api_key The API key of the user. See `openalexR::oa_apikey()`.
+#' @param mailto The email address of the user. See `oap_mail()`.
+#' @param api_key The API key of the user. See `oap_apikey`.
 #' @param verbose Logical indicating whether to show verbose messages.
 #' @param progress Logical default `TRUE` indicating whether to show a progress
 #'   bar.
@@ -29,7 +29,6 @@
 #'
 #' @md
 #'
-#' @importFrom openalexR oa_request
 #' @importFrom utils tail
 #' @importFrom httr2 req_url_query req_perform resp_body_json resp_body_string
 #' @importFrom utils setTxtProgressBar txtProgressBar packageVersion
@@ -41,8 +40,8 @@ pro_request <- function(
   pages = 1000,
   output = NULL,
   overwrite = FALSE,
-  mailto = oa_email(),
-  api_key = oa_apikey(),
+  mailto = oap_mail(),
+  api_key = oap_apikey,
   verbose = FALSE,
   progress = TRUE
 ) {
@@ -77,6 +76,13 @@ pro_request <- function(
 
   output <- normalizePath(output)
 
+  if (is.function(api_key)) {
+    api_key <- api_key()
+  }
+  if (is.null(api_key)) {
+    api_key <- ""
+  }
+
   if (grepl("group_by=", query_url)) {
     page_prefix <- "group_by_page_"
   } else {
@@ -89,12 +95,14 @@ pro_request <- function(
     httr2::req_url_query(
       per_page = 200,
       cursor = "*",
-      mailto = mailto,
       api_key = api_key
     ) |>
-    httr2::req_user_agent(paste0(
+    httr2::req_user_agent(paste(
       "openalexPro2 v",
-      packageVersion("openalexPro2")
+      packageVersion("openalexPro2"),
+      " (mailto:",
+      mailto,
+      ")"
     ))
 
   # Remove empty query parameters
@@ -104,7 +112,10 @@ pro_request <- function(
   page <- 1
 
   # resp <- httr2::req_perform(req)
-  resp <- api_call(req)
+  resp <- api_call(
+    req,
+    error_log = file.path(output, "error.log")
+  )
 
   data <- resp |>
     httr2::resp_body_json()
@@ -142,7 +153,10 @@ pro_request <- function(
       }
 
       # resp <- httr2::req_perform(req)
-      resp <- api_call(req)
+      resp <- api_call(
+        req,
+        error_log = file.path(output, "error.log")
+      )
 
       data <- httr2::resp_body_json(resp)
 

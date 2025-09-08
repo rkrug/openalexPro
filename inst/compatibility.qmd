@@ -16,7 +16,8 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-library(openalexPro)
+library(openalexPro2)
+library(openalexR)
 ```
 
 # Compatibility between `opelalexR` and `openalexPro`
@@ -57,7 +58,7 @@ Now we will do the same using `openalexPro2::pro_request()`. This involves more 
 
 corpus <- file.path("compatibility", "data", "works", "corpus")
 if (!dir.exists(corpus)) {
-  corpus <- oa_query(
+  corpus <- pro_query(
     title_and_abstract.search = "biodiversity AND conservation AND IPBES",
     entity = "works"
   ) |>

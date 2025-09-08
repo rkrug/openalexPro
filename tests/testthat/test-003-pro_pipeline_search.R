@@ -15,7 +15,8 @@ unlink(output_parquet, recursive = TRUE, force = TRUE)
 test_that("pro_request search `biodiversity AND fiance`", {
   vcr::local_cassette("pro_request_search_biodiversity_AND_fiance")
   # Define the API request
-  output_json <- oa_query(
+  output_json <- pro_query(
+    entity = "works",
     title_and_abstract.search = "biodiversity AND finance",
     to_publication_date = "2010-01-01"
   ) |>
@@ -66,6 +67,7 @@ test_that("pro_request_jsonl_parquet search `biodiversity AND finance`", {
   # Get search results from openalexR::oa_fetch(output = "tibble") for
   # comparison
 
+  vcr::local_cassette("oa_fetch_biodiversity_AND_finance")
   results_openalexR <- openalexR::oa_fetch(
     title_and_abstract.search = "biodiversity AND finance",
     to_publication_date = "2010-01-01",
