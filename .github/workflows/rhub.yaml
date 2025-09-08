@@ -7,6 +7,7 @@
 # It is unlikely that you need to modify this file manually.
 
 name: R-hub
+
 run-name: "${{ github.event_name == 'pull_request' && format('R-hub PR #{0}: {1}', github.event.pull_request.number, github.event.pull_request.title) || github.event_name == 'workflow_dispatch' && format('{0}: {1}', github.event.inputs.id, github.event.inputs.name || format('Manually run by {0}', github.triggering_actor)) || format('R-hub {0} @ {1}', github.ref_name, github.sha) }}"
 
 env:
@@ -87,6 +88,7 @@ jobs:
       - uses: quarto-dev/quarto-actions/setup@v2
         with:
           version: ${{ env.QUARTO_VERSION }}
+
       - uses: r-hub/actions/setup-r@v1
         with:
           job-config: ${{ matrix.config.job-config }}
