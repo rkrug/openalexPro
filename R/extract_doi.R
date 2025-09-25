@@ -43,6 +43,8 @@ extract_doi <- function(
 ) {
   what <- match.arg(what, choices = c("doi", "resolver", "prefix", "suffix"))
 
+  nm <- names(x)
+
   x[is.na(x)] <- ""
 
   # Common regex patterns
@@ -67,6 +69,9 @@ extract_doi <- function(
   }
 
   matched_idx <- which(m != -1)
+  if (length(matched_idx)) {
+    names(matches) <- nm[matched_idx]
+  }
 
   if (normalize && length(matches)) {
     # Step 1: lowercase + trim
@@ -82,6 +87,7 @@ extract_doi <- function(
       if (is.null(non_doi_value)) {
         # Keep only valid entries
         matches <- matches[valid]
+        names(matches) <- nm[matched_idx][valid]
       } else {
         # Replace invalid entries with fallback
         matches[!valid] <- non_doi_value
@@ -92,9 +98,11 @@ extract_doi <- function(
   if (is.null(non_doi_value)) {
     # Only return matched DOIs (order preserved among matches, but overall length is shortened)
     out <- matches
+    names(out) <- names(matches)
   } else {
     # Return vector aligned to x
     out <- rep(non_doi_value, length(x))
+    names(out) <- nm
     out[matched_idx] <- matches
   }
 

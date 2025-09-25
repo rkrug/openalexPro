@@ -74,3 +74,27 @@ test_that("extract_doi handles all `what` values correctly", {
     expected_doi
   )
 })
+
+test_that("extract_doi preserves names across output modes", {
+  x <- c(
+    first = "https://doi.org/10.5281/zenodo.1234567",
+    second = "no doi here",
+    third = NA_character_
+  )
+
+  aligned_out <- extract_doi(x)
+  expect_identical(names(aligned_out), names(x))
+  expect_identical(aligned_out[["first"]], "10.5281/zenodo.1234567")
+  expect_identical(aligned_out[["second"]], "")
+  expect_identical(aligned_out[["third"]], "")
+
+  aligned_na <- extract_doi(x, non_doi_value = NA_character_)
+  expect_identical(names(aligned_na), names(x))
+  expect_identical(aligned_na[["first"]], "10.5281/zenodo.1234567")
+  expect_true(is.na(aligned_na[["second"]]))
+  expect_true(is.na(aligned_na[["third"]]))
+
+  matched_only <- extract_doi(x, non_doi_value = NULL)
+  expect_identical(names(matched_only), c("first"))
+  expect_identical(matched_only[["first"]], "10.5281/zenodo.1234567")
+})
