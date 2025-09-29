@@ -1,7 +1,7 @@
 Type: Package
 Package: openalexPro2
 Title: Providing a more advanced access to OpenAlex for the power user
-Version: 0.0.3.1
+Version: 0.0.3.2
 Author: Rainer M Krug
 Maintainer: Rainer M Krug <Rainer@krugs.de>
 Description: More about what it does (maybe more than one line).
@@ -18,7 +18,6 @@ Imports:
     ggplot2,
     ggraph,
     httr2,
-    jsonlite,
     jqr,
     rlang,
     tidygraph,
@@ -34,6 +33,6 @@ Suggests:
     vcr (> 1.7.0),
     vdiffr
 Encoding: UTF-8
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 VignetteBuilder: quarto
 Config/testthat/edition: 3
