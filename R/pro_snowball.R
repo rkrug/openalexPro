@@ -6,13 +6,7 @@
 #' @param verbose Logical indicating whether to show a verbose information.
 #'   Defaults to `FALSE`
 #'
-#' @return A list containing 2 elements:
-#' - nodes: dataframe with publication records.
-#' The last column `oa_input` indicates whether the work was one of the input
-#'   `identifier`(s).
-#' - edges: publication link dataframe of 2 columns `from, to`
-#' such that a row `A, B` means A -> B means A cites B. In bibliometrics, the
-#'   "citation action" comes from A to B.
+#' @return The folder of the results containing multiple subfolders.
 #'
 #' @export
 #'
