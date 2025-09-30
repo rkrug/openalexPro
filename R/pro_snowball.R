@@ -46,17 +46,17 @@ pro_snowball <- function(
     dir.create(output, recursive = TRUE)
   }
 
-  pro_snowball_get_nodes(
+  nodes <- pro_snowball_get_nodes(
     identifier = identifier,
     doi = doi,
     output = output,
     verbose = verbose
-  ) |>
-    pro_snowball_extract_edges(
-      output = output,
-      verbose = verbose
-    ) |>
-    invisible()
+  )
+  edges <- pro_snowball_extract_edges(
+    nodes = nodes,
+    output = output,
+    verbose = verbose
+  )
 
   # Return path to snowball ------------------------------------------------
 

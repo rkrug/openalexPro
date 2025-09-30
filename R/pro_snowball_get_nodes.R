@@ -160,7 +160,26 @@ pro_snowball_get_nodes <- function(
       verbose = verbose
     )
 
-  # Combine individualparquet databases to nodes_parquet ----------------------
+  # Combine individual parquet databases to nodes_parquet --------------------
+
+  json_sources <- c(file.path(output, "keypaper_jsonl", "**", "*.json"))
+
+  cited_jsonl_dir <- file.path(output, "cited_jsonl")
+  if (dir.exists(cited_jsonl_dir) &&
+    length(list.files(cited_jsonl_dir, pattern = "\\.json$", recursive = TRUE)) > 0) {
+    json_sources <- c(json_sources, file.path(output, "cited_jsonl", "**", "*.json"))
+  }
+
+  citing_jsonl_dir <- file.path(output, "citing_jsonl")
+  if (dir.exists(citing_jsonl_dir) &&
+    length(list.files(citing_jsonl_dir, pattern = "\\.json$", recursive = TRUE)) > 0) {
+    json_sources <- c(json_sources, file.path(output, "citing_jsonl", "**", "*.json"))
+  }
+
+  json_sources_sql <- paste(
+    sprintf("'%s'", json_sources),
+    collapse = ",\n          "
+  )
 
   sprintf(
     "
@@ -169,16 +188,14 @@ pro_snowball_get_nodes <- function(
           * REPLACE (CAST(oa_input AS BOOLEAN) AS oa_input)
         FROM 
         read_json_auto(
-          ['%s', '%s','%s'],
+          [%s],
           union_by_name = true
         )
       ) TO
         '%s'
         (FORMAT PARQUET, COMPRESSION SNAPPY, APPEND, PARTITION_BY 'relation')
       ",
-    file.path(output, "keypaper_jsonl", "**", "*.json"),
-    file.path(output, "cited_jsonl", "**", "*.json"),
-    file.path(output, "citing_jsonl", "**", "*.json"),
+    json_sources_sql,
     file.path(output, "nodes")
   ) |>
     DBI::dbExecute(conn = con)
