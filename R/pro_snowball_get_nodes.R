@@ -72,36 +72,39 @@ pro_snowball_get_nodes <- function(
 
   ifelse(
     !is.null(identifier),
-    pro_query(
+    qu <- pro_query(
       openalex = identifier,
       entity = "works"
     ),
-    pro_query(
+    qu <- pro_query(
       doi = doi,
       entity = "works"
     )
-  ) |>
-    pro_request(
-      output = file.path(output, "keypaper_json"),
-      verbose = verbose,
-      progress = verbose
-    ) |>
-    pro_request_jsonl(
-      output = file.path(output, "keypaper_jsonl"),
-      add_columns = list(
-        oa_input = TRUE,
-        relation = "keypaper"
-      ),
-      verbose = verbose
-    ) |>
-    pro_request_jsonl_parquet(
-      output = file.path(output, "keypaper_parquet"),
-      add_columns = list(
-        oa_input = FALSE,
-        relation = "citing"
-      ),
-      verbose = verbose
-    )
+  )
+  x <- pro_request(
+    query_url = qu,
+    output = file.path(output, "keypaper_json"),
+    verbose = verbose,
+    progress = verbose
+  )
+  x <- pro_request_jsonl(
+    input_json = x,
+    output = file.path(output, "keypaper_jsonl"),
+    add_columns = list(
+      oa_input = TRUE,
+      relation = "keypaper"
+    ),
+    verbose = verbose
+  )
+  pro_request_jsonl_parquet(
+    input_jsonl = x,
+    output = file.path(output, "keypaper_parquet"),
+    add_columns = list(
+      oa_input = FALSE,
+      relation = "citing"
+    ),
+    verbose = verbose
+  )
 
   # Getting keypaper ids as returned by OpenAlex ---------------------------
 
@@ -121,7 +124,7 @@ pro_snowball_get_nodes <- function(
   # fetching documents citing the target keypapers (incoming - to: keypaper)
   # ----
 
-  if (limit != "onlyCiting") {
+  if (limit == "onlyCiting") {
     if (verbose) {
       message(
         "Collecting all documents citing the target keypapers (to = keypaper)..."
@@ -149,7 +152,7 @@ pro_snowball_get_nodes <- function(
 
   # fetching documents cited by the keypapers (outgoing - from: keypaper
   # )-----------------------
-  if (limit != "onlyCited") {
+  if (limit == "onlyCited") {
     if (verbose) {
       message(
         "Collecting all documents cited by the target keypapers ..."

@@ -9,6 +9,7 @@ pro_request(
   pages = 1000,
   output = NULL,
   overwrite = FALSE,
+  page_suffix = "",
   mailto = oap_mail(),
   api_key = oap_apikey,
   verbose = FALSE,
@@ -29,6 +30,11 @@ temporary directory. If \code{NULL}, the return value from call to
 
 \item{overwrite}{Logical. If \code{TRUE}, \code{output} will be deleted if it already
 exists.}
+
+\item{page_suffix}{suffix for the file name for the json for each page retrieved.
+If not equal \code{""}, the directory will
+not be deleted, even if it exists, as it is assumed that the =\code{page_suffix} results
+in unique json filenames.}
 
 \item{mailto}{The email address of the user. See \code{oap_mail()}.}
 

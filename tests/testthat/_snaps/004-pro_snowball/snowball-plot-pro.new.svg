@@ -1,0 +1,57 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' class='svglite' data-engine-version='2.0' width='720.00pt' height='576.00pt' viewBox='0 0 720.00 576.00'>
+<defs>
+  <style type='text/css'><![CDATA[
+    .svglite line, .svglite polyline, .svglite polygon, .svglite path, .svglite rect, .svglite circle {
+      fill: none;
+      stroke: #000000;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-miterlimit: 10.00;
+    }
+  ]]></style>
+</defs>
+<rect width='100%' height='100%' style='stroke: none; fill: #FFFFFF;'/>
+<defs>
+  <clipPath id='cpMC4wMHw3MjAuMDB8MC4wMHw1NzYuMDA='>
+    <rect x='0.00' y='0.00' width='720.00' height='576.00' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMC4wMHw3MjAuMDB8MC4wMHw1NzYuMDA=)'>
+<rect x='0.00' y='0.00' width='720.00' height='576.00' style='stroke-width: 1.07; stroke: none;' />
+</g>
+<defs>
+  <clipPath id='cpMjkuODl8NTQ4LjkyfDU1Ljk3fDU0Ni4xMQ=='>
+    <rect x='29.89' y='55.97' width='519.03' height='490.14' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMjkuODl8NTQ4LjkyfDU1Ljk3fDU0Ni4xMQ==)'>
+<rect x='29.89' y='55.97' width='519.03' height='490.14' style='stroke-width: 1.07; stroke: none;' />
+<polygon points='53.48,518.30 58.27,526.60 48.69,526.60 ' style='stroke-width: 0.71; stroke: none; fill: #009E73;' />
+<circle cx='525.33' cy='523.83' r='11.02' style='stroke-width: 0.71; stroke: none; fill: #009E73;' />
+<polygon points='-8.04,83.75 115.00,83.75 114.94,83.75 115.19,83.74 115.43,83.69 115.66,83.60 115.88,83.48 116.07,83.32 116.23,83.14 116.37,82.93 116.46,82.70 116.52,82.46 116.54,82.22 116.54,82.22 116.54,74.29 116.54,74.29 116.52,74.05 116.46,73.81 116.37,73.58 116.23,73.37 116.07,73.18 115.88,73.03 115.66,72.90 115.43,72.82 115.19,72.77 115.00,72.76 -8.04,72.76 -7.86,72.77 -8.11,72.76 -8.35,72.79 -8.59,72.86 -8.81,72.96 -9.02,73.10 -9.19,73.27 -9.34,73.47 -9.46,73.69 -9.54,73.92 -9.58,74.17 -9.58,74.29 -9.58,82.22 -9.58,82.09 -9.58,82.34 -9.54,82.58 -9.46,82.82 -9.34,83.04 -9.19,83.23 -9.02,83.41 -8.81,83.55 -8.59,83.65 -8.35,83.72 -8.11,83.75 ' style='stroke-width: 0.53; fill: #FFFFFF;' />
+<text x='53.48' y='81.19' text-anchor='middle' style='font-size: 8.54px; font-family: sans;' textLength='121.00px' lengthAdjust='spacingAndGlyphs'>James Ravenscroft et al. (2020)</text>
+<polygon points='445.07,83.75 605.58,83.75 605.52,83.75 605.77,83.74 606.01,83.69 606.24,83.60 606.46,83.48 606.65,83.32 606.81,83.14 606.94,82.93 607.04,82.70 607.10,82.46 607.12,82.22 607.12,82.22 607.12,74.29 607.12,74.29 607.10,74.05 607.04,73.81 606.94,73.58 606.81,73.37 606.65,73.18 606.46,73.03 606.24,72.90 606.01,72.82 605.77,72.77 605.58,72.76 445.07,72.76 445.26,72.77 445.01,72.76 444.76,72.79 444.53,72.86 444.30,72.96 444.10,73.10 443.92,73.27 443.77,73.47 443.66,73.69 443.58,73.92 443.54,74.17 443.53,74.29 443.53,82.22 443.54,82.09 443.54,82.34 443.58,82.58 443.66,82.82 443.77,83.04 443.92,83.23 444.10,83.41 444.30,83.55 444.53,83.65 444.76,83.72 445.01,83.75 ' style='stroke-width: 0.53; fill: #FFFFFF;' />
+<text x='525.33' y='81.19' text-anchor='middle' style='font-size: 8.54px; font-family: sans;' textLength='158.46px' lengthAdjust='spacingAndGlyphs'>Chifumi Nishioka &amp; Michael Färber (2020)</text>
+</g>
+<g clip-path='url(#cpMC4wMHw3MjAuMDB8MC4wMHw1NzYuMDA=)'>
+<text x='565.36' y='196.28' style='font-size: 11.00px; font-family: sans;' textLength='81.33px' lengthAdjust='spacingAndGlyphs'>Publication Type</text>
+<circle cx='574.00' cy='211.54' r='1.95' style='stroke-width: 0.71; stroke: none; fill: #000000;' />
+<polygon points='574.00,225.78 576.63,230.34 571.36,230.34 ' style='stroke-width: 0.71; stroke: none; fill: #000000;' />
+<text x='588.12' y='214.57' style='font-size: 8.80px; font-family: sans;' textLength='23.47px' lengthAdjust='spacingAndGlyphs'>article</text>
+<text x='588.12' y='231.85' style='font-size: 8.80px; font-family: sans;' textLength='29.84px' lengthAdjust='spacingAndGlyphs'>preprint</text>
+<text x='565.36' y='268.09' style='font-size: 11.00px; font-family: sans;' textLength='51.37px' lengthAdjust='spacingAndGlyphs'>Key Paper</text>
+<circle cx='574.00' cy='283.35' r='1.95' style='stroke-width: 0.71; stroke: #009E73; fill: #009E73;' />
+<text x='588.12' y='286.38' style='font-size: 8.80px; font-family: sans;' textLength='23.96px' lengthAdjust='spacingAndGlyphs'>TRUE</text>
+<text x='565.36' y='322.62' style='font-size: 11.00px; font-family: sans;' textLength='119.28px' lengthAdjust='spacingAndGlyphs'>cited_by_count_by_year</text>
+<circle cx='578.48' cy='337.88' r='3.56' style='stroke-width: 0.71; fill: #000000;' />
+<circle cx='578.48' cy='355.90' r='7.41' style='stroke-width: 0.71; fill: #000000;' />
+<circle cx='578.48' cy='376.77' r='9.01' style='stroke-width: 0.71; fill: #000000;' />
+<circle cx='578.48' cy='401.39' r='10.24' style='stroke-width: 0.71; fill: #000000;' />
+<text x='597.09' y='340.91' style='font-size: 8.80px; font-family: sans;' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>0.0</text>
+<text x='597.09' y='358.93' style='font-size: 8.80px; font-family: sans;' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>0.2</text>
+<text x='597.09' y='379.80' style='font-size: 8.80px; font-family: sans;' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>0.4</text>
+<text x='597.09' y='404.42' style='font-size: 8.80px; font-family: sans;' textLength='12.23px' lengthAdjust='spacingAndGlyphs'>0.6</text>
+<text x='29.89' y='42.28' style='font-size: 18.00px; font-weight: bold; font-family: sans;' textLength='73.05px' lengthAdjust='spacingAndGlyphs'>Snowball</text>
+</g>
+</svg>
