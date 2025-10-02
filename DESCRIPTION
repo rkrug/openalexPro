@@ -15,13 +15,9 @@ Imports:
     DBI,
     dplyr,
     duckdb,
-    ggplot2,
-    ggraph,
     httr2,
     jqr,
-    rlang,
-    tidygraph,
-    tidyselect
+    rlang
 Additional_repositories: 
     https://ropensci.r-universe.dev
 Suggests: 
