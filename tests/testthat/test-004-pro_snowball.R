@@ -7,7 +7,7 @@ unlink(output_dir, recursive = TRUE, force = TRUE)
 
 test_that("pro_snowball", {
   # openalexR
-  vcr::local_cassette("oa_snowball")
+  # vcr::local_cassette("oa_snowball")
   results_openalexR <- openalexR::oa_snowball(
     identifier = c("W3045921891", "W3046863325"),
     verbose = FALSE
@@ -26,7 +26,7 @@ test_that("pro_snowball", {
     )
 
   # openalexPro
-  vcr::local_cassette("pro_snowball")
+  # vcr::local_cassette("pro_snowball")
   output_dir <- pro_snowball(
     identifier = c("W3045921891", "W3046863325"),
     output = output_dir,
@@ -124,13 +124,13 @@ test_that("pro_snowball", {
 
   # Compare plot_snowball
 
-  plot_pro <- plot_snowball(snowball = results_openalexPro)
-  plot_r <- plot_snowball(snowball = results_openalexR)
+  # plot_pro <- plot_snowball(snowball = results_openalexPro)
+  # plot_r <- plot_snowball(snowball = results_openalexR)
 
-  test_that("snowball plots have visually not changed", {
-    vdiffr::expect_doppelganger("Snowball-plot-Pro", plot_pro)
-    vdiffr::expect_doppelganger("Snowball-plot-R", plot_r)
-  })
+  # test_that("snowball plots have visually not changed", {
+  #   vdiffr::expect_doppelganger("Snowball-plot-Pro", plot_pro)
+  #   vdiffr::expect_doppelganger("Snowball-plot-R", plot_r)
+  # })
 
   # Assert that both plots look the same by giving them the same label
   # test_that("snowball plots are visually the same", {

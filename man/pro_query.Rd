@@ -48,7 +48,7 @@ appended to the \code{User-Agent}.}
 are collapsed with \code{"|"} to express OR).}
 }
 \value{
-An \code{httr2} request object, ready for \code{api_call()}.
+An individual URL or a list of URLs.
 }
 \description{
 Construct an \code{httr2} request for the OpenAlex API. All filters must be

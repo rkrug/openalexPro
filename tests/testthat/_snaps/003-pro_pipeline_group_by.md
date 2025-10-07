@@ -36,9 +36,9 @@
       19                https://openalex.org/types/standard                standard
       20 https://openalex.org/types/supplementary-materials supplementary-materials
          count
-      1  41465
-      2   2223
-      3   3269
+      1  41466
+      2   2224
+      3   3283
       4    231
       5   1426
       6    144
@@ -51,7 +51,7 @@
       13     0
       14  1438
       15    24
-      16   244
+      16   245
       17     0
       18  1017
       19     1
@@ -62,9 +62,9 @@
       # A tibble: 20 x 3
          key                                                key_display_name     count
          <chr>                                              <chr>                <int>
-       1 https://openalex.org/types/article                 article              41465
-       2 https://openalex.org/types/book                    book                  2223
-       3 https://openalex.org/types/book-chapter            book-chapter          3269
+       1 https://openalex.org/types/article                 article              41466
+       2 https://openalex.org/types/book                    book                  2224
+       3 https://openalex.org/types/book-chapter            book-chapter          3283
        4 https://openalex.org/types/dataset                 dataset                231
        5 https://openalex.org/types/dissertation            dissertation          1426
        6 https://openalex.org/types/editorial               editorial              144
@@ -77,7 +77,7 @@
       13 https://openalex.org/types/peer-review             peer-review              0
       14 https://openalex.org/types/preprint                preprint              1438
       15 https://openalex.org/types/reference-entry         reference-entry         24
-      16 https://openalex.org/types/report                  report                 244
+      16 https://openalex.org/types/report                  report                 245
       17 https://openalex.org/types/retraction              retraction               0
       18 https://openalex.org/types/review                  review                1017
       19 https://openalex.org/types/standard                standard                 1

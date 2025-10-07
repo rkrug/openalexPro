@@ -6,8 +6,11 @@
 #' json files.
 #'
 #' For the documentation please see `openalexR::oa_request()`
-#'
-#' @param query_url The URL of the API query.
+#' If query_url is a list, the function is called for each element of the list in parallel
+#' using a maximum of `workers` parallel R sessions. The results from the individual URLs
+#' in the list are returned in a folder named after the names of the list elements in the
+#' `output` folder.
+#' @param query_url The URL of the API query or a list of URLs returned from `pro_query()`.
 #' @param pages The number of pages to be downloaded. The default is set to
 #'   1000, which would be 2,000,000 works. It is recommended to not increase it
 #'   beyond 1000 due to server load and to use the snapshot instead. If `NULL`,
@@ -17,12 +20,9 @@
 #'   `openalexR::oa_request()` with all the arguments is returned
 #' @param overwrite Logical. If `TRUE`, `output` will be deleted if it already
 #'   exists.
-#' @param page_suffix suffix for the file name for the json for each page retrieved.
-#'   If not equal `""`, the directory will
-#'   not be deleted, even if it exists, as it is assumed that the =`page_suffix` results
-#'   in unique json filenames.
 #' @param mailto The email address of the user. See `oap_mail()`.
 #' @param api_key The API key of the user. See `oap_apikey`.
+#' @param workers Number of parallel workers to use if `query_url` is a list. Defaults to 1.
 #' @param verbose Logical indicating whether to show verbose messages.
 #' @param progress Logical default `TRUE` indicating whether to show a progress
 #'   bar.
@@ -36,6 +36,8 @@
 #' @importFrom utils tail
 #' @importFrom httr2 req_url_query req_perform resp_body_json resp_body_string
 #' @importFrom utils setTxtProgressBar txtProgressBar packageVersion
+#' @importFrom future plan multisession sequential
+#' @importFrom future.apply future_lapply
 #'
 #' @export
 #'
@@ -44,28 +46,49 @@ pro_request <- function(
   pages = 1000,
   output = NULL,
   overwrite = FALSE,
-  page_suffix = "",
   mailto = oap_mail(),
   api_key = oap_apikey,
+  workers = 1,
   verbose = FALSE,
   progress = TRUE
 ) {
   # Call for each element if query_url is a list ---------------------------
 
   if (is.list(query_url)) {
-    for (i in seq_along(query_url)) {
-      pro_request(
-        query_url = query_url[[i]],
-        pages = pages,
-        output = output,
-        overwrite = FALSE,
-        page_suffix = i,
-        mailto = mailto,
-        api_key = api_key,
-        verbose = verbose,
-        progress = progress
-      )
-    }
+    # for (i in seq_along(query_url)) {
+    #   pro_request(
+    #     query_url = query_url[[i]],
+    #     pages = pages,
+    #     output = output,
+    #     overwrite = FALSE,
+    #     mailto = mailto,
+    #     api_key = api_key,
+    #     verbose = verbose,
+    #     progress = progress
+    #   )
+    future::plan(future::multisession, workers = workers)
+    on.exit(future::plan(future::sequential), add = TRUE)
+
+    output <- future.apply::future_lapply(
+      seq_along(query_url),
+      function(i) {
+        nm <- names(query_url)[i]
+        if (is.null(nm)) {
+          nm <- paste0("query_", i)
+        }
+        pro_request(
+          query_url = query_url[[i]],
+          pages = pages,
+          output = file.path(output, nm),
+          overwrite = FALSE,
+          mailto = mailto,
+          api_key = api_key,
+          verbose = verbose,
+          progress = progress
+        )
+      },
+      future.seed = TRUE
+    )
     return(output)
   } else {
     # Argument Checks --------------------------------------------------------
@@ -74,27 +97,23 @@ pro_request <- function(
       stop("No `output` output specified!")
     }
 
-    if (page_suffix == "") {
-      if (dir.exists(output)) {
-        if (!overwrite) {
-          stop(
-            "Directory ",
-            output,
-            " exists.\n",
-            "Either specify `overwrite = TRUE` or delete it."
-          )
-        }
-        if (verbose) {
-          message(
-            "Deleting and recreating `",
-            output,
-            "` to avoid inconsistencies."
-          )
-        }
-        unlink(output, recursive = TRUE)
+    if (dir.exists(output)) {
+      if (!overwrite) {
+        stop(
+          "Directory ",
+          output,
+          " exists.\n",
+          "Either specify `overwrite = TRUE` or delete it."
+        )
       }
-    } else {
-      page_suffix <- paste0("_", page_suffix)
+      if (verbose) {
+        message(
+          "Deleting and recreating `",
+          output,
+          "` to avoid inconsistencies."
+        )
+      }
+      unlink(output, recursive = TRUE)
     }
 
     # Preparations -----------------------------------------------------------
@@ -167,7 +186,7 @@ pro_request <- function(
         writeLines(
           con = file.path(
             output,
-            paste0(page_prefix, page, page_suffix, ".json")
+            paste0(page_prefix, page, ".json")
           )
         )
     } else {
@@ -200,7 +219,7 @@ pro_request <- function(
           writeLines(
             con = file.path(
               output,
-              paste0(page_prefix, page, page_suffix, ".json")
+              paste0(page_prefix, page, ".json")
             )
           )
 

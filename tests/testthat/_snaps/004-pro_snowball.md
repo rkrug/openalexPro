@@ -11,33 +11,33 @@
     Code
       sort(names(results_openalexPro$nodes))
     Output
-       [1] "abstract"                       "abstract_inverted_index_v3"    
-       [3] "apc_list"                       "apc_paid"                      
-       [5] "authorships"                    "best_oa_location"              
-       [7] "biblio"                         "citation"                      
-       [9] "citation_normalized_percentile" "cited_by_api_url"              
-      [11] "cited_by_count"                 "cited_by_percentile_year"      
-      [13] "concepts"                       "corresponding_author_ids"      
-      [15] "corresponding_institution_ids"  "countries_distinct_count"      
-      [17] "counts_by_year"                 "created_date"                  
-      [19] "datasets"                       "display_name"                  
-      [21] "doi"                            "fwci"                          
-      [23] "grants"                         "has_fulltext"                  
-      [25] "id"                             "ids"                           
-      [27] "indexed_in"                     "institution_assertions"        
-      [29] "institutions_distinct_count"    "is_paratext"                   
-      [31] "is_retracted"                   "keywords"                      
-      [33] "language"                       "locations"                     
-      [35] "locations_count"                "mesh"                          
-      [37] "oa_input"                       "open_access"                   
-      [39] "page"                           "primary_location"              
-      [41] "primary_topic"                  "publication_date"              
-      [43] "publication_year"               "referenced_works"              
-      [45] "referenced_works_count"         "related_works"                 
-      [47] "relation"                       "sustainable_development_goals" 
-      [49] "title"                          "topics"                        
-      [51] "type"                           "type_crossref"                 
-      [53] "updated_date"                   "versions"                      
+       [1] "abstract"                       "apc_list"                      
+       [3] "apc_paid"                       "authorships"                   
+       [5] "best_oa_location"               "biblio"                        
+       [7] "citation"                       "citation_normalized_percentile"
+       [9] "cited_by_api_url"               "cited_by_count"                
+      [11] "cited_by_percentile_year"       "concepts"                      
+      [13] "corresponding_author_ids"       "corresponding_institution_ids" 
+      [15] "countries_distinct_count"       "counts_by_year"                
+      [17] "created_date"                   "datasets"                      
+      [19] "display_name"                   "doi"                           
+      [21] "fwci"                           "grants"                        
+      [23] "has_fulltext"                   "id"                            
+      [25] "ids"                            "indexed_in"                    
+      [27] "institution_assertions"         "institutions_distinct_count"   
+      [29] "is_paratext"                    "is_retracted"                  
+      [31] "keywords"                       "language"                      
+      [33] "locations"                      "locations_count"               
+      [35] "mesh"                           "oa_input"                      
+      [37] "open_access"                    "page"                          
+      [39] "primary_location"               "primary_topic"                 
+      [41] "publication_date"               "publication_year"              
+      [43] "referenced_works"               "referenced_works_count"        
+      [45] "related_works"                  "relation"                      
+      [47] "sustainable_development_goals"  "title"                         
+      [49] "topics"                         "type"                          
+      [51] "type_crossref"                  "updated_date"                  
+      [53] "versions"                      
     Code
       nrow(results_openalexPro$edges)
     Output
@@ -51,12 +51,12 @@
       edge_type = "core")
     Output
       $nodes
-      # A tibble: 2 x 54
+      # A tibble: 2 x 53
         id     doi   title display_name publication_year publication_date ids$openalex
         <chr>  <chr> <chr> <chr>                   <int> <date>           <chr>       
       1 W3045~ http~ Meas~ Measuring p~             2020 2020-01-01       https://ope~
       2 W3046~ http~ Tren~ Trends of P~             2020 2020-08-01       https://ope~
-      # i 49 more variables: ids$doi <chr>, $mag <chr>, language <chr>,
+      # i 48 more variables: ids$doi <chr>, $mag <chr>, language <chr>,
       #   primary_location <tibble[,9]>, type <chr>, type_crossref <chr>,
       #   indexed_in <list<character>>, open_access <tibble[,4]>,
       #   authorships <list<
@@ -105,12 +105,12 @@
       edge_type = "extended")
     Output
       $nodes
-      # A tibble: 2 x 54
+      # A tibble: 2 x 53
         id     doi   title display_name publication_year publication_date ids$openalex
         <chr>  <chr> <chr> <chr>                   <int> <date>           <chr>       
       1 W3045~ http~ Meas~ Measuring p~             2020 2020-01-01       https://ope~
       2 W3046~ http~ Tren~ Trends of P~             2020 2020-08-01       https://ope~
-      # i 49 more variables: ids$doi <chr>, $mag <chr>, language <chr>,
+      # i 48 more variables: ids$doi <chr>, $mag <chr>, language <chr>,
       #   primary_location <tibble[,9]>, type <chr>, type_crossref <chr>,
       #   indexed_in <list<character>>, open_access <tibble[,4]>,
       #   authorships <list<
@@ -159,12 +159,12 @@
       edge_type = c("extended", "core"))
     Output
       $nodes
-      # A tibble: 2 x 54
+      # A tibble: 2 x 53
         id     doi   title display_name publication_year publication_date ids$openalex
         <chr>  <chr> <chr> <chr>                   <int> <date>           <chr>       
       1 W3045~ http~ Meas~ Measuring p~             2020 2020-01-01       https://ope~
       2 W3046~ http~ Tren~ Trends of P~             2020 2020-08-01       https://ope~
-      # i 49 more variables: ids$doi <chr>, $mag <chr>, language <chr>,
+      # i 48 more variables: ids$doi <chr>, $mag <chr>, language <chr>,
       #   primary_location <tibble[,9]>, type <chr>, type_crossref <chr>,
       #   indexed_in <list<character>>, open_access <tibble[,4]>,
       #   authorships <list<
@@ -213,12 +213,12 @@
       edge_type = "outside")
     Output
       $nodes
-      # A tibble: 2 x 54
+      # A tibble: 2 x 53
         id     doi   title display_name publication_year publication_date ids$openalex
         <chr>  <chr> <chr> <chr>                   <int> <date>           <chr>       
       1 W3045~ http~ Meas~ Measuring p~             2020 2020-01-01       https://ope~
       2 W3046~ http~ Tren~ Trends of P~             2020 2020-08-01       https://ope~
-      # i 49 more variables: ids$doi <chr>, $mag <chr>, language <chr>,
+      # i 48 more variables: ids$doi <chr>, $mag <chr>, language <chr>,
       #   primary_location <tibble[,9]>, type <chr>, type_crossref <chr>,
       #   indexed_in <list<character>>, open_access <tibble[,4]>,
       #   authorships <list<

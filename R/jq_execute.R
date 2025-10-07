@@ -96,7 +96,7 @@ jq_execute <- function(
   }
 
   if (!is.null(page)) {
-    jq_filter <- paste0(jq_filter, " | . + {page: ", page, "}")
+    jq_filter <- paste0(jq_filter, " | . + {page: \"", page, "\"}")
   }
 
   jqr::jq(

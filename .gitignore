@@ -48,3 +48,8 @@ tests/fixtures/vcr/vcr.log
 docs
 
 /Compatibility Report/
+paper.parquet
+
+output_json/*
+output_jsonl/*
+output_parquet/*

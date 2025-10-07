@@ -180,7 +180,7 @@
 #' @param ... Filters as named arguments. Values may be scalars or vectors (vectors
 #'   are collapsed with \code{"|"} to express OR).
 #'
-#' @return An \code{httr2} request object, ready for \code{api_call()}.
+#' @return An individual URL or a list of URLs.
 #'
 #' @examples
 #' \dontrun{
@@ -324,6 +324,7 @@ pro_query <- function(
 
   if (length(urls) > 1) {
     urls <- as.list(urls)
+    names(urls) <- paste0("chunk_", seq_along(urls))
   }
 
   return(urls)

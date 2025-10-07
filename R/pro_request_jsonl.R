@@ -90,8 +90,11 @@ pro_request_jsonl <- function(
   jsons <- list.files(
     input_json,
     pattern = "*.json$",
-    full.names = TRUE
+    full.names = TRUE,
+    recursive = TRUE
   )
+
+  has_subdirs <- length(list.dirs(input_json)) > 1
 
   jsons <- jsons[
     order(
@@ -135,9 +138,20 @@ pro_request_jsonl <- function(
     ## Extract page number into pn
     pn <- basename(fn) |>
       strsplit(split = "_")
+    pn <- pn[[1]]
 
-    pn <- pn[[1]][length(pn[[1]])] |>
+    # pn <- pn[[1]][length(pn[[1]])] |>
+    pn <- pn[length(pn)] |>
       gsub(pattern = ".json", replacement = "")
+
+    if (has_subdirs) {
+      jsonl <- file.path(output, basename(dirname(fn)), basename(fn))
+      pn <- paste0(basename(dirname(fn)), "_", pn)
+    } else {
+      jsonl <- file.path(output, basename(fn))
+      pn = pn
+    }
+    dir.create(dirname(jsonl), recursive = TRUE, showWarnings = FALSE)
 
     try(
       {
@@ -145,7 +159,6 @@ pro_request_jsonl <- function(
         ## - Convert `inverted_abstract_index` to `abstract`
         ## - remove `inverted_abstract_index`
         ## - add `page` = pn
-        jsonl <- file.path(output, basename(fn))
         jq_execute(
           input_json = fn,
           output_jsonl = jsonl,

@@ -4,9 +4,9 @@ suppressPackageStartupMessages(library(openalexR))
 
 # Normal Search `biodiversity AND finance`-------------------------------------
 
-output_json <- file.path(tempdir(), "single_work")
-output_jsonl <- file.path(tempdir(), "single_work_jsonl")
-output_parquet <- file.path(tempdir(), "single_work_parquet")
+output_json <- file.path(tempdir(), "search_work")
+output_jsonl <- file.path(tempdir(), "search_work_jsonl")
+output_parquet <- file.path(tempdir(), "search_work_parquet")
 
 unlink(output_json, recursive = TRUE, force = TRUE)
 unlink(output_jsonl, recursive = TRUE, force = TRUE)

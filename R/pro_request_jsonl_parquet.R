@@ -55,13 +55,6 @@ pro_request_jsonl_parquet <- function(
 
   # Preparations -----------------------------------------------------------
 
-  tempfolder <- tempfile(fileext = "_pro_request_to_parquet")
-  dir.create(tempfolder, recursive = TRUE)
-
-  on.exit(
-    try(unlink(tempfolder, recursive = TRUE, force = TRUE), silent = TRUE),
-    add = TRUE
-  )
   ## Create and setup in memory DuckDB
   con <- DBI::dbConnect(duckdb::duckdb())
 
@@ -89,13 +82,20 @@ pro_request_jsonl_parquet <- function(
         force = TRUE
       )
     }
+  } else {
+    dir.create(
+      output,
+      recursive = TRUE,
+      showWarnings = FALSE
+    )
   }
 
   ## Read names of json files
   jsons <- list.files(
     input_jsonl,
     pattern = "*.json$",
-    full.names = TRUE
+    full.names = TRUE,
+    recursive = TRUE
   )
 
   jsons <- jsons[
@@ -128,9 +128,11 @@ pro_request_jsonl_parquet <- function(
     types <- "group_by"
   }
 
+  if (types == "single") {}
+
   # Go through all jsons, i.e. one per page --------------------------------
   ### Names: results_page_x.json
-
+  browser()
   for (i in seq_along(jsons)) {
     fn <- jsons[i]
     if (verbose) {
@@ -149,8 +151,8 @@ pro_request_jsonl_parquet <- function(
                   read_json_auto( '%s' )
               ) TO
                 '%s'
-              (FORMAT PARQUET, COMPRESSION SNAPPY, APPEND, PARTITION_BY 'page')
-            ",
+              (FORMAT PARQUET, COMPRESSION SNAPPY, PARTITION_BY 'page', APPEND)
+          ",
           fn,
           output
         ) |>

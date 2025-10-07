@@ -1,5 +1,4 @@
 library(testthat)
-library(vcr)
 # library(httptest)
 
 # single work ------------------------------------------------------------
