@@ -69,7 +69,7 @@ pro_request <- function(
     future::plan(future::multisession, workers = workers)
     on.exit(future::plan(future::sequential), add = TRUE)
 
-    output <- future.apply::future_lapply(
+    result <- future.apply::future_lapply(
       seq_along(query_url),
       function(i) {
         nm <- names(query_url)[i]

@@ -132,7 +132,6 @@ pro_request_jsonl_parquet <- function(
 
   # Go through all jsons, i.e. one per page --------------------------------
   ### Names: results_page_x.json
-  browser()
   for (i in seq_along(jsons)) {
     fn <- jsons[i]
     if (verbose) {

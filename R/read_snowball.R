@@ -24,6 +24,7 @@
 #' @md
 #'
 #' @importFrom dplyr filter select collect arrange desc
+#' @importFrom rlang .env .data
 #'
 #' @export
 read_snowball <- function(
@@ -98,3 +99,5 @@ read_snowball <- function(
     )
   )
 }
+
+utils::globalVariables(c(".env", "from", "id", "oa_input", "to"))
