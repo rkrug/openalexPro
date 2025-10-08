@@ -46,3 +46,112 @@ corpus.parquet
 
 /.quarto/
 inst/tca_corpus_complete.plantuml
+Compatibility Report/compatibility.qmd
+Compatibility Report/openalexPro/data/snowballPro/cited_json/results_page_1.json
+Compatibility Report/openalexPro/data/snowballPro/cited_json/results_page_2.json
+Compatibility Report/openalexPro/data/snowballPro/cited_jsonl/results_page_1.json
+Compatibility Report/openalexPro/data/snowballPro/citing_json/results_page_1.json
+Compatibility Report/openalexPro/data/snowballPro/citing_json/results_page_2.json
+Compatibility Report/openalexPro/data/snowballPro/citing_jsonl/results_page_1.json
+Compatibility Report/openalexPro/data/snowballPro/edges/edge_type=core/data_0.parquet
+Compatibility Report/openalexPro/data/snowballPro/edges/edge_type=extended/data_0.parquet
+Compatibility Report/openalexPro/data/snowballPro/edges/edge_type=outside/data_0.parquet
+Compatibility Report/openalexPro/data/snowballPro/keypaper_json/results_page_1.json
+Compatibility Report/openalexPro/data/snowballPro/keypaper_json/results_page_2.json
+Compatibility Report/openalexPro/data/snowballPro/keypaper_jsonl/results_page_1.json
+Compatibility Report/openalexPro/data/snowballPro/keypaper_parquet/page=1/e898f767-032e-4c1e-8e51-3df5a25f1a60.parquet
+Compatibility Report/openalexPro/data/snowballPro/nodes/relation=cited/99e497ac-7648-42a7-a632-1ca05840a80e.parquet
+Compatibility Report/openalexPro/data/snowballPro/nodes/relation=citing/6c87f635-c0d6-4c3a-8756-53e99bbfcac5.parquet
+Compatibility Report/openalexPro/data/snowballPro/nodes/relation=keypaper/15bdcbcd-6f92-4083-9fc8-311e5c708ea8.parquet
+Compatibility Report/openalexPro/data/works/json/results_page_1.json
+Compatibility Report/openalexPro/data/works/json/results_page_2.json
+Compatibility Report/openalexPro/data/works/json/results_page_3.json
+Compatibility Report/openalexPro/data/works/jsonl/results_page_1.json
+Compatibility Report/openalexPro/data/works/jsonl/results_page_2.json
+Compatibility Report/openalexR/data/snowballR.rds
+Compatibility Report/openalexR/data/works.rds
+doc/corpus_to_csljson.html
+doc/corpus_to_csljson.qmd
+doc/corpus_to_csljson.R
+doc/csljson_convert_pandoc.html
+doc/csljson_convert_pandoc.qmd
+doc/csljson_convert_pandoc.R
+doc/Workflow.html
+doc/Workflow.qmd
+doc/Workflow.R
+docs/404.html
+docs/authors.html
+docs/bootstrap-toc.css
+docs/bootstrap-toc.js
+docs/docsearch.css
+docs/docsearch.js
+docs/index.html
+docs/katex-auto.js
+docs/lightswitch.js
+docs/link.svg
+docs/pkgdown.css
+docs/pkgdown.js
+docs/pkgdown.yml
+docs/search.json
+docs/sitemap.xml
+docs/TODO.html
+docs/articles/corpus_to_csljson.html
+docs/articles/csljson_convert_pandoc.html
+docs/articles/errorcodes.pdf
+docs/articles/index.html
+docs/articles/jq.pdf
+docs/articles/Workflow.html
+docs/articles/Workflow.pdf
+docs/deps/data-deps.txt
+docs/deps/bootstrap-5.3.1/bootstrap.bundle.min.js
+docs/deps/bootstrap-5.3.1/bootstrap.bundle.min.js.map
+docs/deps/bootstrap-5.3.1/bootstrap.min.css
+docs/deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js
+docs/deps/clipboard.js-2.0.11/clipboard.min.js
+docs/deps/font-awesome-6.5.2/css/all.css
+docs/deps/font-awesome-6.5.2/css/all.min.css
+docs/deps/font-awesome-6.5.2/css/v4-shims.css
+docs/deps/font-awesome-6.5.2/css/v4-shims.min.css
+docs/deps/font-awesome-6.5.2/webfonts/fa-brands-400.ttf
+docs/deps/font-awesome-6.5.2/webfonts/fa-brands-400.woff2
+docs/deps/font-awesome-6.5.2/webfonts/fa-regular-400.ttf
+docs/deps/font-awesome-6.5.2/webfonts/fa-regular-400.woff2
+docs/deps/font-awesome-6.5.2/webfonts/fa-solid-900.ttf
+docs/deps/font-awesome-6.5.2/webfonts/fa-solid-900.woff2
+docs/deps/font-awesome-6.5.2/webfonts/fa-v4compatibility.ttf
+docs/deps/font-awesome-6.5.2/webfonts/fa-v4compatibility.woff2
+docs/deps/headroom-0.11.0/headroom.min.js
+docs/deps/headroom-0.11.0/jQuery.headroom.min.js
+docs/deps/jquery-3.6.0/jquery-3.6.0.js
+docs/deps/jquery-3.6.0/jquery-3.6.0.min.js
+docs/deps/jquery-3.6.0/jquery-3.6.0.min.map
+docs/deps/search-1.0.0/autocomplete.jquery.min.js
+docs/deps/search-1.0.0/fuse.min.js
+docs/deps/search-1.0.0/mark.min.js
+docs/reference/corpus_export_via_pandoc.html
+docs/reference/corpus_to_csljson.html
+docs/reference/csljson_convert_pandoc.html
+docs/reference/extract_doi.html
+docs/reference/index.html
+docs/reference/jq_execute.html
+docs/reference/load_sql_file.html
+docs/reference/normalize_parquet.html
+docs/reference/oa_apikey.html
+docs/reference/oa_email.html
+docs/reference/oa_query.html
+docs/reference/oap_apikey.html
+docs/reference/oap_mail.html
+docs/reference/opt_filter_names.html
+docs/reference/opt_select_fields.html
+docs/reference/plot_snowball.html
+docs/reference/pro_query.html
+docs/reference/pro_request_jsonl_parquet.html
+docs/reference/pro_request_jsonl.html
+docs/reference/pro_request.html
+docs/reference/pro_snowball_extract_edges.html
+docs/reference/pro_snowball_get_nodes.html
+docs/reference/pro_snowball.html
+docs/reference/read_corpus.html
+docs/reference/read_snowball.html
+docs/reference/reexports.html
+Meta/vignette.rds
