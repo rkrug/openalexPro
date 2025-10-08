@@ -163,6 +163,9 @@
 #' \code{opt_filter_names()}. \code{select} fields are validated via
 #' \code{.validate_select()} using \code{`opt_select_fields()`}.
 #'
+#' If multiple more then 50 `doi` or openalex `id`s are provided, the request
+#' is automatically split into chunks of 50 and a named list of URLs is returned.
+#'
 #' @param entity Character; one of \code{"works"}, \code{"authors"}, \code{"venues"},
 #'   \code{"institutions"}, \code{"concepts"}, \code{"publishers"}, \code{"funders"}.
 #' @param id Optional single ID (e.g., \code{"W1775749144"}) to fetch one entity.
@@ -180,7 +183,7 @@
 #' @param ... Filters as named arguments. Values may be scalars or vectors (vectors
 #'   are collapsed with \code{"|"} to express OR).
 #'
-#' @return An \code{httr2} request object, ready for \code{api_call()}.
+#' @return An individual URL or a list of URLs.
 #'
 #' @examples
 #' \dontrun{
@@ -246,29 +249,86 @@ pro_query <- function(
   .validate_filter(filter)
   .validate_select(select)
 
+  # prepare chunking ------------------------------------------------------
+
+  chunk_targets <- c(
+    "openalex",
+    "ids.openalex",
+    "doi",
+    "cites",
+    "cited_by"
+  )
+  chunk_limit <- 50L
+
+  filter_batches <- list(filter)
+  if (length(filter)) {
+    filter_batches <- list(filter)
+    for (key in intersect(names(filter), chunk_targets)) {
+      next_batches <- list()
+      for (current in filter_batches) {
+        values <- current[[key]]
+        values <- values[!is.na(values)]
+        if (length(values) > chunk_limit) {
+          splits <- split(
+            values,
+            ceiling(seq_along(values) / chunk_limit)
+          )
+          next_batches <- c(
+            next_batches,
+            lapply(splits, function(chunk) {
+              current[[key]] <- chunk
+              current
+            })
+          )
+        } else {
+          next_batches <- c(next_batches, list(current))
+        }
+      }
+      filter_batches <- next_batches
+    }
+  }
+
+  if (!length(filter_batches)) {
+    filter_batches <- list(filter)
+  }
+
   # build strings
   select_str <- .oa_build_select(select)
-  filter_str <- .oa_build_filter(filter)
 
   # base request + path
-  req <- httr2::request(endpoint)
+  req_base <- httr2::request(endpoint)
   path <- if (is.null(id)) entity else paste(entity, id, sep = "/")
-  req <- httr2::req_url_path_append(req, path)
+  req_base <- httr2::req_url_path_append(req_base, path)
 
-  # assemble query (drop NULLs)
-  q <- list(
-    filter = filter_str,
+  # assemble query components shared across batches (drop NULLs later)
+  shared_q <- list(
     search = search,
     group_by = group_by,
     select = select_str
   )
   if (length(options)) {
-    q <- c(q, options)
-  }
-  q <- Filter(Negate(is.null), q)
-  if (length(q)) {
-    req <- httr2::req_url_query(req, !!!q)
+    shared_q <- c(shared_q, options)
   }
 
-  req$url
+  urls <- vapply(
+    filter_batches,
+    function(batch_filter) {
+      filter_str <- .oa_build_filter(batch_filter)
+      q <- c(list(filter = filter_str), shared_q)
+      q <- Filter(Negate(is.null), q)
+      req <- req_base
+      if (length(q)) {
+        req <- httr2::req_url_query(req, !!!q)
+      }
+      req$url
+    },
+    character(1)
+  )
+
+  if (length(urls) > 1) {
+    urls <- as.list(urls)
+    names(urls) <- paste0("chunk_", seq_along(urls))
+  }
+
+  return(urls)
 }

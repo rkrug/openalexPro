@@ -35,14 +35,8 @@ vignettes/*.pdf
 *.utf8.md
 *.knit.md
 
-## test directories
-corpus/
-corpus_authors/
-corpus_json/
-inst/json_1000
-inst/json_10000
-corpus.parquet
-/snowball/
+## test directories (only at repo root)
+/corpus*/
 
 /.quarto/
 inst/tca_corpus_complete.plantuml
@@ -52,3 +46,10 @@ tests/fixtures/vcr/vcr.log
 /doc/
 /Meta/
 docs
+
+/Compatibility Report/
+paper.parquet
+
+output_json/*
+output_jsonl/*
+output_parquet/*

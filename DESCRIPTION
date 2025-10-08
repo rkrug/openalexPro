@@ -1,7 +1,7 @@
 Type: Package
-Package: openalexPro2
+Package: openalexPro
 Title: Providing a more advanced access to OpenAlex for the power user
-Version: 0.0.3
+Version: 0.1.0
 Author: Rainer M Krug
 Maintainer: Rainer M Krug <Rainer@krugs.de>
 Description: More about what it does (maybe more than one line).
@@ -9,19 +9,17 @@ URL: https://github.com/rkrug/openalexPro, https://rkrug.github.io/openalexPro/
 BugReports: https://github.com/rkrug/openalexPro/issues
 License: GPL (>= 2)
 Depends:
-    R (>= 4.1.0)
+    R (>= 4.1.1)
 Imports:
     arrow,
     DBI,
     dplyr,
     duckdb,
-    ggplot2,
-    ggraph,
+    future,
+    future.apply,
     httr2,
     jqr,
-    rlang,
-    tidygraph,
-    tidyselect
+    rlang
 Additional_repositories: 
     https://ropensci.r-universe.dev
 Suggests: 
@@ -33,6 +31,6 @@ Suggests:
     vcr (> 1.7.0),
     vdiffr
 Encoding: UTF-8
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 VignetteBuilder: quarto
 Config/testthat/edition: 3

@@ -11,12 +11,13 @@ pro_request(
   overwrite = FALSE,
   mailto = oap_mail(),
   api_key = oap_apikey,
+  workers = 1,
   verbose = FALSE,
   progress = TRUE
 )
 }
 \arguments{
-\item{query_url}{The URL of the API query.}
+\item{query_url}{The URL of the API query or a list of URLs returned from \code{pro_query()}.}
 
 \item{pages}{The number of pages to be downloaded. The default is set to
 1000, which would be 2,000,000 works. It is recommended to not increase it
@@ -33,6 +34,8 @@ exists.}
 \item{mailto}{The email address of the user. See \code{oap_mail()}.}
 
 \item{api_key}{The API key of the user. See \code{oap_apikey}.}
+
+\item{workers}{Number of parallel workers to use if \code{query_url} is a list. Defaults to 1.}
 
 \item{verbose}{Logical indicating whether to show verbose messages.}
 
@@ -52,4 +55,8 @@ json files.
 }
 \details{
 For the documentation please see \code{openalexR::oa_request()}
+If query_url is a list, the function is called for each element of the list in parallel
+using a maximum of \code{workers} parallel R sessions. The results from the individual URLs
+in the list are returned in a folder named after the names of the list elements in the
+\code{output} folder.
 }

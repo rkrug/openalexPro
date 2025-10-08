@@ -1,9 +1,18 @@
 #' Convert JSON files to Apache Parquet files
 #'
 #'
-#' The function takes a directory of JSON files as written from a call to
-#' `pro_request(..., json_dir = "FOLDER")` and converts it to a Apache Parquet
-#' dataset partitiond by the page.
+#' The function takes a directory of JSONL files as written from a call to
+#' `pro_request_jsonl(...)` and converts it to a Apache Parquet files. Each
+#' jsonl is processed individually, so there is no limit of the number of records.
+#'
+#' The value `page` as created in `pro_request_jsonl()` is used for partitioning.
+#' All jsonl files are combined into a single Apache Parquet dataset, but can be
+#' filtered out by using the "page". As an example:
+#'
+#' 1. the subfolder in the `output` folder is called `Chunk_1`
+#' 2. the page othe json file represents is `2`
+#' 3. The resulting cvalus for `page` will be `Chunk_1_2`
+#'
 #'
 #' @param input_jsonl The directory of JSON files returned from
 #'   `pro_request(..., json_dir = "FOLDER")`.
@@ -55,13 +64,6 @@ pro_request_jsonl_parquet <- function(
 
   # Preparations -----------------------------------------------------------
 
-  tempfolder <- tempfile(fileext = "_pro_request_to_parquet")
-  dir.create(tempfolder, recursive = TRUE)
-
-  on.exit(
-    try(unlink(tempfolder, recursive = TRUE, force = TRUE), silent = TRUE),
-    add = TRUE
-  )
   ## Create and setup in memory DuckDB
   con <- DBI::dbConnect(duckdb::duckdb())
 
@@ -89,13 +91,20 @@ pro_request_jsonl_parquet <- function(
         force = TRUE
       )
     }
+  } else {
+    dir.create(
+      output,
+      recursive = TRUE,
+      showWarnings = FALSE
+    )
   }
 
   ## Read names of json files
   jsons <- list.files(
     input_jsonl,
     pattern = "*.json$",
-    full.names = TRUE
+    full.names = TRUE,
+    recursive = TRUE
   )
 
   jsons <- jsons[
@@ -128,9 +137,10 @@ pro_request_jsonl_parquet <- function(
     types <- "group_by"
   }
 
+  if (types == "single") {}
+
   # Go through all jsons, i.e. one per page --------------------------------
   ### Names: results_page_x.json
-
   for (i in seq_along(jsons)) {
     fn <- jsons[i]
     if (verbose) {
@@ -149,8 +159,8 @@ pro_request_jsonl_parquet <- function(
                   read_json_auto( '%s' )
               ) TO
                 '%s'
-              (FORMAT PARQUET, COMPRESSION SNAPPY, APPEND, PARTITION_BY 'page')
-            ",
+              (FORMAT PARQUET, COMPRESSION SNAPPY, PARTITION_BY 'page', APPEND)
+          ",
           fn,
           output
         ) |>

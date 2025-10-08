@@ -40,5 +40,5 @@ This function runs a jq filter to extract records from the "results" array
 generate a citation string, and optionally add a page field. It writes the
 result as newline-delimited JSON (.jsonl), suitable for Arrow or DuckDB. For
 details on the jq filter logic, see the \code{\link{vignette}}("jq", package
-= "openalexPro2").
+= "openalexPro").
 }

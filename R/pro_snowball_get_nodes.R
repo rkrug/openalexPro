@@ -1,6 +1,9 @@
 #' A function to get the nodes for a snowball search
 #' @param identifier Character vector of openalex identifiers.
 #' @param doi Character vector of dois.
+#' @param limit If `citedOnly` only works cited by the keypaper are retrieved,
+#'   `citingOnly` retrieves only works citing the keypaper. Default: `NULL`
+#'   where all will be retrieved. 'none' is equal to `NULL`
 #' @param output parquet dataset; default: temporary directory.
 #' @param verbose Logical indicating whether to show a verbose information.
 #'   Defaults to `FALSE`
@@ -18,9 +21,18 @@
 pro_snowball_get_nodes <- function(
   identifier = NULL,
   doi = NULL,
+  limit = NULL,
   output = tempfile(fileext = ".snowball"),
   verbose = FALSE
 ) {
+  if (is.null(limit)) {
+    limit <- "none"
+  }
+
+  if (!(limit %in% c("onlyCiting", "onlyCited", "none"))) {
+    stop("`limit` has to be `NULL`, 'onlyCited' or 'onlyCiting'!")
+  }
+
   if (!xor(is.null(identifier), is.null(doi))) {
     stop("Either `identifier` or `doi` needs to be specified!")
   }
@@ -60,36 +72,39 @@ pro_snowball_get_nodes <- function(
 
   ifelse(
     !is.null(identifier),
-    pro_query(
+    qu <- pro_query(
       openalex = identifier,
       entity = "works"
     ),
-    pro_query(
+    qu <- pro_query(
       doi = doi,
       entity = "works"
     )
-  ) |>
-    pro_request(
-      output = file.path(output, "keypaper_json"),
-      verbose = verbose,
-      progress = verbose
-    ) |>
-    pro_request_jsonl(
-      output = file.path(output, "keypaper_jsonl"),
-      add_columns = list(
-        oa_input = TRUE,
-        relation = "keypaper"
-      ),
-      verbose = verbose
-    ) |>
-    pro_request_jsonl_parquet(
-      output = file.path(output, "keypaper_parquet"),
-      add_columns = list(
-        oa_input = FALSE,
-        relation = "citing"
-      ),
-      verbose = verbose
-    )
+  )
+  x <- pro_request(
+    query_url = qu,
+    output = file.path(output, "keypaper_json"),
+    verbose = verbose,
+    progress = verbose
+  )
+  x <- pro_request_jsonl(
+    input_json = x,
+    output = file.path(output, "keypaper_jsonl"),
+    add_columns = list(
+      oa_input = TRUE,
+      relation = "keypaper"
+    ),
+    verbose = verbose
+  )
+  pro_request_jsonl_parquet(
+    input_jsonl = x,
+    output = file.path(output, "keypaper_parquet"),
+    add_columns = list(
+      oa_input = FALSE,
+      relation = "citing"
+    ),
+    verbose = verbose
+  )
 
   # Getting keypaper ids as returned by OpenAlex ---------------------------
 
@@ -109,58 +124,99 @@ pro_snowball_get_nodes <- function(
   # fetching documents citing the target keypapers (incoming - to: keypaper)
   # ----
 
-  if (verbose) {
-    message(
-      "Collecting all documents citing the target keypapers (to = keypaper)..."
-    )
-  }
+  if (limit == "onlyCiting") {
+    if (verbose) {
+      message(
+        "Collecting all documents citing the target keypapers (to = keypaper)..."
+      )
+    }
 
-  pro_query(
-    cites = keypaper_ids,
-    entity = "works"
-  ) |>
-    pro_request(
-      output = file.path(output, "citing_json"),
-      verbose = verbose,
-      progress = verbose
+    pro_query(
+      cites = keypaper_ids,
+      entity = "works"
     ) |>
-    pro_request_jsonl(
-      output = file.path(output, "citing_jsonl"),
-      add_columns = list(
-        oa_input = FALSE,
-        relation = "citing"
-      ),
-      verbose = verbose
-    )
+      pro_request(
+        output = file.path(output, "citing_json"),
+        verbose = verbose,
+        progress = verbose
+      ) |>
+      pro_request_jsonl(
+        output = file.path(output, "citing_jsonl"),
+        add_columns = list(
+          oa_input = FALSE,
+          relation = "citing"
+        ),
+        verbose = verbose
+      )
+  }
 
   # fetching documents cited by the keypapers (outgoing - from: keypaper
   # )-----------------------
+  if (limit == "onlyCited") {
+    if (verbose) {
+      message(
+        "Collecting all documents cited by the target keypapers ..."
+      )
+    }
 
-  if (verbose) {
-    message(
-      "Collecting all documents cited by the target keypapers ..."
+    cited_parquet <- pro_query(
+      cited_by = keypaper_ids,
+      entity = "works"
+    ) |>
+      pro_request(
+        output = file.path(output, "cited_json"),
+        verbose = verbose,
+        progress = verbose
+      ) |>
+      pro_request_jsonl(
+        output = file.path(output, "cited_jsonl"),
+        add_columns = list(
+          oa_input = FALSE,
+          relation = "cited"
+        ),
+        verbose = verbose
+      )
+  }
+  # Combine individual parquet databases to nodes_parquet --------------------
+
+  json_sources <- c(file.path(output, "keypaper_jsonl", "**", "*.json"))
+
+  cited_jsonl_dir <- file.path(output, "cited_jsonl")
+  if (
+    dir.exists(cited_jsonl_dir) &&
+      length(list.files(
+        cited_jsonl_dir,
+        pattern = "\\.json$",
+        recursive = TRUE
+      )) >
+        0
+  ) {
+    json_sources <- c(
+      json_sources,
+      file.path(output, "cited_jsonl", "**", "*.json")
     )
   }
 
-  cited_parquet <- pro_query(
-    cited_by = keypaper_ids,
-    entity = "works"
-  ) |>
-    pro_request(
-      output = file.path(output, "cited_json"),
-      verbose = verbose,
-      progress = verbose
-    ) |>
-    pro_request_jsonl(
-      output = file.path(output, "cited_jsonl"),
-      add_columns = list(
-        oa_input = FALSE,
-        relation = "cited"
-      ),
-      verbose = verbose
+  citing_jsonl_dir <- file.path(output, "citing_jsonl")
+  if (
+    dir.exists(citing_jsonl_dir) &&
+      length(list.files(
+        citing_jsonl_dir,
+        pattern = "\\.json$",
+        recursive = TRUE
+      )) >
+        0
+  ) {
+    json_sources <- c(
+      json_sources,
+      file.path(output, "citing_jsonl", "**", "*.json")
     )
+  }
 
-  # Combine individualparquet databases to nodes_parquet ----------------------
+  json_sources_sql <- paste(
+    sprintf("'%s'", json_sources),
+    collapse = ",\n          "
+  )
 
   sprintf(
     "
@@ -169,16 +225,14 @@ pro_snowball_get_nodes <- function(
           * REPLACE (CAST(oa_input AS BOOLEAN) AS oa_input)
         FROM 
         read_json_auto(
-          ['%s', '%s','%s'],
+          [%s],
           union_by_name = true
         )
       ) TO
         '%s'
         (FORMAT PARQUET, COMPRESSION SNAPPY, APPEND, PARTITION_BY 'relation')
       ",
-    file.path(output, "keypaper_jsonl", "**", "*.json"),
-    file.path(output, "cited_jsonl", "**", "*.json"),
-    file.path(output, "citing_jsonl", "**", "*.json"),
+    json_sources_sql,
     file.path(output, "nodes")
   ) |>
     DBI::dbExecute(conn = con)

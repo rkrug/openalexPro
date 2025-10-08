@@ -1,12 +1,20 @@
-#' Convert JSON files to Apache Parquet files
+#' Convert JSON files to jsonl files
 #'
 #'
 #' The function takes a directory of JSON files as written from a call to
-#' `pro_request(..., output = "FOLDER")` and is preparing the json files to be
-#' processed further using DuckDB. See
+#' `pro_request(...)` and is preparing the json files to be
+#' processed further using DuckDB by converting them to `jsonl` files.
+#' The subfolders in `input_json` are preserved in `output`, i.e.
+#' results of a list of initial queries passed to `pro_request()` are maintained.
 #' @details See \code{\link{jq_execute}} or the \code{\link{vignette}}("jq",
-#'   package = "openalexPro2") for more information on the conversion of the
+#'   package = "openalexPro") for more information on the conversion of the
 #'   JSON files.
+#'   The folder/filename is converted to a value named `page`
+#'   As an example:
+#'   1. the subfolder in the `output` folder is called `Chunk_1`
+#'   2. the page othe json file represents is `2`
+#'   3. The resulting cvalus for `page` will be `Chunk_1_2`
+#'
 #'
 #' @param input_json The directory of JSON files returned from `pro_request(...,
 #'   json_dir = "FOLDER")`.
@@ -90,8 +98,11 @@ pro_request_jsonl <- function(
   jsons <- list.files(
     input_json,
     pattern = "*.json$",
-    full.names = TRUE
+    full.names = TRUE,
+    recursive = TRUE
   )
+
+  has_subdirs <- length(list.dirs(input_json)) > 1
 
   jsons <- jsons[
     order(
@@ -135,9 +146,20 @@ pro_request_jsonl <- function(
     ## Extract page number into pn
     pn <- basename(fn) |>
       strsplit(split = "_")
+    pn <- pn[[1]]
 
-    pn <- pn[[1]][length(pn[[1]])] |>
+    # pn <- pn[[1]][length(pn[[1]])] |>
+    pn <- pn[length(pn)] |>
       gsub(pattern = ".json", replacement = "")
+
+    if (has_subdirs) {
+      jsonl <- file.path(output, basename(dirname(fn)), basename(fn))
+      pn <- paste0(basename(dirname(fn)), "_", pn)
+    } else {
+      jsonl <- file.path(output, basename(fn))
+      pn = pn
+    }
+    dir.create(dirname(jsonl), recursive = TRUE, showWarnings = FALSE)
 
     try(
       {
@@ -145,7 +167,6 @@ pro_request_jsonl <- function(
         ## - Convert `inverted_abstract_index` to `abstract`
         ## - remove `inverted_abstract_index`
         ## - add `page` = pn
-        jsonl <- file.path(output, basename(fn))
         jq_execute(
           input_json = fn,
           output_jsonl = jsonl,

@@ -23,15 +23,7 @@ pro_snowball(
 Defaults to \code{FALSE}}
 }
 \value{
-A list containing 2 elements:
-\itemize{
-\item nodes: dataframe with publication records.
-The last column \code{oa_input} indicates whether the work was one of the input
-\code{identifier}(s).
-\item edges: publication link dataframe of 2 columns \verb{from, to}
-such that a row \verb{A, B} means A -> B means A cites B. In bibliometrics, the
-"citation action" comes from A to B.
-}
+The folder of the results containing multiple subfolders.
 }
 \description{
 A function to perform a snowball search and convert the result to a

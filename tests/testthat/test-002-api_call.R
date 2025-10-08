@@ -1,11 +1,10 @@
 library(testthat)
 
 test_that("api_call returns response object on success (200)", {
-  vcr::use_cassette("api_call_200", {
-    req <- httr2::request("https://api.openalex.org/works/W4234567890")
-    resp <- api_call(req)
-    expect_equal(httr2::resp_status(resp), 200)
-  })
+  vcr::local_cassette("api_call_200")
+  req <- httr2::request("https://api.openalex.org/works/W4234567890")
+  resp <- api_call(req)
+  expect_equal(httr2::resp_status(resp), 200)
 })
 
 # test_that("api_call stops on Request Line too large (400)", {

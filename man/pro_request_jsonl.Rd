@@ -2,7 +2,7 @@
 % Please edit documentation in R/pro_request_jsonl.R
 \name{pro_request_jsonl}
 \alias{pro_request_jsonl}
-\title{Convert JSON files to Apache Parquet files}
+\title{Convert JSON files to jsonl files}
 \usage{
 pro_request_jsonl(
   input_json = NULL,
@@ -35,13 +35,22 @@ The function does returns the output invisibly.
 }
 \description{
 The function takes a directory of JSON files as written from a call to
-\code{pro_request(..., output = "FOLDER")} and is preparing the json files to be
-processed further using DuckDB. See
+\code{pro_request(...)} and is preparing the json files to be
+processed further using DuckDB by converting them to \code{jsonl} files.
+The subfolders in \code{input_json} are preserved in \code{output}, i.e.
+results of a list of initial queries passed to \code{pro_request()} are maintained.
 }
 \details{
 See \code{\link{jq_execute}} or the \code{\link{vignette}}("jq",
-package = "openalexPro2") for more information on the conversion of the
+package = "openalexPro") for more information on the conversion of the
 JSON files.
+The folder/filename is converted to a value named \code{page}
+As an example:
+\enumerate{
+\item the subfolder in the \code{output} folder is called \code{Chunk_1}
+\item the page othe json file represents is \code{2}
+\item The resulting cvalus for \code{page} will be \code{Chunk_1_2}
+}
 
 The function uses DuckDB to read the JSON files and to create the
 Apache Parquet files. The function creates a DuckDB connection in memory

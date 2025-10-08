@@ -76,7 +76,7 @@ pro_snowball_extract_edges <- function(
       name = "nodes"
     )
 
-  system.file("extract_edges.sql", package = "openalexPro2") |>
+  system.file("extract_edges.sql", package = "openalexPro") |>
     load_sql_file() |>
     DBI::dbExecute(conn = con)
 

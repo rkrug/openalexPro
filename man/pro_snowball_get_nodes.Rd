@@ -7,6 +7,7 @@
 pro_snowball_get_nodes(
   identifier = NULL,
   doi = NULL,
+  limit = NULL,
   output = tempfile(fileext = ".snowball"),
   verbose = FALSE
 )
@@ -15,6 +16,10 @@ pro_snowball_get_nodes(
 \item{identifier}{Character vector of openalex identifiers.}
 
 \item{doi}{Character vector of dois.}
+
+\item{limit}{If \code{citedOnly} only works cited by the keypaper are retrieved,
+\code{citingOnly} retrieves only works citing the keypaper. Default: \code{NULL}
+where all will be retrieved. 'none' is equal to \code{NULL}}
 
 \item{output}{parquet dataset; default: temporary directory.}
 

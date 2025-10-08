@@ -48,7 +48,7 @@ appended to the \code{User-Agent}.}
 are collapsed with \code{"|"} to express OR).}
 }
 \value{
-An \code{httr2} request object, ready for \code{api_call()}.
+An individual URL or a list of URLs.
 }
 \description{
 Construct an \code{httr2} request for the OpenAlex API. All filters must be
@@ -58,6 +58,9 @@ supplied as named \code{...} arguments (e.g., \code{from_publication_date = "202
 Filter names are validated via \code{.validate_filter()} using
 \code{opt_filter_names()}. \code{select} fields are validated via
 \code{.validate_select()} using \code{`opt_select_fields()`}.
+
+If multiple more then 50 `doi` or openalex `id`s are provided, the request
+is automatically split into chunks of 50 and a named list of URLs is returned.
 }
 \examples{
 \dontrun{
