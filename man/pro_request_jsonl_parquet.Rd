@@ -35,11 +35,20 @@ afterwards. Defaults to \code{FALSE}.}
 The function does returns the output invisibly.
 }
 \description{
-The function takes a directory of JSON files as written from a call to
-\code{pro_request(..., json_dir = "FOLDER")} and converts it to a Apache Parquet
-dataset partitiond by the page.
+The function takes a directory of JSONL files as written from a call to
+\code{pro_request_jsonl(...)} and converts it to a Apache Parquet files. Each
+jsonl is processed individually, so there is no limit of the number of records.
 }
 \details{
+The value \code{page} as created in \code{pro_request_jsonl()} is used for partitioning.
+All jsonl files are combined into a single Apache Parquet dataset, but can be
+filtered out by using the "page". As an example:
+\enumerate{
+\item the subfolder in the \code{output} folder is called \code{Chunk_1}
+\item the page othe json file represents is \code{2}
+\item The resulting cvalus for \code{page} will be \code{Chunk_1_2}
+}
+
 The function uses DuckDB to read the JSON files and to create the
 Apache Parquet files. The function creates a DuckDB connection in memory
 and readsds the JSON files into DuckDB when needed. Then it creates a SQL

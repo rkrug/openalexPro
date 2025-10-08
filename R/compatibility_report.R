@@ -1,6 +1,6 @@
 #' Render and open the compatibility report
 #'
-#' Renders the Quarto report at `system.file("compatibility.qmd", package = "openalexPro2")
+#' Renders the Quarto report at `system.file("compatibility.qmd", package = "openalexPro")
 #' and opens the resulting HTML in your default browser.
 #'
 #' This report is designed to help you validate client–API compatibility in
@@ -30,7 +30,7 @@ compatibility_report <- function(
 ) {
   input <- system.file(
     "compatibility.qmd",
-    package = "openalexPro2",
+    package = "openalexPro",
     mustWork = FALSE
   )
 

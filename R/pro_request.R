@@ -144,8 +144,8 @@ pro_request <- function(
         api_key = api_key
       ) |>
       httr2::req_user_agent(paste(
-        "openalexPro2 v",
-        packageVersion("openalexPro2"),
+        "openalexPro v",
+        packageVersion("openalexPro"),
         " (mailto:",
         mailto,
         ")"

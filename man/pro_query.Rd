@@ -58,6 +58,9 @@ supplied as named \code{...} arguments (e.g., \code{from_publication_date = "202
 Filter names are validated via \code{.validate_filter()} using
 \code{opt_filter_names()}. \code{select} fields are validated via
 \code{.validate_select()} using \code{`opt_select_fields()`}.
+
+If multiple more then 50 `doi` or openalex `id`s are provided, the request
+is automatically split into chunks of 50 and a named list of URLs is returned.
 }
 \examples{
 \dontrun{

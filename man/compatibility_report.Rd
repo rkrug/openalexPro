@@ -23,7 +23,7 @@ system browser.}
 Invisibly returns the path to the rendered HTML file.
 }
 \description{
-Renders the Quarto report at `system.file("compatibility.qmd", package = "openalexPro2")
+Renders the Quarto report at `system.file("compatibility.qmd", package = "openalexPro")
 and opens the resulting HTML in your default browser.
 }
 \details{

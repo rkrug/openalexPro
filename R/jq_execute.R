@@ -5,7 +5,7 @@
 #' generate a citation string, and optionally add a page field. It writes the
 #' result as newline-delimited JSON (.jsonl), suitable for Arrow or DuckDB. For
 #' details on the jq filter logic, see the \code{\link{vignette}}("jq", package
-#' = "openalexPro2").
+#' = "openalexPro").
 #'
 #' @param input_json Path to the input JSON file
 #' @param output_jsonl Path to the output .jsonl file

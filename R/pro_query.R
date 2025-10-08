@@ -163,6 +163,9 @@
 #' \code{opt_filter_names()}. \code{select} fields are validated via
 #' \code{.validate_select()} using \code{`opt_select_fields()`}.
 #'
+#' If multiple more then 50 `doi` or openalex `id`s are provided, the request
+#' is automatically split into chunks of 50 and a named list of URLs is returned.
+#'
 #' @param entity Character; one of \code{"works"}, \code{"authors"}, \code{"venues"},
 #'   \code{"institutions"}, \code{"concepts"}, \code{"publishers"}, \code{"funders"}.
 #' @param id Optional single ID (e.g., \code{"W1775749144"}) to fetch one entity.

@@ -1,9 +1,18 @@
 #' Convert JSON files to Apache Parquet files
 #'
 #'
-#' The function takes a directory of JSON files as written from a call to
-#' `pro_request(..., json_dir = "FOLDER")` and converts it to a Apache Parquet
-#' dataset partitiond by the page.
+#' The function takes a directory of JSONL files as written from a call to
+#' `pro_request_jsonl(...)` and converts it to a Apache Parquet files. Each
+#' jsonl is processed individually, so there is no limit of the number of records.
+#'
+#' The value `page` as created in `pro_request_jsonl()` is used for partitioning.
+#' All jsonl files are combined into a single Apache Parquet dataset, but can be
+#' filtered out by using the "page". As an example:
+#'
+#' 1. the subfolder in the `output` folder is called `Chunk_1`
+#' 2. the page othe json file represents is `2`
+#' 3. The resulting cvalus for `page` will be `Chunk_1_2`
+#'
 #'
 #' @param input_jsonl The directory of JSON files returned from
 #'   `pro_request(..., json_dir = "FOLDER")`.
