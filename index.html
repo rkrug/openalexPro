@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Providing a more advanced access to OpenAlex for the power user • openalexPro2</title>
+<title>Providing a more advanced access to OpenAlex for the power user • openalexPro</title>
 <script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
@@ -20,9 +20,9 @@
 
     <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
 
-    <a class="navbar-brand me-2" href="index.html">openalexPro2</a>
+    <a class="navbar-brand me-2" href="index.html">openalexPro</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -96,7 +96,7 @@
 </h3>
 <p>The query is defined using the function <code>openalexR:oa_query()</code>. For details about arguments and how to use it, please see there. For convenience, it is re-published in the <code>openalexPro2</code> package.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/rkrug/openalexPro" class="external-link">openalexPro2</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">openalexPro2</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu">oa_query</span><span class="op">(</span></span>
 <span>  title_and_abstract.search <span class="op">=</span> <span class="st">"biodiversity AND conservation AND IPBES"</span>,</span>
@@ -109,7 +109,7 @@
 <p>The returned jsons are saved as jsons on the disk in the folder provided by the argument <code>output</code>. They contain metadata from the request as well as the results.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">json_raw</span> <span class="op">&lt;-</span> <span class="st">"./json_raw"</span></span>
-<span><span class="fu">openalexPro2</span><span class="fu">::</span><span class="fu"><a href="reference/pro_request.html">pro_request</a></span><span class="op">(</span></span>
+<span><span class="fu">openalexPro2</span><span class="fu">::</span><span class="fu">pro_request</span><span class="op">(</span></span>
 <span>  query_url <span class="op">=</span> <span class="va">query_url</span>,</span>
 <span>  output <span class="op">=</span> <span class="va">json_raw</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -141,7 +141,7 @@
 <p>Here the files are converted into a parquet dataset saved as individual <code>parquet</code> files in the folder provided by the argument <code>output</code>.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">parquet</span> <span class="op">&lt;-</span> <span class="st">"./parquet"</span></span>
-<span><span class="fu">openalexPro2</span><span class="fu">::</span><span class="fu"><a href="reference/pro_request_jsonl_parquet.html">pro_request_jsonl_parquet</a></span><span class="op">(</span></span>
+<span><span class="fu">openalexPro2</span><span class="fu">::</span><span class="fu">pro_request_jsonl_parquet</span><span class="op">(</span></span>
 <span>  json_dir <span class="op">=</span> <span class="va">json_extracted</span>,</span>
 <span>  output <span class="op">=</span> <span class="va">parquet</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span>
@@ -239,7 +239,7 @@
 <div class="citation">
 <h2 data-toc-skip>Citation</h2>
 <ul class="list-unstyled">
-<li><a href="authors.html#citation">Citing openalexPro2</a></li>
+<li><a href="authors.html#citation">Citing openalexPro</a></li>
 </ul>
 </div>
 

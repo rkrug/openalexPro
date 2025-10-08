@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Workflow using openalexPro2 • openalexPro2</title>
+<title>Workflow using openalexPro2 • openalexPro</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
@@ -20,9 +20,9 @@
 
     <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
 
-    <a class="navbar-brand me-2" href="../index.html">openalexPro2</a>
+    <a class="navbar-brand me-2" href="../index.html">openalexPro</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -76,11 +76,11 @@
 </h2>
 <p>The workflow when using <code>openalexPro2</code> is essentially as follows:</p>
 <ol type="1">
-<li>the function <code><a href="../reference/pro_query.html">openalexPro2::pro_query()</a></code> is used to build the API query for the OpenAlex API</li>
-<li>the function <code><a href="../reference/pro_request.html">openalexPro2::pro_request()</a></code> is used to retrieve the results from the OpenAlex API and to store them in a folder in the format oif <code>json</code> files as returned by OpenAlex.</li>
-<li>the function <code><a href="../reference/pro_request_jsonl.html">openalexPro2::pro_request_jsonl()</a></code> is doing some cleaning and editing of the json files into <strong>Json Lines</strong>, aka <strong>NDJSON</strong>, which is atext file where each line is a separate JSON object. For details <a href="jq.qmd">see</a>
+<li>the function <code>openalexPro2::pro_query()</code> is used to build the API query for the OpenAlex API</li>
+<li>the function <code>openalexPro2::pro_request()</code> is used to retrieve the results from the OpenAlex API and to store them in a folder in the format oif <code>json</code> files as returned by OpenAlex.</li>
+<li>the function <code>openalexPro2::pro_request_jsonl()</code> is doing some cleaning and editing of the json files into <strong>Json Lines</strong>, aka <strong>NDJSON</strong>, which is atext file where each line is a separate JSON object. For details <a href="jq.qmd">see</a>
 </li>
-<li>the function <code><a href="../reference/pro_request_jsonl_parquet.html">openalexPro2::pro_request_jsonl_parquet()</a></code> is used to convert the <code>json</code> files to a parquet database</li>
+<li>the function <code>openalexPro2::pro_request_jsonl_parquet()</code> is used to convert the <code>json</code> files to a parquet database</li>
 </ol>
 <p>TODO: Add plantuml graph TODO add more info and examles</p>
 </section><script id="quarto-html-after-body" type="application/javascript">
