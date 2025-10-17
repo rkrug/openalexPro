@@ -154,7 +154,7 @@ pro_request_jsonl <- function(
 
     if (has_subdirs) {
       jsonl <- file.path(output, basename(dirname(fn)), basename(fn))
-      pn <- paste0(basename(dirname(fn)), "_", pn)
+      pn <- basename(dirname(fn))
     } else {
       jsonl <- file.path(output, basename(fn))
       pn = pn
