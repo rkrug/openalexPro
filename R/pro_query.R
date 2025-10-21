@@ -180,6 +180,7 @@
 #' @param mailto Optional email to join the polite pool; added as a query parameter and
 #'   appended to the \code{User-Agent}.
 #' @param user_agent Optional custom \code{User-Agent}.
+#' @param   chunk_limit Number of DOIS or ids per chunk if chunked. Default: 50
 #' @param ... Filters as named arguments. Values may be scalars or vectors (vectors
 #'   are collapsed with \code{"|"} to express OR).
 #'
@@ -223,6 +224,7 @@ pro_query <- function(
   endpoint = "https://api.openalex.org",
   mailto = NULL,
   user_agent = NULL,
+  chunk_limit = 50L,
   ...
 ) {
   entities <- c(
@@ -258,7 +260,6 @@ pro_query <- function(
     "cites",
     "cited_by"
   )
-  chunk_limit <- 50L
 
   filter_batches <- list(filter)
   if (length(filter)) {

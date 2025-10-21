@@ -16,6 +16,7 @@ pro_query(
   endpoint = "https://api.openalex.org",
   mailto = NULL,
   user_agent = NULL,
+  chunk_limit = 50L,
   ...
 )
 }
@@ -43,6 +44,8 @@ moved into the \code{ids.openalex} filter and \code{id} is cleared.}
 appended to the \code{User-Agent}.}
 
 \item{user_agent}{Optional custom \code{User-Agent}.}
+
+\item{chunk_limit}{Number of DOIS or ids per chunk if chunked. Default: 50}
 
 \item{...}{Filters as named arguments. Values may be scalars or vectors (vectors
 are collapsed with \code{"|"} to express OR).}
