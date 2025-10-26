@@ -46,7 +46,7 @@ filtered out by using the "page". As an example:
 \enumerate{
 \item the subfolder in the \code{output} folder is called \code{Chunk_1}
 \item the page othe json file represents is \code{2}
-\item The resulting cvalus for \code{page} will be \code{Chunk_1_2}
+\item The resulting values for \code{page} will be \code{Chunk_1_2}
 }
 
 The function uses DuckDB to read the JSON files and to create the
