@@ -11,7 +11,7 @@
 #'
 #' 1. the subfolder in the `output` folder is called `Chunk_1`
 #' 2. the page othe json file represents is `2`
-#' 3. The resulting cvalus for `page` will be `Chunk_1_2`
+#' 3. The resulting values for `page` will be `Chunk_1_2`
 #'
 #'
 #' @param input_jsonl The directory of JSON files returned from

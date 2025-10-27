@@ -192,6 +192,10 @@ pro_request <- function(
     } else {
       # Pagination loop
       repeat {
+        if (!is.null(pages)) {
+          if (page > pages) break # Remove this to fetch all pages
+        }
+
         if (verbose) {
           message("\nDownloading page ", page)
           message("URL: ", req$url)
@@ -230,10 +234,6 @@ pro_request <- function(
         # This is needed for groups as at the moment OpenAlex returns a final
         # cursor page with no tresults if (isTRUE(data$meta$groups_count == 200))
         # { break }
-
-        if (!is.null(pages)) {
-          if (page > pages) break # Remove this to fetch all pages
-        }
 
         req <- req |>
           httr2::req_url_query(cursor = data$meta$next_cursor)
