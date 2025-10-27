@@ -6,6 +6,8 @@ format: gfm
 ---
 [![name status badge](https://rkrug.r-universe.dev/badges/:name)](https://rkrug.r-universe.dev/)
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17453180.svg)](https://doi.org/10.5281/zenodo.17453180)
+
 [![openalexPro status badge](https://rkrug.r-universe.dev/openalexPro/badges/version)](https://rkrug.r-universe.dev/openalexPro)
 
 
