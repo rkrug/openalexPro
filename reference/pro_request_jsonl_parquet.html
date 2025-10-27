@@ -11,7 +11,7 @@ jsonl is processed individually, so there is no limit of the number of records."
 
     <a class="navbar-brand me-2" href="../index.html">openalexPro</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -101,7 +101,7 @@ afterwards. Defaults to <code>FALSE</code>.</p></dd>
 All jsonl files are combined into a single Apache Parquet dataset, but can be
 filtered out by using the "page". As an example:</p><ol><li><p>the subfolder in the <code>output</code> folder is called <code>Chunk_1</code></p></li>
 <li><p>the page othe json file represents is <code>2</code></p></li>
-<li><p>The resulting cvalus for <code>page</code> will be <code>Chunk_1_2</code></p></li>
+<li><p>The resulting values for <code>page</code> will be <code>Chunk_1_2</code></p></li>
 </ol><p>The function uses DuckDB to read the JSON files and to create the
 Apache Parquet files. The function creates a DuckDB connection in memory
 and readsds the JSON files into DuckDB when needed. Then it creates a SQL

@@ -9,7 +9,7 @@ supplied as named ... arguments (e.g., from_publication_date = "2020-01-01").'><
 
     <a class="navbar-brand me-2" href="../index.html">openalexPro</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -57,6 +57,7 @@ supplied as named <code>...</code> arguments (e.g., <code>from_publication_date 
 <span>  endpoint <span class="op">=</span> <span class="st">"https://api.openalex.org"</span>,</span>
 <span>  mailto <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  user_agent <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  chunk_limit <span class="op">=</span> <span class="fl">50L</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -107,6 +108,10 @@ appended to the <code>User-Agent</code>.</p></dd>
 
 <dt id="arg-user-agent">user_agent<a class="anchor" aria-label="anchor" href="#arg-user-agent"></a></dt>
 <dd><p>Optional custom <code>User-Agent</code>.</p></dd>
+
+
+<dt id="arg-chunk-limit">chunk_limit<a class="anchor" aria-label="anchor" href="#arg-chunk-limit"></a></dt>
+<dd><p>Number of DOIS or ids per chunk if chunked. Default: 50</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
