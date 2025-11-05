@@ -3,7 +3,7 @@ pkgdown: 2.1.3
 pkgdown_sha: ~
 articles:
   Workflow: Workflow.html
-last_built: 2025-10-27T08:01Z
+last_built: 2025-11-05T10:01Z
 urls:
   reference: https://rkrug.github.io/openalexPro/reference
   article: https://rkrug.github.io/openalexPro/articles
