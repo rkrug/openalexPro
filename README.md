@@ -86,7 +86,7 @@ opt_select_fields()
 This defines a basic query.
 
 ```r
-query <- oa_query(
+query <- pro_query(
   title_and_abstract.search = "biodiversity AND conservation AND IPBES",
   entity = "works"
 )
