@@ -51,8 +51,9 @@ test_that("pro_request with url list  and parallel", {
   fns <- list.files(output_json, "*.json", full.names = TRUE, recursive = TRUE)
   expect_snapshot(
     {
-      fns
-      tools::md5sum(fns)
+      basename(fns)
+      tools::md5sum(fns) |>
+        as.vector()
     }
   )
   for (fn in fns) {
@@ -75,8 +76,9 @@ test_that("pro_request_jsonl with subfolders", {
   fns <- list.files(output_jsonl, "*.json", full.names = TRUE, recursive = TRUE)
   expect_snapshot(
     {
-      fns
-      tools::md5sum(fns)
+      basename(fns)
+      tools::md5sum(fns) |>
+        as.vector()
     }
   )
   for (fn in fns) {
@@ -105,8 +107,9 @@ test_that("pro_request_jsonl_parquet with subfolders", {
   fns <- list.files(output_jsonl, "*.json", full.names = TRUE, recursive = TRUE)
   expect_snapshot(
     {
-      fns
-      tools::md5sum(fns)
+      basename(fns)
+      tools::md5sum(fns) |>
+        as.vector()
       p <- arrow::open_dataset(output_parquet)
       p
       p |>

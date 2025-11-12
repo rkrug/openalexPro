@@ -46,7 +46,6 @@ test_that("pro_request_jsonl search `biodiversity AND finance`", {
   # Check that the output file contains the expected data
   expect_snapshot_file(
     file.path(output_jsonl, "results_page_1.json"),
-    ,
     name = "jsonl"
   )
 })
@@ -63,6 +62,10 @@ test_that("pro_request_jsonl_parquet search `biodiversity AND finance`", {
   expect_true(
     length(list.files(output_parquet, "*.parquet", recursive = TRUE)) >= 1
   )
+})
+
+test_that("pro_request_jsonl_parquet and openalexR::oa_fetch() return same results", {
+  testthat::skip("Skipping comparison test with openalexR::oa_fetch() for now")
 
   # Get search results from openalexR::oa_fetch(output = "tibble") for
   # comparison

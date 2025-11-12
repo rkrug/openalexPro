@@ -1,30 +1,39 @@
 #' Perform an API call to the OpenAlex API with retry logic
 #'
 #' This function performs a request to the OpenAlex API and handles different
-#' HTTP status codes with retry for transient errors.
+#' HTTP status codes with retry for transient errors. Optionally, specific
+#' non-200 status codes (e.g. 400) can return the raw HTML response instead
+#' of aborting.
 #'
 #' @param req A request object created by \code{\link[httr2]{request}}.
-#' @param max_tries Maximum number of retry attempts (default: 10)
-#' @param error_log File path for error logging (default: "error.log")
+#' @param max_retries Maximum number of retry attempts (default: 10).
+#' @param transient_responses Integer vector of HTTP statuses considered transient
+#'   (default: 500, 502, 503, 504, 429).
+#' @param error_log File path for error logging (default: `NULL` (none)).
+#' @param get_html_response Integer or \code{NULL} controlling when to return a
+#'   non-200 response instead of aborting:
+#'   \itemize{
+#'     \item \emph{Missing:} default behaviour (abort on all non-200 statuses).
+#'     \item \code{NULL:} return the response object for all non-200 statuses.
+#'     \item integer (e.g. \code{400}): return the response object only if the
+#'       HTTP status equals this value \emph{and} the response has an HTML
+#'       \code{Content-Type}.
+#'   }
 #'
-#' @return A response object or error.
+#' @return An \code{httr2} response object (on success, or per get_html_response rules), or aborts.
 #'
-#' @importFrom httr2 req_perform resp_status
-#' @importFrom rlang caller_env
+#' @importFrom httr2 req_retry req_error req_perform resp_status resp_header
+#' @importFrom rlang caller_env abort
 #' @noRd
-
 api_call <- function(
   req,
   max_retries = 10,
   transient_responses = c(500, 502, 503, 504, 429),
-  error_log = "error.log"
+  error_log = NULL,
+  get_html_response
 ) {
-  # Define a simple file logger --------------------------------------------
-
-  log_fun <- function(
-    msg,
-    log_file
-  ) {
+  # simple logger
+  log_fun <- function(msg, log_file) {
     timestamp <- format(Sys.time(), "%Y-%m-%d %H:%M:%S")
     full_msg <- paste0("[", timestamp, "] ", msg, "\n")
     if (!is.null(log_file)) {
@@ -34,23 +43,41 @@ api_call <- function(
     }
   }
 
-  # Add retry logic for potentially transient errors -----------------------
-
+  # Retry logic for transient statuses
   req <- req |>
     httr2::req_retry(
       max_tries = max_retries,
-      backoff = ~ 2^.x, # exponential backoff
+      backoff = ~ 2^.x,
       is_transient = function(resp) {
         status <- httr2::resp_status(resp)
         status %in% transient_responses
       }
     )
 
-  # Perform the request and capture errors ---------------------------------
+  # IMPORTANT: control when httr2 should throw vs return the response
+  if (!missing(get_html_response) && is.null(get_html_response)) {
+    # Return ALL non-200 responses (never auto-throw)
+    req <- req |> httr2::req_error(is_error = function(resp) FALSE)
+  } else if (!missing(get_html_response) && is.numeric(get_html_response)) {
+    # Return only when status matches the integer AND content is HTML
+    req <- req |>
+      httr2::req_error(is_error = function(resp) {
+        status <- httr2::resp_status(resp)
+        if (status == get_html_response) {
+          ct <- httr2::resp_header(resp, "content-type")
+          is_html <- !is.na(ct) &&
+            grepl("text/html|application/xhtml\\+xml", ct, ignore.case = TRUE)
+          return(!is_html) # don't throw if HTML; throw otherwise
+        }
+        # default: throw on other 4xx/5xx
+        return(status >= 400)
+      })
+    # If get_html_response is missing: leave default erroring behavior
+  }
+
+  # Perform the request
   resp <- tryCatch(
-    {
-      httr2::req_perform(req, error_call = rlang::caller_env())
-    },
+    httr2::req_perform(req, error_call = rlang::caller_env()),
     error = function(e) {
       log_fun(
         paste0(
@@ -66,16 +93,56 @@ api_call <- function(
   )
 
   status <- httr2::resp_status(resp)
-
-  # Return immediately if everything is OK ---------------------------------
-
   if (status == 200) {
     return(resp)
-  } else {
+  }
+
+  # Non-200 handling
+  if (missing(get_html_response)) {
+    # unchanged: abort
+    log_fun(paste0("\u26A0 Unexpected HTTP status ", status), error_log)
+    rlang::abort(
+      paste0("Unexpected HTTP status ", status, "\n  Aborting!"),
+      class = "unexpected_http_status"
+    )
+  } else if (is.null(get_html_response)) {
+    # returned for all non-200
     log_fun(
-      paste0("\u26A0 Unexpected HTTP status ", status),
+      paste0(
+        "\u26A0 HTTP ",
+        status,
+        " — returning response for caller inspection"
+      ),
       error_log
     )
+    return(resp)
+  } else if (is.numeric(get_html_response) && status == get_html_response) {
+    ct <- httr2::resp_header(resp, "content-type")
+    is_html <- !is.na(ct) &&
+      grepl("text/html|application/xhtml\\+xml", ct, ignore.case = TRUE)
+    if (is_html) {
+      log_fun(
+        paste0(
+          "\u26A0 HTTP ",
+          status,
+          " (HTML) — returning response for caller inspection"
+        ),
+        error_log
+      )
+      return(resp)
+    }
+    # matched status but not HTML → abort
+    log_fun(
+      paste0("\u26A0 Unexpected HTTP status ", status, " (non-HTML)"),
+      error_log
+    )
+    rlang::abort(
+      paste0("Unexpected HTTP status ", status, " (non-HTML)\n  Aborting!"),
+      class = "unexpected_http_status"
+    )
+  } else {
+    # integer provided, but status didn't match → abort
+    log_fun(paste0("\u26A0 Unexpected HTTP status ", status), error_log)
     rlang::abort(
       paste0("Unexpected HTTP status ", status, "\n  Aborting!"),
       class = "unexpected_http_status"

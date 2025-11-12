@@ -86,7 +86,7 @@ opt_select_fields()
 This defines a basic query.
 
 ```r
-query <- oa_query(
+query <- pro_query(
   title_and_abstract.search = "biodiversity AND conservation AND IPBES",
   entity = "works"
 )
@@ -94,7 +94,7 @@ query <- oa_query(
 
 This returns a URL, which one can open in the browser.
 
-If, however, for example 100 DOIs are given to be retrieved, the query is chunked into chunks of a maximum of the value of the argument `chunk_limit`, default is 50. In this case, the functions returns a `list()` with each element named `Chunk_x` and contailing the URL as a character vector.
+If, however, for example 100 DOIs are given to be retrieved, the query is chunked into chunks of a maximum of the value of the argument `chunk_limit`, default is 50. In this case, the functions returns a `list()` with each element named `Chunk_x` and containing the URL as a character vector.
 
 ### 2. Retrieving records (`openalexPro::pro_request()`)
 
