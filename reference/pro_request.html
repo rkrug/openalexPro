@@ -13,7 +13,7 @@ json files."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">openalexPro</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -60,7 +60,9 @@ json files.</p>
 <span>  api_key <span class="op">=</span> <span class="va">oap_apikey</span>,</span>
 <span>  workers <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  progress <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  progress <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  count_only <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  error_log <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -110,12 +112,20 @@ exists.</p></dd>
 <dd><p>Logical default <code>TRUE</code> indicating whether to show a progress
 bar.</p></dd>
 
+
+<dt id="arg-count-only">count_only<a class="anchor" aria-label="anchor" href="#arg-count-only"></a></dt>
+<dd><p>return count only as a named numeric vector or list.</p></dd>
+
+
+<dt id="arg-error-log">error_log<a class="anchor" aria-label="anchor" href="#arg-error-log"></a></dt>
+<dd><p>location of error log of API calls. (default: <code>NULL</code> (none)).</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>If <code>output</code> is <code>NULL</code>, the return value from call to
-<code><a href="https://docs.ropensci.org/openalexR/reference/oa_request.html" class="external-link">openalexR::oa_request()</a></code>, otherwise the complete path to the expanded and
-normalized <code>output</code>.</p>
+    <p>If <code>count_only</code> is <code>FALSE</code> (the default) the complete path to the expanded and
+normalized <code>output</code>. If <code>count_only</code> is <code>TRUE</code>, a named numeric vector with the count
+of the works from the specified query_url(s).</p>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
@@ -135,7 +145,7 @@ in the list are returned in a folder named after the names of the list elements 
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>

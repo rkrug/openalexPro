@@ -1,0 +1,55 @@
+# Execute a jq transformation from an OpenAlex-style JSON to JSONL
+
+This function runs a jq filter to extract records from the "results"
+array (or from the root if type = "single"), reconstruct the abstract
+text, generate a citation string, and optionally add a page field. It
+writes the result as newline-delimited JSON (.jsonl), suitable for Arrow
+or DuckDB. For details on the jq filter logic, see the
+[`vignette`](https://rdrr.io/r/utils/vignette.html)("jq", package =
+"openalexPro").
+
+## Usage
+
+``` r
+jq_execute(
+  input_json,
+  output_jsonl,
+  add_columns = list(),
+  jq_filter = NULL,
+  page = NULL,
+  type = c("results", "single", "group_by")
+)
+```
+
+## Arguments
+
+- input_json:
+
+  Path to the input JSON file
+
+- output_jsonl:
+
+  Path to the output .jsonl file
+
+- add_columns:
+
+  List of additional fields to be added to the output. They nave to be
+  provided as a named list, e./g. \`list(column_1 = "value_1", column_2
+  = 2)\`. Only Scalar values are supported.
+
+- jq_filter:
+
+  Optional custom jq filter string. If NULL, the default filter is used.
+
+- page:
+
+  Optional integer to be added as a "page" field in each output record
+
+- type:
+
+  Either "results" (default, expects a .results\[\] array) or "single"
+  (treat input as array of records directly)
+
+## Value
+
+Invisibly returns the output path
