@@ -53,3 +53,5 @@ paper.parquet
 output_json/*
 output_jsonl/*
 output_parquet/*
+
+only_local/

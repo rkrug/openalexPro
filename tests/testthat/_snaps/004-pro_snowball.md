@@ -13,31 +13,30 @@
     Output
        [1] "abstract"                       "apc_list"                      
        [3] "apc_paid"                       "authorships"                   
-       [5] "best_oa_location"               "biblio"                        
-       [7] "citation"                       "citation_normalized_percentile"
-       [9] "cited_by_api_url"               "cited_by_count"                
+       [5] "awards"                         "best_oa_location"              
+       [7] "biblio"                         "citation"                      
+       [9] "citation_normalized_percentile" "cited_by_count"                
       [11] "cited_by_percentile_year"       "concepts"                      
       [13] "corresponding_author_ids"       "corresponding_institution_ids" 
       [15] "countries_distinct_count"       "counts_by_year"                
-      [17] "created_date"                   "datasets"                      
-      [19] "display_name"                   "doi"                           
+      [17] "created_date"                   "display_name"                  
+      [19] "doi"                            "funders"                       
       [21] "fwci"                           "grants"                        
-      [23] "has_fulltext"                   "id"                            
+      [23] "has_content"                    "id"                            
       [25] "ids"                            "indexed_in"                    
-      [27] "institution_assertions"         "institutions_distinct_count"   
+      [27] "institutions"                   "institutions_distinct_count"   
       [29] "is_paratext"                    "is_retracted"                  
-      [31] "keywords"                       "language"                      
-      [33] "locations"                      "locations_count"               
-      [35] "mesh"                           "oa_input"                      
-      [37] "open_access"                    "page"                          
-      [39] "primary_location"               "primary_topic"                 
-      [41] "publication_date"               "publication_year"              
-      [43] "referenced_works"               "referenced_works_count"        
-      [45] "related_works"                  "relation"                      
-      [47] "sustainable_development_goals"  "title"                         
-      [49] "topics"                         "type"                          
-      [51] "type_crossref"                  "updated_date"                  
-      [53] "versions"                      
+      [31] "is_xpac"                        "keywords"                      
+      [33] "language"                       "locations"                     
+      [35] "locations_count"                "mesh"                          
+      [37] "oa_input"                       "open_access"                   
+      [39] "page"                           "primary_location"              
+      [41] "primary_topic"                  "publication_date"              
+      [43] "publication_year"               "referenced_works"              
+      [45] "referenced_works_count"         "related_works"                 
+      [47] "relation"                       "sustainable_development_goals" 
+      [49] "title"                          "topics"                        
+      [51] "type"                           "updated_date"                  
     Code
       nrow(results_openalexPro$edges)
     Output
@@ -51,14 +50,14 @@
       edge_type = "core")
     Output
       $nodes
-      # A tibble: 2 x 53
+      # A tibble: 2 x 52
         id     doi   title display_name publication_year publication_date ids$openalex
         <chr>  <chr> <chr> <chr>                   <int> <date>           <chr>       
-      1 W3045~ http~ Meas~ Measuring p~             2020 2020-01-01       https://ope~
+      1 W3045~ http~ Meas~ Measuring p~             2022 2022-02-25       https://ope~
       2 W3046~ http~ Tren~ Trends of P~             2020 2020-08-01       https://ope~
-      # i 48 more variables: ids$doi <chr>, $mag <chr>, language <chr>,
-      #   primary_location <tibble[,9]>, type <chr>, type_crossref <chr>,
-      #   indexed_in <list<character>>, open_access <tibble[,4]>,
+      # i 47 more variables: ids$doi <chr>, $mag <chr>, language <chr>,
+      #   primary_location <tibble[,11]>, type <chr>, indexed_in <list<character>>,
+      #   open_access <tibble[,4]>,
       #   authorships <list<
         tbl_df<
           author_position        : character
@@ -92,8 +91,17 @@
             >
         >
       >>,
-      #   institution_assertions <list<character>>, countries_distinct_count <int>,
-      #   institutions_distinct_count <int>,
+      #   institutions <list<
+        tbl_df<
+          id          : character
+          display_name: character
+          ror         : character
+          country_code: character
+          type        : character
+          lineage     : list<character>
+        >
+      >>,
+      #   countries_distinct_count <int>, institutions_distinct_count <int>,
       #   corresponding_author_ids <list<character>>, ...
       
       $edges
@@ -105,14 +113,14 @@
       edge_type = "extended")
     Output
       $nodes
-      # A tibble: 2 x 53
+      # A tibble: 2 x 52
         id     doi   title display_name publication_year publication_date ids$openalex
         <chr>  <chr> <chr> <chr>                   <int> <date>           <chr>       
-      1 W3045~ http~ Meas~ Measuring p~             2020 2020-01-01       https://ope~
+      1 W3045~ http~ Meas~ Measuring p~             2022 2022-02-25       https://ope~
       2 W3046~ http~ Tren~ Trends of P~             2020 2020-08-01       https://ope~
-      # i 48 more variables: ids$doi <chr>, $mag <chr>, language <chr>,
-      #   primary_location <tibble[,9]>, type <chr>, type_crossref <chr>,
-      #   indexed_in <list<character>>, open_access <tibble[,4]>,
+      # i 47 more variables: ids$doi <chr>, $mag <chr>, language <chr>,
+      #   primary_location <tibble[,11]>, type <chr>, indexed_in <list<character>>,
+      #   open_access <tibble[,4]>,
       #   authorships <list<
         tbl_df<
           author_position        : character
@@ -146,8 +154,17 @@
             >
         >
       >>,
-      #   institution_assertions <list<character>>, countries_distinct_count <int>,
-      #   institutions_distinct_count <int>,
+      #   institutions <list<
+        tbl_df<
+          id          : character
+          display_name: character
+          ror         : character
+          country_code: character
+          type        : character
+          lineage     : list<character>
+        >
+      >>,
+      #   countries_distinct_count <int>, institutions_distinct_count <int>,
       #   corresponding_author_ids <list<character>>, ...
       
       $edges
@@ -159,14 +176,14 @@
       edge_type = c("extended", "core"))
     Output
       $nodes
-      # A tibble: 2 x 53
+      # A tibble: 2 x 52
         id     doi   title display_name publication_year publication_date ids$openalex
         <chr>  <chr> <chr> <chr>                   <int> <date>           <chr>       
-      1 W3045~ http~ Meas~ Measuring p~             2020 2020-01-01       https://ope~
+      1 W3045~ http~ Meas~ Measuring p~             2022 2022-02-25       https://ope~
       2 W3046~ http~ Tren~ Trends of P~             2020 2020-08-01       https://ope~
-      # i 48 more variables: ids$doi <chr>, $mag <chr>, language <chr>,
-      #   primary_location <tibble[,9]>, type <chr>, type_crossref <chr>,
-      #   indexed_in <list<character>>, open_access <tibble[,4]>,
+      # i 47 more variables: ids$doi <chr>, $mag <chr>, language <chr>,
+      #   primary_location <tibble[,11]>, type <chr>, indexed_in <list<character>>,
+      #   open_access <tibble[,4]>,
       #   authorships <list<
         tbl_df<
           author_position        : character
@@ -200,8 +217,17 @@
             >
         >
       >>,
-      #   institution_assertions <list<character>>, countries_distinct_count <int>,
-      #   institutions_distinct_count <int>,
+      #   institutions <list<
+        tbl_df<
+          id          : character
+          display_name: character
+          ror         : character
+          country_code: character
+          type        : character
+          lineage     : list<character>
+        >
+      >>,
+      #   countries_distinct_count <int>, institutions_distinct_count <int>,
       #   corresponding_author_ids <list<character>>, ...
       
       $edges
@@ -213,14 +239,14 @@
       edge_type = "outside")
     Output
       $nodes
-      # A tibble: 2 x 53
+      # A tibble: 2 x 52
         id     doi   title display_name publication_year publication_date ids$openalex
         <chr>  <chr> <chr> <chr>                   <int> <date>           <chr>       
-      1 W3045~ http~ Meas~ Measuring p~             2020 2020-01-01       https://ope~
+      1 W3045~ http~ Meas~ Measuring p~             2022 2022-02-25       https://ope~
       2 W3046~ http~ Tren~ Trends of P~             2020 2020-08-01       https://ope~
-      # i 48 more variables: ids$doi <chr>, $mag <chr>, language <chr>,
-      #   primary_location <tibble[,9]>, type <chr>, type_crossref <chr>,
-      #   indexed_in <list<character>>, open_access <tibble[,4]>,
+      # i 47 more variables: ids$doi <chr>, $mag <chr>, language <chr>,
+      #   primary_location <tibble[,11]>, type <chr>, indexed_in <list<character>>,
+      #   open_access <tibble[,4]>,
       #   authorships <list<
         tbl_df<
           author_position        : character
@@ -254,8 +280,17 @@
             >
         >
       >>,
-      #   institution_assertions <list<character>>, countries_distinct_count <int>,
-      #   institutions_distinct_count <int>,
+      #   institutions <list<
+        tbl_df<
+          id          : character
+          display_name: character
+          ror         : character
+          country_code: character
+          type        : character
+          lineage     : list<character>
+        >
+      >>,
+      #   countries_distinct_count <int>, institutions_distinct_count <int>,
       #   corresponding_author_ids <list<character>>, ...
       
       $edges

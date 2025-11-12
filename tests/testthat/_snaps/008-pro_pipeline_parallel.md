@@ -23,77 +23,44 @@
 # pro_request with url list  and parallel
 
     Code
-      fns
+      basename(fns)
     Output
-      [1] "/var/folders/t0/yh20csln4dbcgqxct5nxz2kr0000gn/T//RtmpRJzp57/parallel_work/chunk_1/results_page_1.json"
-      [2] "/var/folders/t0/yh20csln4dbcgqxct5nxz2kr0000gn/T//RtmpRJzp57/parallel_work/chunk_1/results_page_2.json"
-      [3] "/var/folders/t0/yh20csln4dbcgqxct5nxz2kr0000gn/T//RtmpRJzp57/parallel_work/chunk_2/results_page_1.json"
-      [4] "/var/folders/t0/yh20csln4dbcgqxct5nxz2kr0000gn/T//RtmpRJzp57/parallel_work/chunk_2/results_page_2.json"
-      [5] "/var/folders/t0/yh20csln4dbcgqxct5nxz2kr0000gn/T//RtmpRJzp57/parallel_work/chunk_3/results_page_1.json"
-      [6] "/var/folders/t0/yh20csln4dbcgqxct5nxz2kr0000gn/T//RtmpRJzp57/parallel_work/chunk_3/results_page_2.json"
-      [7] "/var/folders/t0/yh20csln4dbcgqxct5nxz2kr0000gn/T//RtmpRJzp57/parallel_work/chunk_4/results_page_1.json"
-      [8] "/var/folders/t0/yh20csln4dbcgqxct5nxz2kr0000gn/T//RtmpRJzp57/parallel_work/chunk_4/results_page_2.json"
+      [1] "results_page_1.json" "results_page_2.json" "results_page_1.json"
+      [4] "results_page_2.json" "results_page_1.json" "results_page_2.json"
+      [7] "results_page_1.json" "results_page_2.json"
     Code
-      tools::md5sum(fns)
+      as.vector(tools::md5sum(fns))
     Output
-      /var/folders/t0/yh20csln4dbcgqxct5nxz2kr0000gn/T//RtmpRJzp57/parallel_work/chunk_1/results_page_1.json 
-                                                                          "bbc3769fdfa764e82195af1d51b76d44" 
-      /var/folders/t0/yh20csln4dbcgqxct5nxz2kr0000gn/T//RtmpRJzp57/parallel_work/chunk_1/results_page_2.json 
-                                                                          "b749026ad415a43a2c65b7ed8c385ea9" 
-      /var/folders/t0/yh20csln4dbcgqxct5nxz2kr0000gn/T//RtmpRJzp57/parallel_work/chunk_2/results_page_1.json 
-                                                                          "3413151208c51578004e8f2fd98bc3e1" 
-      /var/folders/t0/yh20csln4dbcgqxct5nxz2kr0000gn/T//RtmpRJzp57/parallel_work/chunk_2/results_page_2.json 
-                                                                          "68f1d1244df3d5873265c3bcc6e1a26e" 
-      /var/folders/t0/yh20csln4dbcgqxct5nxz2kr0000gn/T//RtmpRJzp57/parallel_work/chunk_3/results_page_1.json 
-                                                                          "68743054ff1907c4377eb14a217deb25" 
-      /var/folders/t0/yh20csln4dbcgqxct5nxz2kr0000gn/T//RtmpRJzp57/parallel_work/chunk_3/results_page_2.json 
-                                                                          "77f5e88e9f2260abfb919eb83370d4fa" 
-      /var/folders/t0/yh20csln4dbcgqxct5nxz2kr0000gn/T//RtmpRJzp57/parallel_work/chunk_4/results_page_1.json 
-                                                                          "23e508d89f1b2601287fcbbe7d654db8" 
-      /var/folders/t0/yh20csln4dbcgqxct5nxz2kr0000gn/T//RtmpRJzp57/parallel_work/chunk_4/results_page_2.json 
-                                                                          "772ec0fea46d4366a1ffbb69dd3e5806" 
+      [1] "bbc3769fdfa764e82195af1d51b76d44" "b749026ad415a43a2c65b7ed8c385ea9"
+      [3] "3413151208c51578004e8f2fd98bc3e1" "68f1d1244df3d5873265c3bcc6e1a26e"
+      [5] "68743054ff1907c4377eb14a217deb25" "77f5e88e9f2260abfb919eb83370d4fa"
+      [7] "23e508d89f1b2601287fcbbe7d654db8" "772ec0fea46d4366a1ffbb69dd3e5806"
 
 # pro_request_jsonl with subfolders
 
     Code
-      fns
+      basename(fns)
     Output
-      [1] "/private/var/folders/t0/yh20csln4dbcgqxct5nxz2kr0000gn/T/RtmpRJzp57/parallel_work_jsonl/chunk_1/results_page_1.json"
-      [2] "/private/var/folders/t0/yh20csln4dbcgqxct5nxz2kr0000gn/T/RtmpRJzp57/parallel_work_jsonl/chunk_2/results_page_1.json"
-      [3] "/private/var/folders/t0/yh20csln4dbcgqxct5nxz2kr0000gn/T/RtmpRJzp57/parallel_work_jsonl/chunk_3/results_page_1.json"
-      [4] "/private/var/folders/t0/yh20csln4dbcgqxct5nxz2kr0000gn/T/RtmpRJzp57/parallel_work_jsonl/chunk_4/results_page_1.json"
+      [1] "results_page_1.json" "results_page_1.json" "results_page_1.json"
+      [4] "results_page_1.json"
     Code
-      tools::md5sum(fns)
+      as.vector(tools::md5sum(fns))
     Output
-      /private/var/folders/t0/yh20csln4dbcgqxct5nxz2kr0000gn/T/RtmpRJzp57/parallel_work_jsonl/chunk_1/results_page_1.json 
-                                                                                       "bb1a21de3af5375cf1f5e628c8bae949" 
-      /private/var/folders/t0/yh20csln4dbcgqxct5nxz2kr0000gn/T/RtmpRJzp57/parallel_work_jsonl/chunk_2/results_page_1.json 
-                                                                                       "45399de49156b11b88727c4463651144" 
-      /private/var/folders/t0/yh20csln4dbcgqxct5nxz2kr0000gn/T/RtmpRJzp57/parallel_work_jsonl/chunk_3/results_page_1.json 
-                                                                                       "28f5a31385294302e4b0c9947d7b5d54" 
-      /private/var/folders/t0/yh20csln4dbcgqxct5nxz2kr0000gn/T/RtmpRJzp57/parallel_work_jsonl/chunk_4/results_page_1.json 
-                                                                                       "53b1ac8f99b78dc87960ad3d19c2ae07" 
+      [1] "986a593874eda35d584d7ca6cdeb5dec" "cd4d002b7a1768e6bc96e243154a8964"
+      [3] "fc557dd43e49202011bf9a8dce3e1c67" "ed491a130855098745e57f83f6cb5fb8"
 
 # pro_request_jsonl_parquet with subfolders
 
     Code
-      fns
+      basename(fns)
     Output
-      [1] "/var/folders/t0/yh20csln4dbcgqxct5nxz2kr0000gn/T//RtmpRJzp57/parallel_work_jsonl/chunk_1/results_page_1.json"
-      [2] "/var/folders/t0/yh20csln4dbcgqxct5nxz2kr0000gn/T//RtmpRJzp57/parallel_work_jsonl/chunk_2/results_page_1.json"
-      [3] "/var/folders/t0/yh20csln4dbcgqxct5nxz2kr0000gn/T//RtmpRJzp57/parallel_work_jsonl/chunk_3/results_page_1.json"
-      [4] "/var/folders/t0/yh20csln4dbcgqxct5nxz2kr0000gn/T//RtmpRJzp57/parallel_work_jsonl/chunk_4/results_page_1.json"
+      [1] "results_page_1.json" "results_page_1.json" "results_page_1.json"
+      [4] "results_page_1.json"
     Code
-      tools::md5sum(fns)
+      as.vector(tools::md5sum(fns))
     Output
-      /var/folders/t0/yh20csln4dbcgqxct5nxz2kr0000gn/T//RtmpRJzp57/parallel_work_jsonl/chunk_1/results_page_1.json 
-                                                                                "bb1a21de3af5375cf1f5e628c8bae949" 
-      /var/folders/t0/yh20csln4dbcgqxct5nxz2kr0000gn/T//RtmpRJzp57/parallel_work_jsonl/chunk_2/results_page_1.json 
-                                                                                "45399de49156b11b88727c4463651144" 
-      /var/folders/t0/yh20csln4dbcgqxct5nxz2kr0000gn/T//RtmpRJzp57/parallel_work_jsonl/chunk_3/results_page_1.json 
-                                                                                "28f5a31385294302e4b0c9947d7b5d54" 
-      /var/folders/t0/yh20csln4dbcgqxct5nxz2kr0000gn/T//RtmpRJzp57/parallel_work_jsonl/chunk_4/results_page_1.json 
-                                                                                "53b1ac8f99b78dc87960ad3d19c2ae07" 
+      [1] "986a593874eda35d584d7ca6cdeb5dec" "cd4d002b7a1768e6bc96e243154a8964"
+      [3] "fc557dd43e49202011bf9a8dce3e1c67" "ed491a130855098745e57f83f6cb5fb8"
     Code
       p <- arrow::open_dataset(output_parquet)
       p
@@ -127,10 +94,10 @@
       dplyr::collect(dplyr::arrange(dplyr::distinct(dplyr::select(p, page)), page))
     Output
       # A tibble: 4 x 1
-        page     
-        <chr>    
-      1 chunk_1_1
-      2 chunk_2_1
-      3 chunk_3_1
-      4 chunk_4_1
+        page   
+        <chr>  
+      1 chunk_1
+      2 chunk_2
+      3 chunk_3
+      4 chunk_4
 

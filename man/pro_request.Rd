@@ -13,7 +13,9 @@ pro_request(
   api_key = oap_apikey,
   workers = 1,
   verbose = FALSE,
-  progress = TRUE
+  progress = TRUE,
+  count_only = FALSE,
+  error_log = NULL
 )
 }
 \arguments{
@@ -41,11 +43,15 @@ exists.}
 
 \item{progress}{Logical default \code{TRUE} indicating whether to show a progress
 bar.}
+
+\item{count_only}{return count only as a named numeric vector or list.}
+
+\item{error_log}{location of error log of API calls. (default: \code{NULL} (none)).}
 }
 \value{
-If \code{output} is \code{NULL}, the return value from call to
-\code{openalexR::oa_request()}, otherwise the complete path to the expanded and
-normalized \code{output}.
+If \code{count_only} is \code{FALSE} (the default) the complete path to the expanded and
+normalized \code{output}. If \code{count_only} is \code{TRUE}, a named numeric vector with the count
+of the works from the specified query_url(s).
 }
 \description{
 This function adds one argument to \code{openalexR::oa_request()}, namely
