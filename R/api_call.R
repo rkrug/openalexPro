@@ -111,7 +111,7 @@ api_call <- function(
       paste0(
         "\u26A0 HTTP ",
         status,
-        " — returning response for caller inspection"
+        " - returning response for caller inspection"
       ),
       error_log
     )
@@ -125,13 +125,13 @@ api_call <- function(
         paste0(
           "\u26A0 HTTP ",
           status,
-          " (HTML) — returning response for caller inspection"
+          " (HTML) - returning response for caller inspection"
         ),
         error_log
       )
       return(resp)
     }
-    # matched status but not HTML → abort
+    # matched status but not HTML \u2192 abort
     log_fun(
       paste0("\u26A0 Unexpected HTTP status ", status, " (non-HTML)"),
       error_log
@@ -141,7 +141,7 @@ api_call <- function(
       class = "unexpected_http_status"
     )
   } else {
-    # integer provided, but status didn't match → abort
+    # integer provided, but status didn't match \u2192 abort
     log_fun(paste0("\u26A0 Unexpected HTTP status ", status), error_log)
     rlang::abort(
       paste0("Unexpected HTTP status ", status, "\n  Aborting!"),
