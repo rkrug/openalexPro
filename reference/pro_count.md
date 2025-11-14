@@ -39,10 +39,10 @@ pro_count(
 
 ## Value
 
-A named integer vector containing \`count\`, \`db_response_time_ms\`,
-\`page\`, and \`per_page\` elements. If count is negative, the size of
-the request is larger then the allowed limit of 4094. If the request
-fails, each value is \`NA\`.
+A data.frame containing \`count\`, \`db_response_time_ms\`, \`page\`,
+and \`per_page\` elements. If count is negative, the size of the request
+is larger then the allowed limit of 4094. If the request fails, each
+value is \`NA\`.
 
 ## Examples
 
