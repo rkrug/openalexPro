@@ -24,7 +24,7 @@ Defaults to `oap_apikey`, and gracefully handles `NULL` or lazy evaluation.}
 \item{error_log}{location of error log of API calls. (default: `NULL` (none)).}
 }
 \value{
-A named integer vector containing `count`, `db_response_time_ms`,
+A data.frame containing `count`, `db_response_time_ms`,
   `page`, and `per_page` elements. If count is negative, the size of the
   request is larger then the allowed limit of 4094. If the request fails,
   each value is `NA`.

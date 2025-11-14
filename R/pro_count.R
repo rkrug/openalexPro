@@ -12,7 +12,7 @@
 #'   Defaults to `oap_apikey`, and gracefully handles `NULL` or lazy evaluation.
 #' @param error_log location of error log of API calls. (default: `NULL` (none)).
 #'
-#' @return A named integer vector containing `count`, `db_response_time_ms`,
+#' @return A data.frame containing `count`, `db_response_time_ms`,
 #'   `page`, and `per_page` elements. If count is negative, the size of the
 #'   request is larger then the allowed limit of 4094. If the request fails,
 #'   each value is `NA`.
@@ -52,11 +52,12 @@ pro_count <- function(
       ")"
     ))
 
-  meta <- c(
+  meta <- data.frame(
     count = NA_integer_,
     db_response_time_ms = NA_integer_,
     page = NA_integer_,
-    per_page = NA_integer_
+    per_page = NA_integer_,
+    error = NA_character_
   )
 
   resp <- api_call(
@@ -69,7 +70,13 @@ pro_count <- function(
       data <- resp |>
         httr2::resp_body_json()
 
-      meta <- unlist(data$meta)
+      meta <- data.frame(data$meta[c(
+        "count",
+        "db_response_time_ms",
+        "page",
+        "per_page"
+      )])
+      meta$error <- NA_character_
     }
   )
   if (is.na(meta["page"])) {
@@ -90,6 +97,8 @@ pro_count <- function(
         # [1] 4195 4094
 
         meta$count <- -nums[1]
+
+        meta$error <- "ERROR: Request size exceeds the maximum limit of 4094."
       }
     )
   }

@@ -3,8 +3,8 @@
     Code
       count
     Output
-                    count db_response_time_ms                page            per_page 
-                      408                  42                   1                   1 
+        count db_response_time_ms page per_page error
+      1   408                  42    1        1  <NA>
 
 # pro_request search count and openalexR::oa_fetch() return same results
 
@@ -29,8 +29,8 @@
     Code
       count
     Output
-                    count db_response_time_ms                page            per_page 
-                      408                  42                   1                   1 
+        count db_response_time_ms page per_page error
+      1   408                  42    1        1  <NA>
     Code
       identical(count_oa$count, count[["count"]])
     Output

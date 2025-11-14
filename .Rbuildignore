@@ -26,3 +26,4 @@
 ^vignettes/Workflow_files$
 ^Compatibility Report$
 ^only_local$
+^vignettes/.quarto$
