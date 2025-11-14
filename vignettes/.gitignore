@@ -3,3 +3,4 @@
 
 /.quarto/
 /Workflow_files
+**/*.quarto_ipynb
