@@ -1,3 +1,0 @@
-[2025-09-25 14:40:26] ❌ API call failed after 10 attempts: `mock` must have the argument `req`; it currently has `...`, `.x`, `.y`, and `.`.
-[2025-09-25 14:40:33] ❌ API call failed after 10 attempts: `mock` must have the argument `req`; it currently has `...`, `.x`, `.y`, and `.`.
-[2025-09-29 14:18:42] ❌ API call failed after 10 attempts: `mock` must have the argument `req`; it currently has `...`, `.x`, `.y`, and `.`.

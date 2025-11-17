@@ -7,7 +7,7 @@
 pro_count(
   query_url,
   mailto = oap_mail(),
-  api_key = oap_apikey,
+  api_key = oap_apikey(),
   error_log = NULL
 )
 }
@@ -19,7 +19,7 @@ PRO endpoint URL.}
 the request `User-Agent`. Defaults to the configured `oap_mail()`.}
 
 \item{api_key}{Either a character string API key or a function returning one.
-Defaults to `oap_apikey`, and gracefully handles `NULL` or lazy evaluation.}
+Defaults to `oap_apikey()`, and gracefully handles `NULL` or lazy evaluation.}
 
 \item{error_log}{location of error log of API calls. (default: `NULL` (none)).}
 }

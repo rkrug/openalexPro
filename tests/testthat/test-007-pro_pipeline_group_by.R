@@ -12,7 +12,7 @@ unlink(output_jsonl, recursive = TRUE, force = TRUE)
 unlink(output_parquet, recursive = TRUE, force = TRUE)
 
 test_that("pro_request `biodiversity` and group by `type`", {
-  # vcr::local_cassette("pro_request_biodiversity_and_group_by_type")
+  vcr::local_cassette("pro_request_biodiversity_and_group_by_type")
   # Define the API request
   output_json <- pro_query(
     entity = "works",
@@ -31,7 +31,15 @@ test_that("pro_request `biodiversity` and group by `type`", {
   # Check that the output file contains the expected data
   expect_snapshot_file(
     file.path(output_json, "group_by_page_1.json"),
-    name = "json"
+    name = "json",
+    transform = function(x) {
+      # x is a character vector of lines
+      gsub(
+        '"db_response_time_ms"\\s*:\\s*[0-9]+',
+        '"db_response_time_ms": 0', # or 0, or whatever constant
+        x
+      )
+    }
   )
 
   # Clean up temporary files
@@ -71,7 +79,7 @@ test_that("pro_request_jsonl_parquet `biodiversity` and group by type", {
   # Get search results from openalexR::oa_fetch(output = "tibble") for
   # comparison
 
-  # vcr::local_cassette("oa_fetch_group_by")
+  vcr::local_cassette("oa_fetch_group_by")
   results_openalexR <- openalexR::oa_fetch(
     title_and_abstract.search = "biodiversity",
     to_publication_date = "2010-01-01",

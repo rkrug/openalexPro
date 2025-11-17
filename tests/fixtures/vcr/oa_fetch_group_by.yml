@@ -1,0 +1,32 @@
+http_interactions:
+- request:
+    method: GET
+    uri: https://api.openalex.org/works?filter=title_and_abstract.search%3Abiodiversity%2Cto_publication_date%3A2010-01-01&group_by=type&mailto=rainer%40krugs.de
+  response:
+    status: 200
+    headers:
+      date: Mon, 17 Nov 2025 17:13:45 GMT
+      content-type: application/json
+      cf-ray: 9a00dc4b79befbd6-ZRH
+      cf-cache-status: DYNAMIC
+      access-control-allow-origin: '*'
+      vary: accept-encoding
+      server: cloudflare
+      via: 1.1 heroku-router
+      access-control-allow-headers: Accept, Accept-Language, Accept-Encoding, Authorization,
+        Content-Type
+      access-control-allow-methods: GET, HEAD, POST, OPTIONS
+      access-control-expose-headers: Cache-Control, RateLimit-Limit, RateLimit-Remaining,
+        RateLimit-Reset, Retry-After
+      nel: '{"report_to":"heroku-nel","response_headers":["Via"],"max_age":3600,"success_fraction":0.01,"failure_fraction":0.1}'
+      ratelimit-limit: '100'
+      ratelimit-remaining: '99'
+      ratelimit-reset: '1'
+      report-to: '{"group":"heroku-nel","endpoints":[{"url":"https://nel.heroku.com/reports?s=y9t7jyRu9XP%2B5ugum4oc%2Fnmr0LJb5gE3Shc4D5ss%2Fms%3D\u0026sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add\u0026ts=1763399625"}],"max_age":3600}'
+      reporting-endpoints: heroku-nel="https://nel.heroku.com/reports?s=y9t7jyRu9XP%2B5ugum4oc%2Fnmr0LJb5gE3Shc4D5ss%2Fms%3D&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&ts=1763399625"
+      content-encoding: gzip
+    body:
+      string: |
+        {"meta":{"count":138876,"db_response_time_ms":25,"page":1,"per_page":200,"groups_count":16},"group_by":[{"key":"https://openalex.org/types/article","key_display_name":"article","count":123965},{"key":"https://openalex.org/types/book-chapter","key_display_name":"book-chapter","count":5107},{"key":"https://openalex.org/types/book","key_display_name":"book","count":3002},{"key":"https://openalex.org/types/review","key_display_name":"review","count":1882},{"key":"https://openalex.org/types/dissertation","key_display_name":"dissertation","count":1818},{"key":"https://openalex.org/types/preprint","key_display_name":"preprint","count":1367},{"key":"https://openalex.org/types/other","key_display_name":"other","count":498},{"key":"https://openalex.org/types/letter","key_display_name":"letter","count":306},{"key":"https://openalex.org/types/report","key_display_name":"report","count":281},{"key":"https://openalex.org/types/dataset","key_display_name":"dataset","count":246},{"key":"https://openalex.org/types/editorial","key_display_name":"editorial","count":167},{"key":"https://openalex.org/types/paratext","key_display_name":"paratext","count":147},{"key":"https://openalex.org/types/erratum","key_display_name":"erratum","count":43},{"key":"https://openalex.org/types/reference-entry","key_display_name":"reference-entry","count":24},{"key":"https://openalex.org/types/libguides","key_display_name":"libguides","count":22},{"key":"https://openalex.org/types/standard","key_display_name":"standard","count":1}]}
+  recorded_at: 2025-11-17 17:13:45
+recorded_with: VCR-vcr/2.0.0

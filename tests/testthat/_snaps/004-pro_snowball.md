@@ -53,7 +53,7 @@
       # A tibble: 2 x 52
         id     doi   title display_name publication_year publication_date ids$openalex
         <chr>  <chr> <chr> <chr>                   <int> <date>           <chr>       
-      1 W3045~ http~ Meas~ Measuring p~             2022 2022-02-25       https://ope~
+      1 W3045~ http~ Meas~ Measuring p~             2020 2020-07-28       https://ope~
       2 W3046~ http~ Tren~ Trends of P~             2020 2020-08-01       https://ope~
       # i 47 more variables: ids$doi <chr>, $mag <chr>, language <chr>,
       #   primary_location <tibble[,11]>, type <chr>, indexed_in <list<character>>,
@@ -91,17 +91,8 @@
             >
         >
       >>,
-      #   institutions <list<
-        tbl_df<
-          id          : character
-          display_name: character
-          ror         : character
-          country_code: character
-          type        : character
-          lineage     : list<character>
-        >
-      >>,
-      #   countries_distinct_count <int>, institutions_distinct_count <int>,
+      #   institutions <list<character>>, countries_distinct_count <int>,
+      #   institutions_distinct_count <int>,
       #   corresponding_author_ids <list<character>>, ...
       
       $edges
@@ -116,7 +107,7 @@
       # A tibble: 2 x 52
         id     doi   title display_name publication_year publication_date ids$openalex
         <chr>  <chr> <chr> <chr>                   <int> <date>           <chr>       
-      1 W3045~ http~ Meas~ Measuring p~             2022 2022-02-25       https://ope~
+      1 W3045~ http~ Meas~ Measuring p~             2020 2020-07-28       https://ope~
       2 W3046~ http~ Tren~ Trends of P~             2020 2020-08-01       https://ope~
       # i 47 more variables: ids$doi <chr>, $mag <chr>, language <chr>,
       #   primary_location <tibble[,11]>, type <chr>, indexed_in <list<character>>,
@@ -154,17 +145,8 @@
             >
         >
       >>,
-      #   institutions <list<
-        tbl_df<
-          id          : character
-          display_name: character
-          ror         : character
-          country_code: character
-          type        : character
-          lineage     : list<character>
-        >
-      >>,
-      #   countries_distinct_count <int>, institutions_distinct_count <int>,
+      #   institutions <list<character>>, countries_distinct_count <int>,
+      #   institutions_distinct_count <int>,
       #   corresponding_author_ids <list<character>>, ...
       
       $edges
@@ -179,7 +161,7 @@
       # A tibble: 2 x 52
         id     doi   title display_name publication_year publication_date ids$openalex
         <chr>  <chr> <chr> <chr>                   <int> <date>           <chr>       
-      1 W3045~ http~ Meas~ Measuring p~             2022 2022-02-25       https://ope~
+      1 W3045~ http~ Meas~ Measuring p~             2020 2020-07-28       https://ope~
       2 W3046~ http~ Tren~ Trends of P~             2020 2020-08-01       https://ope~
       # i 47 more variables: ids$doi <chr>, $mag <chr>, language <chr>,
       #   primary_location <tibble[,11]>, type <chr>, indexed_in <list<character>>,
@@ -217,17 +199,8 @@
             >
         >
       >>,
-      #   institutions <list<
-        tbl_df<
-          id          : character
-          display_name: character
-          ror         : character
-          country_code: character
-          type        : character
-          lineage     : list<character>
-        >
-      >>,
-      #   countries_distinct_count <int>, institutions_distinct_count <int>,
+      #   institutions <list<character>>, countries_distinct_count <int>,
+      #   institutions_distinct_count <int>,
       #   corresponding_author_ids <list<character>>, ...
       
       $edges
@@ -242,7 +215,7 @@
       # A tibble: 2 x 52
         id     doi   title display_name publication_year publication_date ids$openalex
         <chr>  <chr> <chr> <chr>                   <int> <date>           <chr>       
-      1 W3045~ http~ Meas~ Measuring p~             2022 2022-02-25       https://ope~
+      1 W3045~ http~ Meas~ Measuring p~             2020 2020-07-28       https://ope~
       2 W3046~ http~ Tren~ Trends of P~             2020 2020-08-01       https://ope~
       # i 47 more variables: ids$doi <chr>, $mag <chr>, language <chr>,
       #   primary_location <tibble[,11]>, type <chr>, indexed_in <list<character>>,
@@ -280,17 +253,8 @@
             >
         >
       >>,
-      #   institutions <list<
-        tbl_df<
-          id          : character
-          display_name: character
-          ror         : character
-          country_code: character
-          type        : character
-          lineage     : list<character>
-        >
-      >>,
-      #   countries_distinct_count <int>, institutions_distinct_count <int>,
+      #   institutions <list<character>>, countries_distinct_count <int>,
+      #   institutions_distinct_count <int>,
       #   corresponding_author_ids <list<character>>, ...
       
       $edges

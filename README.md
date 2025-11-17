@@ -10,6 +10,7 @@ format: gfm
 
 [![openalexPro status badge](https://rkrug.r-universe.dev/openalexPro/badges/version)](https://rkrug.r-universe.dev/openalexPro)
 
+[![Codecov test coverage](https://codecov.io/gh/rkrug/openalexPro/graph/badge.svg)](https://app.codecov.io/gh/rkrug/openalexPro)
 
 # Disclaimer
 

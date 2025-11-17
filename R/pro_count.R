@@ -9,7 +9,7 @@
 #' @param mailto Character string used for the API `mailto` query parameter and
 #'   the request `User-Agent`. Defaults to the configured `oap_mail()`.
 #' @param api_key Either a character string API key or a function returning one.
-#'   Defaults to `oap_apikey`, and gracefully handles `NULL` or lazy evaluation.
+#'   Defaults to `oap_apikey()`, and gracefully handles `NULL` or lazy evaluation.
 #' @param error_log location of error log of API calls. (default: `NULL` (none)).
 #'
 #' @return A data.frame containing `count`, `db_response_time_ms`,
@@ -27,7 +27,7 @@
 pro_count <- function(
   query_url,
   mailto = oap_mail(),
-  api_key = oap_apikey,
+  api_key = oap_apikey(),
   error_log = NULL
 ) {
   if (is.function(api_key)) {
