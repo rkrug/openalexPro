@@ -36,7 +36,7 @@ exists.}
 
 \item{mailto}{The email address of the user. See \code{oap_mail()}.}
 
-\item{api_key}{The API key of the user. See \code{oap_apikey}.}
+\item{api_key}{The API key of the user. See \code{oap_apikey()}.}
 
 \item{workers}{Number of parallel workers to use if \code{query_url} is a list. Defaults to 1.}
 

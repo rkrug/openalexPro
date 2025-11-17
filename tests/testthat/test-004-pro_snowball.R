@@ -7,7 +7,7 @@ unlink(output_dir, recursive = TRUE, force = TRUE)
 
 test_that("pro_snowball", {
   # openalexR
-  # vcr::local_cassette("oa_snowball")
+  vcr::local_cassette("oa_snowball")
   results_openalexR <- openalexR::oa_snowball(
     identifier = c("W3045921891", "W3046863325"),
     verbose = FALSE
@@ -26,7 +26,7 @@ test_that("pro_snowball", {
     )
 
   # openalexPro
-  # vcr::local_cassette("pro_snowball")
+  vcr::local_cassette("pro_snowball")
   output_dir <- pro_snowball(
     identifier = c("W3045921891", "W3046863325"),
     output = output_dir,

@@ -21,7 +21,7 @@
 #' @param overwrite Logical. If `TRUE`, `output` will be deleted if it already
 #'   exists.
 #' @param mailto The email address of the user. See `oap_mail()`.
-#' @param api_key The API key of the user. See `oap_apikey`.
+#' @param api_key The API key of the user. See `oap_apikey()`.
 #' @param workers Number of parallel workers to use if `query_url` is a list. Defaults to 1.
 #' @param verbose Logical indicating whether to show verbose messages.
 #' @param progress Logical default `TRUE` indicating whether to show a progress

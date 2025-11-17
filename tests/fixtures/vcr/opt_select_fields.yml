@@ -1,0 +1,32 @@
+http_interactions:
+- request:
+    method: GET
+    uri: https://api.openalex.org/works/W1775749144?select=DOESNTEXIST
+  response:
+    status: 400
+    headers:
+      date: Mon, 17 Nov 2025 17:06:48 GMT
+      content-type: application/json
+      content-length: '985'
+      cf-ray: 9a00d21c5b1bbb0a-ZRH
+      cf-cache-status: DYNAMIC
+      access-control-allow-origin: '*'
+      server: cloudflare
+      via: 1.1 heroku-router
+      access-control-allow-headers: Accept, Accept-Language, Accept-Encoding, Authorization,
+        Content-Type
+      access-control-allow-methods: GET, HEAD, POST, OPTIONS
+      access-control-expose-headers: Cache-Control, RateLimit-Limit, RateLimit-Remaining,
+        RateLimit-Reset, Retry-After
+      nel: '{"report_to":"heroku-nel","response_headers":["Via"],"max_age":3600,"success_fraction":0.01,"failure_fraction":0.1}'
+      ratelimit-limit: '5'
+      ratelimit-remaining: '9'
+      ratelimit-reset: '1'
+      report-to: '{"group":"heroku-nel","endpoints":[{"url":"https://nel.heroku.com/reports?s=CEFhfLsR3Am4XGl6nhO8TpM69rvxzRdn8sY069P7tro%3D\u0026sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add\u0026ts=1763399208"}],"max_age":3600}'
+      reporting-endpoints: heroku-nel="https://nel.heroku.com/reports?s=CEFhfLsR3Am4XGl6nhO8TpM69rvxzRdn8sY069P7tro%3D&sid=c46efe9b-d3d2-4a0c-8c76-bfafa16c5add&ts=1763399208"
+      vary: accept-encoding
+    body:
+      string: |
+        {"error":"Invalid query parameters error.","message":"DOESNTEXIST is not a valid select field. Valid fields for select are: id, doi, title, display_name, relevance_score, publication_year, publication_date, ids, language, primary_location, sources, type, type_crossref, indexed_in, open_access, authorships, institution_assertions, institutions, countries_distinct_count, institutions_distinct_count, corresponding_author_ids, corresponding_institution_ids, apc_list, apc_paid, fwci, is_authors_truncated, has_fulltext, fulltext_origin, cited_by_count, citation_normalized_percentile, cited_by_percentile_year, biblio, is_retracted, is_paratext, is_xpac, primary_topic, topics, keywords, concepts, mesh, locations_count, locations, best_oa_location, sustainable_development_goals, grants, awards, funders, datasets, versions, has_content, referenced_works_count, referenced_works, related_works, abstract_inverted_index, cited_by_api_url, counts_by_year, updated_date, created_date."}
+  recorded_at: 2025-11-17 17:06:48
+recorded_with: VCR-vcr/2.0.0

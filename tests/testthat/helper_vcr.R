@@ -13,23 +13,13 @@ invisible(vcr::vcr_configure(
   filter_query_parameters = list(api_key = "<api-key>")
 ))
 
+try(
+  options(openalexR.apikey = keyring::key_get("API_openalex")),
+)
+
 if (is.null(oap_apikey())) {
   options(openalexR.apikey = "<api-key>")
 }
 if (is.null(oap_mail())) {
   options(openalexR.mailto = "rainer@krugs.de")
-}
-
-api <- NULL
-try(
-  api <- keyring::key_get("API_openalex"),
-  silent = TRUE
-)
-if (is.null(api)) {
-  try(
-    Sys.unsetenv(openalexR.apikey),
-    silent = TRUE
-  )
-} else {
-  Sys.setenv(openalexR.apikey = api)
 }
