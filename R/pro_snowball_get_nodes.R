@@ -99,10 +99,6 @@ pro_snowball_get_nodes <- function(
   pro_request_jsonl_parquet(
     input_jsonl = x,
     output = file.path(output, "keypaper_parquet"),
-    add_columns = list(
-      oa_input = FALSE,
-      relation = "citing"
-    ),
     verbose = verbose
   )
 

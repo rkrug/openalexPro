@@ -31,7 +31,15 @@ test_that("pro_request `biodiversity` and group by `type`", {
   # Check that the output file contains the expected data
   expect_snapshot_file(
     file.path(output_json, "group_by_page_1.json"),
-    name = "json"
+    name = "json",
+    transform = function(x) {
+      # x is a character vector of lines
+      gsub(
+        '"db_response_time_ms"\\s*:\\s*[0-9]+',
+        '"db_response_time_ms": 0', # or 0, or whatever constant
+        x
+      )
+    }
   )
 
   # Clean up temporary files
