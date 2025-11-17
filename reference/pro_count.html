@@ -51,7 +51,7 @@ the first page is fetched to minimise API usage.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">pro_count</span><span class="op">(</span></span>
 <span>  <span class="va">query_url</span>,</span>
 <span>  mailto <span class="op">=</span> <span class="fu"><a href="oap_mail.html">oap_mail</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>  api_key <span class="op">=</span> <span class="va">oap_apikey</span>,</span>
+<span>  api_key <span class="op">=</span> <span class="fu"><a href="oap_apikey.html">oap_apikey</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  error_log <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -72,7 +72,7 @@ the request `User-Agent`. Defaults to the configured `oap_mail()`.</p></dd>
 
 <dt id="arg-api-key">api_key<a class="anchor" aria-label="anchor" href="#arg-api-key"></a></dt>
 <dd><p>Either a character string API key or a function returning one.
-Defaults to `oap_apikey`, and gracefully handles `NULL` or lazy evaluation.</p></dd>
+Defaults to `oap_apikey()`, and gracefully handles `NULL` or lazy evaluation.</p></dd>
 
 
 <dt id="arg-error-log">error_log<a class="anchor" aria-label="anchor" href="#arg-error-log"></a></dt>

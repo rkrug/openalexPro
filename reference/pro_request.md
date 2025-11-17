@@ -56,7 +56,8 @@ pro_request(
 
 - api_key:
 
-  The API key of the user. See `oap_apikey`.
+  The API key of the user. See
+  [`oap_apikey()`](https://rkrug.github.io/openalexPro/reference/oap_apikey.md).
 
 - workers:
 

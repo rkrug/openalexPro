@@ -11,7 +11,6 @@ records.
 pro_request_jsonl_parquet(
   input_jsonl = NULL,
   output = NULL,
-  add_columns = list(),
   overwrite = FALSE,
   verbose = TRUE,
   delete_input = FALSE
@@ -29,13 +28,6 @@ pro_request_jsonl_parquet(
 
   output directory for the parquet dataset; default: temporary
   directory.
-
-- add_columns:
-
-  List of additional fields to be added to the output. They nave to be
-  provided as a named list, e./g.
-  `list(column_1 = "value_1", column_2 = 2)`. Only Scalar values are
-  supported.
 
 - overwrite:
 

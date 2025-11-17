@@ -10,7 +10,7 @@ is requested and the first page is fetched to minimise API usage.
 pro_count(
   query_url,
   mailto = oap_mail(),
-  api_key = oap_apikey,
+  api_key = oap_apikey(),
   error_log = NULL
 )
 ```
@@ -30,7 +30,7 @@ pro_count(
 - api_key:
 
   Either a character string API key or a function returning one.
-  Defaults to \`oap_apikey\`, and gracefully handles \`NULL\` or lazy
+  Defaults to \`oap_apikey()\`, and gracefully handles \`NULL\` or lazy
   evaluation.
 
 - error_log:

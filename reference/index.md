@@ -29,6 +29,9 @@
 - [`opt_select_fields()`](https://rkrug.github.io/openalexPro/reference/opt_select_fields.md)
   : Get available select fields from OpenAlex API
 
+- [`pro_fetch()`](https://rkrug.github.io/openalexPro/reference/pro_fetch.md)
+  : Fetch and convert OpenAlex data
+
 - [`pro_query()`](https://rkrug.github.io/openalexPro/reference/pro_query.md)
   : Build an OpenAlex request (httr2)
 

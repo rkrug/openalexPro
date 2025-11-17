@@ -51,7 +51,6 @@ jsonl is processed individually, so there is no limit of the number of records.<
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">pro_request_jsonl_parquet</span><span class="op">(</span></span>
 <span>  input_jsonl <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  output <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  add_columns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  overwrite <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  delete_input <span class="op">=</span> <span class="cn">FALSE</span></span>
@@ -70,11 +69,6 @@ jsonl is processed individually, so there is no limit of the number of records.<
 <dt id="arg-output">output<a class="anchor" aria-label="anchor" href="#arg-output"></a></dt>
 <dd><p>output directory for the parquet dataset; default: temporary
 directory.</p></dd>
-
-
-<dt id="arg-add-columns">add_columns<a class="anchor" aria-label="anchor" href="#arg-add-columns"></a></dt>
-<dd><p>List of additional fields to be added to the output. They
-nave to be provided as a named list, e./g. <code>list(column_1 = "value_1", column_2 = 2)</code>. Only Scalar values are supported.</p></dd>
 
 
 <dt id="arg-overwrite">overwrite<a class="anchor" aria-label="anchor" href="#arg-overwrite"></a></dt>
