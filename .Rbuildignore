@@ -27,3 +27,5 @@
 ^Compatibility Report$
 ^only_local$
 ^vignettes/.quarto$
+^codecov\.yml$
+^\.github$
