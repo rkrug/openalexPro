@@ -55,3 +55,4 @@ output_jsonl/*
 output_parquet/*
 
 only_local/
+.DS_Store

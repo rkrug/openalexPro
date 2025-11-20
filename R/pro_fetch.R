@@ -7,7 +7,7 @@
 #' The function
 #' \itemize{
 #'   \item downloads records from OpenAlex via \code{pro_request()} into a
-#'     \code{"json"} subfolder of \code{output},
+#'     \code{"json"} subfolder of \code{project_folder},
 #'   \item converts the JSON files to \code{jsonl} via
 #'     \code{pro_request_jsonl()} into a \code{"jsonl"} subfolder, and
 #'   \item converts the jsonl files to an Apache Parquet dataset via
@@ -25,13 +25,13 @@
 #' @param count_only Do not use it here. The function will abort if it set to
 #' `TRUE` and give a warning if `FALSE`
 #'
-#' @param output Directory where all intermediate (\code{json},
+#' @param project_folder Directory where all intermediate (\code{json},
 #'   \code{jsonl}) and final (\code{parquet}) results are stored.
 #'   If it does not exist, it is created. If \code{NULL}, a temporary
 #'   directory is created.
 #'
 #' @return Invisibly, the normalized path of the \code{parquet} subfolder
-#'   inside \code{output}, i.e. the value returned by
+#'   inside \code{project_folder}, i.e. the value returned by
 #'   \code{pro_request_jsonl_parquet()}.
 #'
 #' @md
@@ -40,7 +40,7 @@
 pro_fetch <- function(
   query_url,
   pages = 1000,
-  output = NULL,
+  project_folder = NULL,
   overwrite = FALSE,
   mailto = oap_mail(),
   api_key = oap_apikey,
@@ -56,13 +56,13 @@ pro_fetch <- function(
       stop("Setting `count_only = TRUE` is not supported in `pro_fetch()`")
     }
   }
-  if (is.null(output)) {
-    output <- tempdir()
+  if (is.null(project_folder)) {
+    project_folder <- tempdir()
   }
 
-  if (!dir.exists(output)) {
+  if (!dir.exists(project_folder)) {
     dir.create(
-      output,
+      project_folder,
       recursive = TRUE,
       showWarnings = FALSE
     )
@@ -71,7 +71,7 @@ pro_fetch <- function(
   pro_request(
     query_url = query_url,
     pages = pages,
-    output = file.path(output, "json"),
+    output = file.path(project_folder, "json"),
     overwrite = overwrite,
     mailto = mailto,
     api_key = api_key,
@@ -82,12 +82,12 @@ pro_fetch <- function(
     error_log = error_log
   ) |>
     pro_request_jsonl(
-      output = file.path(output, "jsonl"),
+      output = file.path(project_folder, "jsonl"),
       overwrite = overwrite,
       delete_input = FALSE
     ) |>
     pro_request_jsonl_parquet(
-      output = file.path(output, "parquet"),
+      output = file.path(project_folder, "parquet"),
       overwrite = overwrite,
       verbose = verbose,
       delete_input = FALSE

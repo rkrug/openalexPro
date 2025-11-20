@@ -7,7 +7,7 @@
 pro_fetch(
   query_url,
   pages = 1000,
-  output = NULL,
+  project_folder = NULL,
   overwrite = FALSE,
   mailto = oap_mail(),
   api_key = oap_apikey,
@@ -26,7 +26,7 @@ pro_fetch(
 beyond 1000 due to server load and to use the snapshot instead. If \code{NULL},
 all pages will be downloaded. Default: 1000.}
 
-\item{output}{Directory where all intermediate (\code{json},
+\item{project_folder}{Directory where all intermediate (\code{json},
 \code{jsonl}) and final (\code{parquet}) results are stored.
 If it does not exist, it is created. If \code{NULL}, a temporary
 directory is created.}
@@ -52,7 +52,7 @@ bar.}
 }
 \value{
 Invisibly, the normalized path of the \code{parquet} subfolder
-inside \code{output}, i.e. the value returned by
+inside \code{project_folder}, i.e. the value returned by
 \code{pro_request_jsonl_parquet()}.
 }
 \description{
@@ -64,7 +64,7 @@ Convenience wrapper around \code{\link{pro_request}},
 The function
 \itemize{
 \item downloads records from OpenAlex via \code{pro_request()} into a
-\code{"json"} subfolder of \code{output},
+\code{"json"} subfolder of \code{project_folder},
 \item converts the JSON files to \code{jsonl} via
 \code{pro_request_jsonl()} into a \code{"jsonl"} subfolder, and
 \item converts the jsonl files to an Apache Parquet dataset via

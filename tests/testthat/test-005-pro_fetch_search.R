@@ -4,7 +4,7 @@ suppressPackageStartupMessages(library(openalexR))
 
 # Normal Search `biodiversity AND finance`-------------------------------------
 
-output_dir <- file.path(tempdir(), "output")
+output_dir <- file.path(tempdir(), "project_folder")
 # output_dir = "~/Documents/GitHub/openalexPro/search"
 
 unlink(output_dir, recursive = TRUE, force = TRUE)
@@ -19,7 +19,7 @@ test_that("pro_fetch search `biodiversity AND fiance`", {
   ) |>
     pro_fetch(
       pages = 1,
-      output = output_dir,
+      project_folder = output_dir,
       mailto = "test@example.com",
       verbose = FALSE,
       progress = FALSE
