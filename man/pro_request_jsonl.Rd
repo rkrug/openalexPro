@@ -10,7 +10,8 @@ pro_request_jsonl(
   add_columns = list(),
   overwrite = FALSE,
   verbose = TRUE,
-  delete_input = FALSE
+  delete_input = FALSE,
+  workers = 1
 )
 }
 \arguments{

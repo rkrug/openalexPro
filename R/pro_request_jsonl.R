@@ -39,6 +39,7 @@
 #'
 #' @importFrom duckdb duckdb
 #' @importFrom DBI dbConnect dbDisconnect dbExecute
+#' @importFrom future.apply future_lapply
 #'
 #' @md
 #'
@@ -58,7 +59,8 @@ pro_request_jsonl <- function(
   add_columns = list(),
   overwrite = FALSE,
   verbose = TRUE,
-  delete_input = FALSE
+  delete_input = FALSE,
+  workers = 1
 ) {
   # Argument checks --------------------------------------------------------
 
@@ -137,7 +139,9 @@ pro_request_jsonl <- function(
   # Go through all jsons, i.e. one per page --------------------------------
   ### Names: results_page_x.json
 
-  for (i in seq_along(jsons)) {
+  future::plan(future::multisession, workers = workers)
+  # for (i in seq_along(jsons)) {
+  future.apply::future_lapply(seq_along(jsons), function(i) {
     fn <- jsons[i]
     if (verbose) {
       message("Preparing ", i, " of ", length(jsons), " : ", fn)
@@ -181,7 +185,9 @@ pro_request_jsonl <- function(
       },
       silent = !verbose
     )
-  }
+    invisible(NULL)
+  })
+  # }
 
   if (verbose) {
     message("Done")
