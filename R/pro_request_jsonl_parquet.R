@@ -169,6 +169,84 @@ pro_request_jsonl_parquet <- function(
     )
   }
 
+  # Instead to unify schematas - suggested  by chatGPT:
+
+  # library(DBI)
+  # library(duckdb)
+
+  # con <- dbConnect(duckdb())
+
+  # json_dir <- "path/to/jsonl" # adjust
+  # output <- "path/to/out.parquet" # your original output
+  # json_glob <- file.path(json_dir, "*.jsonl")
+
+  # json_files <- list.files(
+  #   json_dir,
+  #   pattern = "\\.jsonl$",
+  #   full.names = TRUE
+  # )
+
+  # ## 1) Global schema inference (no data materialized in R)
+
+  # schema <- DBI::dbGetQuery(
+  #   con,
+  #   sprintf(
+  #     "
+  #   DESCRIBE
+  #   SELECT *
+  #   FROM read_json_auto(
+  #     '%s',
+  #     union_by_name = true,
+  #     sample_size = -1,             -- scan all rows for types (streamed by DuckDB)
+  #     maximum_sample_files = %d     -- look at all jsonl files
+  #   )
+  # ",
+  #     json_glob,
+  #     length(json_files)
+  #   )
+  # )
+
+  # ## 2) Build columns = {col: 'TYPE', ...} from DESCRIBE output
+
+  # # DuckDB usually returns column_name / column_type; fall back to name / type if needed
+  # name_col <- if ("column_name" %in% names(schema)) "column_name" else "name"
+  # type_col <- if ("column_type" %in% names(schema)) "column_type" else "type"
+
+  # columns_expr <- paste(
+  #   sprintf("%s: '%s'", schema[[name_col]], schema[[type_col]]),
+  #   collapse = ",\n      "
+  # )
+
+  # # Optional: inspect what will be forced
+  # cat("columns = {\n", columns_expr, "\n}\n")
+
+  # ## 3) Per-file loop: JSONL -> Parquet with fixed schema
+
+  # for (fn in json_files) {
+  #   sql <- sprintf(
+  #     "
+  #   COPY (
+  #     SELECT
+  #       *
+  #     FROM
+  #       read_json_auto(
+  #         '%s',
+  #         columns = {
+  #           %s
+  #         }
+  #       )
+  #   ) TO
+  #     '%s'
+  #   (FORMAT PARQUET, COMPRESSION SNAPPY, PARTITION_BY 'page', APPEND);
+  # ",
+  #     fn,
+  #     columns_expr,
+  #     output
+  #   )
+
+  #   DBI::dbExecute(conn = con, sql)
+  # }
+
   if (delete_input) {
     unlink(input_jsonl, recursive = TRUE, force = TRUE)
   }

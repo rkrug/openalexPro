@@ -2,7 +2,7 @@
 #'
 #' This function adds one argument to `openalexR::oa_request()`, namely
 #' `output`. When specified, all return values from OpenAlex will be saved as
-#' jaon files in that directory and the return value is the directory of the
+#' json files in that directory and the return value is the directory of the
 #' json files.
 #'
 #' For the documentation please see `openalexR::oa_request()`
@@ -10,6 +10,14 @@
 #' using a maximum of `workers` parallel R sessions. The results from the individual URLs
 #' in the list are returned in a folder named after the names of the list elements in the
 #' `output` folder.
+#'
+#' Nested progress bars:
+#' * outer bar: list elements (queries)
+#' * inner bar: pages per query
+#'
+#' If the `progressr` package is not available or `progress = FALSE`, the function
+#' falls back to a simple `txtProgressBar` (per-query) or no progress at all.
+#'
 #' @param query_url The URL of the API query or a list of URLs returned from `pro_query()`.
 #' @param pages The number of pages to be downloaded. The default is set to
 #'   1000, which would be 2,000,000 works. It is recommended to not increase it
@@ -35,14 +43,13 @@
 #'
 #' @md
 #'
-#' @importFrom utils tail
+#' @importFrom utils tail setTxtProgressBar txtProgressBar packageVersion
 #' @importFrom httr2 req_url_query req_perform resp_body_json resp_body_string
-#' @importFrom utils setTxtProgressBar txtProgressBar packageVersion
 #' @importFrom future plan multisession sequential
 #' @importFrom future.apply future_lapply
+#' @importFrom progressr with_progress progressor
 #'
 #' @export
-#'
 pro_request <- function(
   query_url,
   pages = 1000,
@@ -56,151 +63,258 @@ pro_request <- function(
   count_only = FALSE,
   error_log = NULL
 ) {
-  # Call for each element if query_url is a list ---------------------------
   if (!is.null(error_log)) {
     message("error log file: ", error_log)
   }
 
+  # ---------------------------------------------------------------------------
+  # LIST METHOD: multiple queries -> outer progress bar + futures
+  # ---------------------------------------------------------------------------
   if (is.list(query_url)) {
-    # for (i in seq_along(query_url)) {
-    #   pro_request(
-    #     query_url = query_url[[i]],
-    #     pages = pages,
-    #     output = output,
-    #     overwrite = FALSE,
-    #     mailto = mailto,
-    #     api_key = api_key,
-    #     verbose = verbose,
-    #     progress = progress
-    #   )
-    future::plan(future::multisession, workers = workers)
-    on.exit(future::plan(future::sequential), add = TRUE)
+    old_plan <- future::plan()
+    on.exit(future::plan(old_plan), add = TRUE)
 
-    result <- future.apply::future_lapply(
-      seq_along(query_url),
-      function(i) {
-        nm <- names(query_url)[i]
-        if (is.null(nm)) {
-          nm <- paste0("query_", i)
+    if (workers > 1) {
+      future::plan(future::multisession, workers = workers)
+    } else {
+      future::plan(future::sequential)
+    }
+
+    use_progressr <- isTRUE(progress) &&
+      requireNamespace("progressr", quietly = TRUE)
+
+    if (use_progressr) {
+      progressr::with_progress({
+        p_queries <- progressr::progressor(
+          steps = length(query_url),
+          message = "Queries"
+        )
+
+        result <- future.apply::future_lapply(
+          seq_along(query_url),
+          function(i) {
+            nm <- names(query_url)[i]
+            if (is.null(nm) || identical(nm, "")) {
+              nm <- paste0("query_", i)
+            }
+            p_queries(message = nm)
+
+            pro_request(
+              query_url = query_url[[i]],
+              pages = pages,
+              output = if (is.null(output)) NULL else file.path(output, nm),
+              overwrite = FALSE,
+              mailto = mailto,
+              api_key = api_key,
+              verbose = verbose,
+              progress = progress,
+              count_only = count_only,
+              error_log = error_log
+            )
+          },
+          future.seed = TRUE
+        )
+
+        if (count_only) {
+          # result is a list of numeric scalars
+          out <- unlist(result, use.names = FALSE)
+          names(out) <- if (is.null(names(query_url))) {
+            paste0("query_", seq_along(query_url))
+          } else {
+            names(query_url)
+          }
+          return(out)
+        } else {
+          return(output)
         }
-        pro_request(
-          query_url = query_url[[i]],
-          pages = pages,
-          output = file.path(output, nm),
-          overwrite = FALSE,
-          mailto = mailto,
-          api_key = api_key,
-          verbose = verbose,
-          progress = progress,
-          count_only = count_only,
+      })
+    } else {
+      result <- future.apply::future_lapply(
+        seq_along(query_url),
+        function(i) {
+          nm <- names(query_url)[i]
+          if (is.null(nm) || identical(nm, "")) {
+            nm <- paste0("query_", i)
+          }
+          pro_request(
+            query_url = query_url[[i]],
+            pages = pages,
+            output = if (is.null(output)) NULL else file.path(output, nm),
+            overwrite = FALSE,
+            mailto = mailto,
+            api_key = api_key,
+            verbose = verbose,
+            progress = progress,
+            count_only = count_only,
+            error_log = error_log
+          )
+        },
+        future.seed = TRUE
+      )
+
+      if (count_only) {
+        out <- unlist(result, use.names = FALSE)
+        names(out) <- if (is.null(names(query_url))) {
+          paste0("query_", seq_along(query_url))
+        } else {
+          names(query_url)
+        }
+        return(out)
+      } else {
+        return(output)
+      }
+    }
+  }
+
+  # ---------------------------------------------------------------------------
+  # SCALAR METHOD: single query -> inner progress bar over pages
+  # ---------------------------------------------------------------------------
+  if (count_only) {
+    out <- pro_count(
+      query_url = query_url,
+      mailto = mailto,
+      api_key = api_key
+    )
+    return(out)
+  }
+
+  # Argument Checks -----------------------------------------------------------
+  if (is.null(output)) {
+    stop("No `output` specified!")
+  }
+
+  if (dir.exists(output)) {
+    if (!overwrite) {
+      stop(
+        "Directory ",
+        output,
+        " exists.\n",
+        "Either specify `overwrite = TRUE` or delete it."
+      )
+    }
+    if (verbose) {
+      message(
+        "Deleting and recreating `",
+        output,
+        "` to avoid inconsistencies."
+      )
+    }
+    unlink(output, recursive = TRUE)
+  }
+
+  # Preparations --------------------------------------------------------------
+  dir.create(output, recursive = TRUE, showWarnings = FALSE)
+  output <- normalizePath(output)
+
+  if (is.function(api_key)) {
+    api_key <- api_key()
+  }
+  if (is.null(api_key)) {
+    api_key <- ""
+  }
+
+  if (grepl("group_by=", query_url, fixed = TRUE)) {
+    page_prefix <- "group_by_page_"
+  } else {
+    page_prefix <- "results_page_"
+  }
+
+  # Base request with query and custom user agent
+  req <- httr2::request(query_url) |>
+    httr2::req_url_query(
+      per_page = 200,
+      cursor = "*",
+      api_key = api_key
+    ) |>
+    httr2::req_user_agent(paste(
+      "openalexPro v",
+      packageVersion("openalexPro"),
+      " (mailto:",
+      mailto,
+      ")"
+    ))
+
+  # Initialize results and page counter
+  page <- 1L
+
+  # First request to inspect meta
+  resp <- api_call(
+    req,
+    error_log = error_log
+  )
+
+  data <- resp |>
+    httr2::resp_body_json()
+
+  single_record <- is.null(data$meta)
+  if (single_record) {
+    page_prefix <- "single_"
+    progress <- FALSE
+  }
+
+  # Precompute max_pages if we have meta
+  max_pages <- NA_integer_
+  if (
+    !single_record && !is.null(data$meta$count) && !is.null(data$meta$per_page)
+  ) {
+    max_pages <- ceiling(data$meta$count / data$meta$per_page)
+    if (!is.null(pages)) {
+      max_pages <- min(max_pages, pages)
+    }
+  }
+
+  # SINGLE-RECORD CASE --------------------------------------------------------
+  if (single_record) {
+    page <- 1L
+    resp |>
+      httr2::resp_body_string() |>
+      writeLines(
+        con = file.path(
+          output,
+          paste0(page_prefix, page, ".json")
+        )
+      )
+    return(output)
+  }
+
+  # PAGINATED CASE ------------------------------------------------------------
+  use_progressr <- isTRUE(progress) &&
+    requireNamespace("progressr", quietly = TRUE)
+
+  if (use_progressr && !is.na(max_pages)) {
+    # Inner nested progress bar over pages
+    progressr::with_progress({
+      p_pages <- progressr::progressor(
+        steps = max_pages,
+        message = "Pages"
+      )
+
+      # Pagination loop
+      repeat {
+        if (!is.null(pages) && page > pages) {
+          break
+        }
+
+        if (verbose) {
+          message("\nDownloading page ", page)
+          message("URL: ", req$url)
+        }
+
+        p_pages(message = paste0("Page ", page))
+
+        resp <- api_call(
+          req,
           error_log = error_log
         )
-      },
-      future.seed = TRUE
-    )
-    if (count_only) {
-      output <- do.call(result, what = rbind)
-      rownames(output) <- names(query_url)
-    }
-    return(output)
-  } else {
-    if (count_only) {
-      output <- pro_count(
-        query_url = query_url,
-        mailto = mailto,
-        api_key = api_key
-      )
-    } else {
-      # Argument Checks --------------------------------------------------------
 
-      if (is.null(output)) {
-        stop("No `output` output specified!")
-      }
+        data <- httr2::resp_body_json(resp)
 
-      if (dir.exists(output)) {
-        if (!overwrite) {
-          stop(
-            "Directory ",
-            output,
-            " exists.\n",
-            "Either specify `overwrite = TRUE` or delete it."
-          )
+        # grouping returns at the moment a last page with no groups - this must
+        # not be saved!
+        if (isTRUE(data$meta$groups_count == 0)) {
+          break
         }
-        if (verbose) {
-          message(
-            "Deleting and recreating `",
-            output,
-            "` to avoid inconsistencies."
-          )
-        }
-        unlink(output, recursive = TRUE)
-      }
 
-      # Preparations -----------------------------------------------------------
-
-      dir.create(output, recursive = TRUE, showWarnings = FALSE)
-
-      output <- normalizePath(output)
-
-      if (is.function(api_key)) {
-        api_key <- api_key()
-      }
-      if (is.null(api_key)) {
-        api_key <- ""
-      }
-
-      if (grepl("group_by=", query_url)) {
-        page_prefix <- "group_by_page_"
-      } else {
-        page_prefix <- "results_page_"
-      }
-
-      # Created with help from chatGPT
-      # Base request with query and custom user agent
-      req <- httr2::request(query_url) |>
-        httr2::req_url_query(
-          per_page = 200,
-          cursor = "*",
-          api_key = api_key
-        ) |>
-        httr2::req_user_agent(paste(
-          "openalexPro v",
-          packageVersion("openalexPro"),
-          " (mailto:",
-          mailto,
-          ")"
-        ))
-
-      # Remove empty query parameters
-      # req$url$query <- req$url$query[req$url$query != ""]
-
-      # Initialize results and page counter
-      page <- 1
-
-      # resp <- httr2::req_perform(req)
-      resp <- api_call(
-        req,
-        error_log = error_log
-      )
-
-      data <- resp |>
-        httr2::resp_body_json()
-
-      if (is.null(data$meta)) {
-        single_record <- TRUE
-        page_prefix <- "single_"
-        progress <- FALSE
-      } else {
-        single_record <- FALSE
-        if (progress) {
-          max_pages <- ceiling(data$meta$count / data$meta$per_page)
-          # Create a progress bar
-          pb <- txtProgressBar(min = 0, max = max_pages, style = 3)
-        }
-      }
-
-      if (single_record) {
-        page <- 1
         resp |>
           httr2::resp_body_string() |>
           writeLines(
@@ -209,60 +323,70 @@ pro_request <- function(
               paste0(page_prefix, page, ".json")
             )
           )
-      } else {
-        # Pagination loop
-        repeat {
-          if (!is.null(pages)) {
-            if (page > pages) break # Remove this to fetch all pages
-          }
 
-          if (verbose) {
-            message("\nDownloading page ", page)
-            message("URL: ", req$url)
-          }
-
-          if (progress) {
-            setTxtProgressBar(pb, page) # Update progress bar
-          }
-
-          # resp <- httr2::req_perform(req)
-          resp <- api_call(
-            req,
-            error_log = error_log
-          )
-
-          data <- httr2::resp_body_json(resp)
-
-          ## grouping returns at the moment a last page with no groups - this must
-          ## not be saved!
-          if (isTRUE(data$meta$groups_count == 0)) {
-            break
-          }
-          resp |>
-            httr2::resp_body_string() |>
-            writeLines(
-              con = file.path(
-                output,
-                paste0(page_prefix, page, ".json")
-              )
-            )
-
-          if (is.null(data$meta$next_cursor)) {
-            break
-          }
-
-          # This is needed for groups as at the moment OpenAlex returns a final
-          # cursor page with no tresults if (isTRUE(data$meta$groups_count == 200))
-          # { break }
-
-          req <- req |>
-            httr2::req_url_query(cursor = data$meta$next_cursor)
-
-          page <- page + 1
+        if (is.null(data$meta$next_cursor)) {
+          break
         }
+
+        req <- req |>
+          httr2::req_url_query(cursor = data$meta$next_cursor)
+
+        page <- page + 1L
       }
-      ###
+    })
+  } else {
+    # Fallback: txtProgressBar (if progress = TRUE and we know max_pages)
+    if (progress && !is.na(max_pages)) {
+      pb <- txtProgressBar(min = 0, max = max_pages, style = 3)
     }
-    return(output)
+
+    # Pagination loop
+    repeat {
+      if (!is.null(pages) && page > pages) {
+        break
+      }
+
+      if (verbose) {
+        message("\nDownloading page ", page)
+        message("URL: ", req$url)
+      }
+
+      if (progress && !is.na(max_pages)) {
+        setTxtProgressBar(pb, page)
+      }
+
+      resp <- api_call(
+        req,
+        error_log = error_log
+      )
+
+      data <- httr2::resp_body_json(resp)
+
+      # grouping returns at the moment a last page with no groups - this must
+      # not be saved!
+      if (isTRUE(data$meta$groups_count == 0)) {
+        break
+      }
+
+      resp |>
+        httr2::resp_body_string() |>
+        writeLines(
+          con = file.path(
+            output,
+            paste0(page_prefix, page, ".json")
+          )
+        )
+
+      if (is.null(data$meta$next_cursor)) {
+        break
+      }
+
+      req <- req |>
+        httr2::req_url_query(cursor = data$meta$next_cursor)
+
+      page <- page + 1L
+    }
   }
+
+  output
 }

@@ -28,6 +28,7 @@
 #'   Defaults to `TRUE`
 #' @param delete_input Determines if the `input_json` should be deleted
 #'   afterwards. Defaults to `FALSE`.
+#' @param workers Number of parallel workers to use. Defaults to 1.
 #'
 #' @return The function does returns the output invisibly.
 #'
@@ -139,7 +140,19 @@ pro_request_jsonl <- function(
   # Go through all jsons, i.e. one per page --------------------------------
   ### Names: results_page_x.json
 
-  future::plan(future::multisession, workers = workers)
+  old_plan <- future::plan()
+  on.exit(future::plan(old_plan), add = TRUE)
+  if (workers > 1) {
+    future::plan(
+      future::multisession,
+      workers = workers
+    )
+  } else {
+    future::plan(
+      future::sequential
+    )
+  }
+
   # for (i in seq_along(jsons)) {
   future.apply::future_lapply(seq_along(jsons), function(i) {
     fn <- jsons[i]

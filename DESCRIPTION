@@ -19,6 +19,7 @@ Imports:
     future.apply,
     httr2,
     jqr,
+    progressr,
     rlang
 Additional_repositories: 
     https://ropensci.r-universe.dev

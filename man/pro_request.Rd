@@ -56,7 +56,7 @@ of the works from the specified query_url(s).
 \description{
 This function adds one argument to \code{openalexR::oa_request()}, namely
 \code{output}. When specified, all return values from OpenAlex will be saved as
-jaon files in that directory and the return value is the directory of the
+json files in that directory and the return value is the directory of the
 json files.
 }
 \details{
@@ -65,4 +65,13 @@ If query_url is a list, the function is called for each element of the list in p
 using a maximum of \code{workers} parallel R sessions. The results from the individual URLs
 in the list are returned in a folder named after the names of the list elements in the
 \code{output} folder.
+
+Nested progress bars:
+\itemize{
+\item outer bar: list elements (queries)
+\item inner bar: pages per query
+}
+
+If the \code{progressr} package is not available or \code{progress = FALSE}, the function
+falls back to a simple \code{txtProgressBar} (per-query) or no progress at all.
 }

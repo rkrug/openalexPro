@@ -84,7 +84,8 @@ pro_fetch <- function(
     pro_request_jsonl(
       output = file.path(project_folder, "jsonl"),
       overwrite = overwrite,
-      delete_input = FALSE
+      delete_input = FALSE,
+      workers = workers
     ) |>
     pro_request_jsonl_parquet(
       output = file.path(project_folder, "parquet"),

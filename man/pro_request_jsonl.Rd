@@ -30,6 +30,8 @@ Defaults to \code{TRUE}}
 
 \item{delete_input}{Determines if the \code{input_json} should be deleted
 afterwards. Defaults to \code{FALSE}.}
+
+\item{workers}{Number of parallel workers to use. Defaults to 1.}
 }
 \value{
 The function does returns the output invisibly.
