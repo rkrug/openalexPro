@@ -27,21 +27,30 @@
 #'   and shuts it down before returning. If a connection is supplied, it is
 #'   left open and not modified beyond running the sampling query.
 #'
+#' @param select Optional character vector of column names to return. If
+#'   \code{NULL} (default), all columns are returned (equivalent to
+#'   \code{SELECT *}). Column names are passed through
+#'   \code{\link[DBI:dbQuoteIdentifier]{DBI::dbQuoteIdentifier()}} to safely
+#'   handle special characters. If any requested column does not exist in the
+#'   Parquet schema, DuckDB will raise an error.
+#'
 #' @return
 #' A \code{data.frame} with up to \code{n} rows, containing a uniform random
-#' sample from the union of all Parquet files matched by \code{path}.
+#' sample from the union of all Parquet files matched by \code{path}, restricted
+#' to the columns specified in \code{select} (or all columns if \code{select} is
+#' \code{NULL}).
 #'
 #' @details
 #' The function delegates to the following SQL pattern (simplified):
 #'
 #' \preformatted{
-#' SELECT *
+#' SELECT [columns]
 #' FROM parquet_scan('path/to/files/*.parquet')
 #' USING SAMPLE reservoir(n ROWS)
 #' [REPEATABLE (seed)]
 #' }
 #'
-#* Using \code{reservoir(n ROWS)} gives an exact uniform sample of size
+#' Using \code{reservoir(n ROWS)} gives an exact uniform sample of size
 #' \code{n} from all rows in the dataset (unless \code{n} exceeds the total
 #' row count, in which case all rows are returned).
 #'
@@ -70,6 +79,14 @@
 #'   seed = 1234
 #' )
 #'
+#' # Sample only a subset of columns
+#' sample_df_small <- sample_parquet_duckdb(
+#'   path = "spc_corpus/output/chapter_3/corpus/*.parquet",
+#'   n = 1000L,
+#'   seed = 1234,
+#'   select = c("id", "doi", "citation", "author_abbr", "display_name", "ab")
+#' )
+#'
 #' # Reuse a DuckDB connection for multiple samples
 #' con <- DBI::dbConnect(duckdb::duckdb())
 #' on.exit(DBI::dbDisconnect(con, shutdown = TRUE), add = TRUE)
@@ -91,9 +108,15 @@
 #'
 #' @export
 #'
-#' @importFrom DBI dbConnect dbDisconnect dbGetQuery dbQuoteString
+#' @importFrom DBI dbConnect dbDisconnect dbGetQuery dbQuoteString dbQuoteIdentifier
 #' @importFrom duckdb duckdb
-sample_parquet_n <- function(path, n, seed = NULL, con = NULL) {
+sample_parquet_n <- function(
+  path,
+  n,
+  seed = NULL,
+  con = NULL,
+  select = NULL
+) {
   # Basic argument checks
   if (!is.character(path) || length(path) != 1L || is.na(path)) {
     stop("`path` must be a non-missing character scalar.", call. = FALSE)
@@ -122,6 +145,15 @@ sample_parquet_n <- function(path, n, seed = NULL, con = NULL) {
     seed_int <- NULL
   }
 
+  if (!is.null(select)) {
+    if (!is.character(select) || length(select) == 0L || anyNA(select)) {
+      stop(
+        "`select` must be NULL or a non-empty character vector of column names.",
+        call. = FALSE
+      )
+    }
+  }
+
   # Create a temporary DuckDB connection if needed
   local_con <- is.null(con)
   if (local_con) {
@@ -132,9 +164,19 @@ sample_parquet_n <- function(path, n, seed = NULL, con = NULL) {
   # Quote path for use inside parquet_scan()
   path_quoted <- DBI::dbQuoteString(con, path)
 
+  # Build the SELECT list
+  select_sql <- if (is.null(select)) {
+    "*"
+  } else {
+    quoted_cols <- DBI::dbQuoteIdentifier(con, select)
+    paste(as.character(quoted_cols), collapse = ", ")
+  }
+
   # Build the SQL query
   query <- paste0(
-    "SELECT * FROM parquet_scan(",
+    "SELECT ",
+    select_sql,
+    " FROM parquet_scan(",
     path_quoted,
     ") USING SAMPLE reservoir(",
     n_int,

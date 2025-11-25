@@ -4,7 +4,7 @@
 \alias{sample_parquet_n}
 \title{Sample rows from Parquet files using DuckDB reservoir sampling}
 \usage{
-sample_parquet_n(path, n, seed = NULL, con = NULL)
+sample_parquet_n(path, n, seed = NULL, con = NULL, select = NULL)
 }
 \arguments{
 \item{path}{Character scalar. Path or glob pointing to one or more Parquet
@@ -24,10 +24,19 @@ an existing DuckDB database. If \code{NULL} (the default), the function
 creates a temporary in-memory DuckDB instance, uses it for the query,
 and shuts it down before returning. If a connection is supplied, it is
 left open and not modified beyond running the sampling query.}
+
+\item{select}{Optional character vector of column names to return. If
+\code{NULL} (default), all columns are returned (equivalent to
+\code{SELECT *}). Column names are passed through
+\code{\link[DBI:dbQuoteIdentifier]{DBI::dbQuoteIdentifier()}} to safely
+handle special characters. If any requested column does not exist in the
+Parquet schema, DuckDB will raise an error.}
 }
 \value{
 A \code{data.frame} with up to \code{n} rows, containing a uniform random
-sample from the union of all Parquet files matched by \code{path}.
+sample from the union of all Parquet files matched by \code{path}, restricted
+to the columns specified in \code{select} (or all columns if \code{select} is
+\code{NULL}).
 }
 \description{
 Draw a uniform random sample of \code{n} rows from one or more Parquet files
@@ -42,12 +51,13 @@ you want a random subset of rows without materialising the whole table.
 The function delegates to the following SQL pattern (simplified):
 
 \preformatted{
-SELECT *
+SELECT [columns]
 FROM parquet_scan('path/to/files/*.parquet')
 USING SAMPLE reservoir(n ROWS)
 [REPEATABLE (seed)]
 }
 
+Using \code{reservoir(n ROWS)} gives an exact uniform sample of size
 \code{n} from all rows in the dataset (unless \code{n} exceeds the total
 row count, in which case all rows are returned).
 
@@ -74,6 +84,14 @@ sample_df <- sample_parquet_duckdb(
   path = "spc_corpus/output/chapter_3/corpus/*.parquet",
   n = 1000L,
   seed = 1234
+)
+
+# Sample only a subset of columns
+sample_df_small <- sample_parquet_duckdb(
+  path = "spc_corpus/output/chapter_3/corpus/*.parquet",
+  n = 1000L,
+  seed = 1234,
+  select = c("id", "doi", "citation", "author_abbr", "display_name", "ab")
 )
 
 # Reuse a DuckDB connection for multiple samples
