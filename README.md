@@ -140,64 +140,8 @@ openalexPro::pro_request_jsonl_parquet(
 The `read_corpus()` function reads the corpus either as a arrow `Dataset` object if `return_data = FALSE`, which is essentially metadata to the dataset,  or a `data.frame`, i.e. a data table, if `return_data = TRUE`, in which case the whole dataset is loaded into memory.
 
 
-## Basic Workflow for Snowball Searches
+## Snowball Searches
 
-As the function `openalexR::oa_snowball()`, `openalexPro` provides a snowball function which stores the results again in a parquet database, but which can be red in a compatible firmat as in `openalexR::oa_snowball()`.
-
-Snowball searches based on following the citation graph and identify the cited and citing works, starting from a set of key-works.
-
-### 1. Define Keypapers
-
-The keypapers can be identified by either their DOIs or their OpenAlex ids.
-
-### 2. Do the snowball search
-
-The snowball search creates several sub-folders in the `output` folder (assumed it is called `snowball`):
-
-```
-snowball/
-├── cited_json/
-├── cited_jsonl/
-├── citing_json/
-├── citing_jsonl/
-├── edges/
-├── keypaper_json/
-├── keypaper_jsonl/
-├── keypaper_parquet/
-└── nodes/
-```
-
-These contain the following files:
-
-- **raw `json` files returned** (`cited_json`, `citing_json`, `keypaper_json`),
-- **processsed `json` files** (`cited_jsonl`, `citing_jsonl`, `keypaper_jsonl`),
-- **`parquet` database of the keypaper** (`keypaper_parquet`) and the
-- **`nodes` and `edges`** of the snowball search as `parquet` databases.
-
-#### Use OpenAlex ids
-
-```r
-snowball_dir <- "./snowball_ids"
-snowball_docs <- pro_snowball(
-  identifier = c("W2741809807", "W2755950973"),
-  output = snowball_dir,
-  verbose = TRUE
-)
-```
-
-#### Use DOIs
-
-```r
-snowball_dir_dois <- "./snowball_dois"
-oa_snowball(
-  doi = c("10.1016/j.joi.2017.08.007", "10.7717/peerj.4375"),
-  output = snowball_dir_dois,
-  verbose = TRUE
-)
-```
-
-### Convenience Function to Read the Retrieved Data (`openalexPro::read_snowball()`)
-
-
-The function `read_snowball()` reads the snowball search. The function returns, if `return_data = TRUE` either a `list` which contains an list two elements, `nodes` and `edges`. This structure of this list is functional identical to the one returned by `openalexR::oa_snowball()` in regards to network structure. If `return_data = FALSE` it returns a `dataset` object 
-
+Snowball search functionality has moved to the separate
+[`openalexSnowball`](https://github.com/rkrug/openalexSnowball) package, which
+depends on `openalexPro` for the underlying pipeline.

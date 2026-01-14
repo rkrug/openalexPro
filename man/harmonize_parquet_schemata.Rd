@@ -61,9 +61,6 @@ The function performs three steps:
 Missing columns are *not* rewritten; Parquet readers naturally treat them as
 nullable and fill `NULL`s where absent. Only mismatched column *types*
 trigger a rewrite.
-
-If the `progressr` package is installed and `verbose = TRUE`, a progress bar
-is shown; otherwise files are processed in a simple loop.
 }
 \examples{
 \dontrun{
