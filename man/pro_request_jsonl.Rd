@@ -55,6 +55,8 @@ As an example:
 \item The resulting cvalus for \code{page} will be \code{Chunk_1_2}
 }
 
+Upon completion, a file \verb{00_completed} is c reated in the outpud directory.
+
 The function uses DuckDB to read the JSON files and to create the
 Apache Parquet files. The function creates a DuckDB connection in memory
 and readsds the JSON files into DuckDB when needed. Then it creates a SQL

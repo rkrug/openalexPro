@@ -74,4 +74,6 @@ Nested progress bars:
 
 If the \code{progressr} package is not available or \code{progress = FALSE}, the function
 falls back to a simple \code{txtProgressBar} (per-query) or no progress at all.
+
+Upon completion, a file \verb{00_completed} is c reated in the outpud directory.
 }

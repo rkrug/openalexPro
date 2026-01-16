@@ -18,6 +18,8 @@
 #' If the `progressr` package is not available or `progress = FALSE`, the function
 #' falls back to a simple `txtProgressBar` (per-query) or no progress at all.
 #'
+#' Upon completion, a file `00_completed` is c reated in the outpud directory.
+#'
 #' @param query_url The URL of the API query or a list of URLs returned from `pro_query()`.
 #' @param pages The number of pages to be downloaded. The default is set to
 #'   1000, which would be 2,000,000 works. It is recommended to not increase it
@@ -387,6 +389,8 @@ pro_request <- function(
       page <- page + 1L
     }
   }
+
+  file.create(file.path(output, "00_completed"))
 
   output
 }

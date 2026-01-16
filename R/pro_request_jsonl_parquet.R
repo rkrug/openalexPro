@@ -13,6 +13,7 @@
 #' 2. the page othe json file represents is `2`
 #' 3. The resulting values for `page` will be `Chunk_1_2`
 #'
+#' Upon completion, a file `00_completed` is c reated in the outpud directory.
 #'
 #' @param input_jsonl The directory of JSON files returned from
 #'   `pro_request(..., json_dir = "FOLDER")`.
@@ -172,6 +173,8 @@ pro_request_jsonl_parquet <- function(
   if (delete_input) {
     unlink(input_jsonl, recursive = TRUE, force = TRUE)
   }
+
+  file.create(file.path(output, "00_completed"))
 
   return(invisible(normalizePath(output)))
 }

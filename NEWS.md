@@ -1,4 +1,6 @@
 # openalexPro 0.4.1
+
+* Added creation of `00_completed` in output directory of `json`, `jsonl` and `parquet` folders upon successful completion
 * Changed api key and email handling. Removed oap_mail()_ and oap_apikey() and simplified handling of api key and email to only use 
   environmental variables `openalexPro.email` and `openalexPro.apikey`
   
