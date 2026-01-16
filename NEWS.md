@@ -1,5 +1,6 @@
 # openalexPro 0.4.1
 
+* Changed default pages from 1,000 to 10,000
 * Refactored `pro_query` and removed `multiple_ids` argument using Claude and expanded tests and added vignette.
 * Added creation of `00_completed` in output directory of `json`, `jsonl` and `parquet` folders upon successful completion
 * Changed api key and email handling. Removed oap_mail()_ and oap_apikey() and simplified handling of api key and email to only use 

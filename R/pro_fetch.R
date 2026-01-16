@@ -39,7 +39,7 @@
 #' @export
 pro_fetch <- function(
   query_url,
-  pages = 1000,
+  pages = 10000,
   project_folder = NULL,
   overwrite = FALSE,
   mailto = Sys.getenv("openalexPro.email"),

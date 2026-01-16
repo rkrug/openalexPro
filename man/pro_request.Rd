@@ -6,7 +6,7 @@
 \usage{
 pro_request(
   query_url,
-  pages = 1000,
+  pages = 10000,
   output = NULL,
   overwrite = FALSE,
   mailto = Sys.getenv("openalexPro.email"),
@@ -22,9 +22,9 @@ pro_request(
 \item{query_url}{The URL of the API query or a list of URLs returned from \code{pro_query()}.}
 
 \item{pages}{The number of pages to be downloaded. The default is set to
-1000, which would be 2,000,000 works. It is recommended to not increase it
-beyond 1000 due to server load and to use the snapshot instead. If \code{NULL},
-all pages will be downloaded. Default: 1000.}
+0, which would be 2,000,000 works. It is recommended to not increase it
+beyond 10000 due to server load and to use the snapshot instead. If \code{NULL},
+all pages will be downloaded. Default: 10000.}
 
 \item{output}{directory where the JSON files are saved. Default is a
 temporary directory. If \code{NULL}, the return value from call to
