@@ -1,0 +1,614 @@
+---
+title: "Building OpenAlex API Queries with `pro_query()`"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    embed-resources: true
+    mermaid:
+      theme: neutral
+vignette: >
+  %\VignetteIndexEntry{Building OpenAlex API Queries with `pro_query()`}
+  %\VignetteEngine{quarto::html}
+  %\VignetteEncoding{UTF-8}
+execute:
+  cache: false
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = FALSE
+)
+```
+
+# Introduction
+
+The `pro_query()` function is the foundation of the `openalexPro` workflow. It constructs well-formed URLs for querying the OpenAlex API, handling parameter validation, filter construction, and automatic request chunking for large queries.
+
+This vignette provides a comprehensive guide to using `pro_query()`, including:
+
+- Basic usage patterns
+- Advanced filtering and selection
+- Automatic chunking for large queries
+- Error handling and validation
+- Internal architecture and flow
+
+# Basic Usage
+
+## Simple Query
+
+The most basic query requires only an entity type:
+
+```{r}
+library(openalexPro)
+
+# Query for works
+url <- pro_query(entity = "works")
+url
+```
+
+## Full-Text Search
+
+Add a search term to perform full-text search:
+
+```{r}
+url <- pro_query(
+  entity = "works",
+  search = "climate change biodiversity"
+)
+url
+```
+
+## Field Selection
+
+Use the `select` parameter to specify which fields to return:
+
+```{r}
+url <- pro_query(
+  entity = "works",
+  search = "machine learning",
+  select = c("ids", "title", "publication_year", "cited_by_count")
+)
+url
+```
+
+**Note:** The function validates field names against `opt_select_fields()` and provides helpful suggestions for typos:
+
+```{r}
+# This will error with a suggestion
+try(
+  pro_query(
+    entity = "works",
+    select = c("id", "title") # Should be "ids" not "id"
+  )
+)
+# Error: Invalid select field(s): id.
+# Did you mean: id → ids?
+# Valid select field(s) are defined in `opt_select_fields()`.
+```
+
+# Filtering
+
+## Basic Filters
+
+Filters are passed as named arguments via `...`:
+
+```{r}
+url <- pro_query(
+  entity = "works",
+  from_publication_date = "2020-01-01",
+  to_publication_date = "2023-12-31",
+  type = "article"
+)
+url
+```
+
+## Multiple Values (OR Logic)
+
+Pass a vector to express OR logic within a filter:
+
+```{r}
+url <- pro_query(
+  entity = "works",
+  language = c("en", "de", "fr"), # English OR German OR French
+  type = c("article", "preprint") # Article OR Preprint
+)
+url
+```
+
+## Filter Validation
+
+Filter names are validated against `opt_filter_names()`:
+
+```{r}
+# This will error with suggestions
+try(
+  pro_query(
+    entity = "works",
+    publiction_year = 2023 # Typo: should be "publication_year"
+  )
+)
+# Error: Invalid filter name(s): publiction_year.
+# Did you mean: publiction_year → publication_year?
+# Valid filter names are defined in `opt_filter_names()`.
+```
+
+# Advanced Features
+
+## Grouping (Facets)
+
+Use `group_by` to get aggregate counts:
+
+```{r}
+url <- pro_query(
+  entity = "works",
+  search = "artificial intelligence",
+  group_by = "publication_year"
+)
+url
+```
+
+## Additional Options
+
+The `options` parameter accepts additional query parameters:
+
+```{r}
+url <- pro_query(
+  entity = "works",
+  search = "quantum computing",
+  options = list(
+    per_page = 200,
+    sort = "cited_by_count:desc",
+    cursor = "*"
+  )
+)
+url
+```
+
+## Single Entity Retrieval
+
+Fetch a specific entity by ID:
+
+```{r}
+url <- pro_query(
+  entity = "works",
+  id = "W2741809807"
+)
+url
+```
+
+# Automatic Chunking
+
+When querying with large lists of DOIs or IDs, `pro_query()` automatically splits the request into chunks to avoid API limits.
+
+## Chunking Behavior
+
+By default, requests are chunked at 50 items. The following filters trigger automatic chunking:
+
+- `openalex`
+- `ids.openalex`
+- `doi`
+- `cites`
+- `cited_by`
+
+## Example: Large DOI List
+
+```{r}
+# Create a list of 120 DOIs
+dois <- paste0("10.1234/example", 1:120)
+
+# This returns a named list of URLs
+urls <- pro_query(
+  entity = "works",
+  doi = dois,
+  chunk_limit = 50 # Default
+)
+
+# Check the result
+length(urls) # 3 chunks (50 + 50 + 20)
+names(urls) # "chunk_1", "chunk_2", "chunk_3"
+```
+
+## Custom Chunk Size
+
+Adjust the chunk size with `chunk_limit`:
+
+```{r}
+urls <- pro_query(
+  entity = "works",
+  doi = dois,
+  chunk_limit = 100 # Larger chunks
+)
+
+length(urls) # 2 chunks (100 + 20)
+```
+
+# Supported Entities
+
+`pro_query()` supports all major OpenAlex entities:
+
+```{r}
+# Works
+pro_query(entity = "works", search = "neuroscience")
+
+# Authors
+pro_query(entity = "authors", search = "Einstein")
+
+# Institutions
+pro_query(entity = "institutions", search = "MIT")
+
+# Venues (journals, conferences)
+pro_query(entity = "venues", search = "Nature")
+
+# Concepts (topics/fields)
+pro_query(entity = "concepts", search = "machine learning")
+
+# Publishers
+pro_query(entity = "publishers", search = "Springer")
+
+# Funders
+pro_query(entity = "funders", search = "NSF")
+```
+
+# Function Architecture
+
+## High-Level Flow
+
+```{mermaid}
+flowchart TD
+    Start([pro_query called]) --> ValidateEntity[Validate entity type]
+    ValidateEntity --> GatherFilters[Gather filters from ...]
+    GatherFilters --> CheckMultipleID{Multiple IDs<br/>provided?}
+
+    CheckMultipleID -->|Yes| MoveToFilter[Move IDs to<br/>ids.openalex filter]
+    CheckMultipleID -->|No| ValidateInputs[Validate filters<br/>and select fields]
+    MoveToFilter --> ValidateInputs
+
+    ValidateInputs --> CheckChunking{Filters contain<br/>chunkable fields?}
+
+    CheckChunking -->|No| SingleBatch[Single batch:<br/>filter_batches = list]
+    CheckChunking -->|Yes| ChunkLoop[Split large filters<br/>into chunks]
+
+    ChunkLoop --> CheckSize{Values > chunk_limit?}
+    CheckSize -->|Yes| SplitValues[Split values into<br/>groups of chunk_limit]
+    CheckSize -->|No| KeepIntact[Keep filter intact]
+
+    SplitValues --> NextFilter{More chunkable<br/>filters?}
+    KeepIntact --> NextFilter
+    NextFilter -->|Yes| ChunkLoop
+    NextFilter -->|No| BuildURLs
+
+    SingleBatch --> BuildURLs[Build URLs for each batch]
+
+    BuildURLs --> ForEachBatch[For each batch:<br/>1. Build filter string<br/>2. Build select string<br/>3. Assemble query params<br/>4. Create URL]
+
+    ForEachBatch --> CheckCount{Multiple batches?}
+
+    CheckCount -->|Yes| ReturnList[Return named list:<br/>chunk_1, chunk_2, ...]
+    CheckCount -->|No| ReturnSingle[Return single URL]
+
+    ReturnList --> End([Return URLs])
+    ReturnSingle --> End
+
+    style Start fill:#e1f5e1
+    style End fill:#e1f5e1
+    style ValidateInputs fill:#fff3cd
+    style ChunkLoop fill:#cce5ff
+    style BuildURLs fill:#f8d7da
+```
+
+## Internal Helper Functions
+
+The function uses several internal helpers for clean, maintainable code:
+
+### `.is_empty(x)`
+Checks if an object is NULL or has zero length.
+
+```{r}
+# Used throughout for consistent NULL/empty checking
+.is_empty(NULL) # TRUE
+.is_empty(character()) # TRUE
+.is_empty("value") # FALSE
+```
+
+### `.oa_collapse(x)`
+Collapses vectors into pipe-separated strings for the API.
+
+```{r}
+# Handles NULL, NA values, and logical conversion
+.oa_collapse(c("en", "de", "fr")) # "en|de|fr"
+.oa_collapse(c(TRUE, FALSE)) # "true|false"
+.oa_collapse(c("a", NA, "b")) # "a|b"
+```
+
+### `.oa_build_filter(fl)`
+Constructs the filter query string from a named list.
+
+```{r}
+# Combines multiple filters with commas
+filters <- list(
+  from_publication_date = "2020-01-01",
+  language = c("en", "de"),
+  type = "article"
+)
+.oa_build_filter(filters)
+# "from_publication_date:2020-01-01,language:en|de,type:article"
+```
+
+### `.fuzzy_suggest(bad, allowed)`
+Provides spelling suggestions for invalid field names using edit distance.
+
+```{r}
+# Suggests corrections within edit distance of 3
+.fuzzy_suggest("titel", c("title", "author", "year")) # "title"
+.fuzzy_suggest("publiction_year", opt_filter_names()) # "publication_year"
+```
+
+### `.build_validation_error(bad, allowed, field_type, helper_fn_name)`
+Constructs helpful error messages with suggestions.
+
+### `.validate_select(select)` and `.validate_filter(fl)`
+Validate field names and filter names against allowed values.
+
+## Chunking Algorithm
+
+The chunking algorithm is designed to handle multiple chunkable filters simultaneously:
+
+```{mermaid}
+flowchart TD
+    Start([Start with filter_batches<br/>containing original filter]) --> IdentifyTargets[Identify chunk targets<br/>in current filters]
+
+    IdentifyTargets --> LoopTargets{For each<br/>chunk target}
+
+    LoopTargets --> LoopBatches{For each<br/>current batch}
+
+    LoopBatches --> GetValues[Get values for<br/>this target key]
+    GetValues --> RemoveNA[Remove NA values]
+
+    RemoveNA --> CheckSize{length > chunk_limit?}
+
+    CheckSize -->|Yes| Split[Split into chunks<br/>of chunk_limit]
+    CheckSize -->|No| Keep[Keep batch as-is]
+
+    Split --> CreateBatches[Create new batches<br/>with chunked values]
+    Keep --> AddToNew[Add to new_batches]
+    CreateBatches --> AddToNew
+
+    AddToNew --> MoreBatches{More batches<br/>to process?}
+    MoreBatches -->|Yes| LoopBatches
+    MoreBatches -->|No| UpdateBatches[filter_batches = new_batches]
+
+    UpdateBatches --> MoreTargets{More targets<br/>to process?}
+    MoreTargets -->|Yes| LoopTargets
+    MoreTargets -->|No| Return([Return filter_batches])
+
+    style Start fill:#e1f5e1
+    style Return fill:#e1f5e1
+    style CheckSize fill:#fff3cd
+    style Split fill:#f8d7da
+```
+
+### Example: Chunking Multiple Filters
+
+```{r}
+# Both DOI and cites will be chunked
+urls <- pro_query(
+  entity = "works",
+  doi = paste0("10.1234/example", 1:75), # 75 DOIs
+  cites = paste0("W", 1000:1089) # 90 IDs
+)
+
+# Result: 75/50 = 2 DOI chunks, 90/50 = 2 cites chunks
+# Cross product: 2 × 2 = 4 total URL batches
+length(urls) # 4
+```
+
+# Best Practices
+
+## 1. Use Field Selection
+
+Always use `select` to limit returned fields and reduce API response size:
+
+```{r}
+# Good: Only request needed fields
+pro_query(
+  entity = "works",
+  select = c("ids", "title", "publication_year")
+)
+
+# Avoid: Requesting all fields (default behavior without select)
+```
+
+## 2. Leverage Chunking
+
+Let `pro_query()` handle large ID lists automatically:
+
+```{r}
+# The function handles chunking transparently
+urls <- pro_query(
+  entity = "works",
+  doi = large_doi_vector # Even thousands of DOIs
+)
+
+# Then iterate over chunks in your request logic
+for (url in urls) {
+  # Process each chunk...
+}
+```
+
+## 3. Validate Early
+
+Use the validation helpers to check your filters before making requests:
+
+```{r}
+# Check available filters
+opt_filter_names()
+
+# Check available select fields
+opt_select_fields()
+```
+
+## 4. Use Sorting and Pagination
+
+For large result sets, use appropriate options:
+
+```{r}
+pro_query(
+  entity = "works",
+  search = "climate change",
+  options = list(
+    per_page = 200, # Maximum page size
+    sort = "publication_date:desc",
+    cursor = "*" # For cursor pagination
+  )
+)
+```
+
+# Common Use Cases
+
+## Finding Recent Publications
+
+```{r}
+url <- pro_query(
+  entity = "works",
+  from_publication_date = "2024-01-01",
+  type = "article",
+  select = c("ids", "title", "publication_date", "authorships"),
+  options = list(
+    per_page = 200,
+    sort = "publication_date:desc"
+  )
+)
+```
+
+## Analyzing Highly Cited Works
+
+```{r}
+url <- pro_query(
+  entity = "works",
+  from_cited_by_count = 100,
+  type = "article",
+  select = c("ids", "title", "cited_by_count", "publication_year"),
+  options = list(
+    sort = "cited_by_count:desc",
+    per_page = 50
+  )
+)
+```
+
+## Finding Author Publications
+
+```{r}
+url <- pro_query(
+  entity = "works",
+  `author.id` = "A2208157607", # Use backticks for dots in names
+  select = c("ids", "title", "publication_year"),
+  options = list(sort = "publication_date:desc")
+)
+```
+
+## Institution Output Analysis
+
+```{r}
+url <- pro_query(
+  entity = "works",
+  `institutions.id` = "I4200000001",
+  from_publication_date = "2020-01-01",
+  type = "article",
+  select = c("ids", "title", "authorships", "publication_year")
+)
+```
+
+## Bulk DOI Lookup
+
+```{r}
+# Read DOIs from file
+dois <- readLines("my_dois.txt")
+
+# Query in chunks automatically
+urls <- pro_query(
+  entity = "works",
+  doi = dois,
+  select = c("ids", "title", "cited_by_count")
+)
+
+# Process each chunk
+results <- lapply(urls, function(url) {
+  # Use pro_request() or similar to fetch data
+  # pro_request(url)
+})
+```
+
+# Error Handling
+
+The function provides helpful error messages for common mistakes:
+
+## Invalid Entity
+
+```{r}
+try(pro_query(entity = "paper"))
+# Error: 'arg' should be one of "works", "authors", "venues",
+#        "institutions", "concepts", "publishers", "funders"
+```
+
+## Invalid Filter Names
+
+```{r}
+try(pro_query(entity = "works", invalid_filter = "value"))
+# Error: Invalid filter name(s): invalid_filter.
+# Valid filter names are defined in `opt_filter_names()`.
+```
+
+## Invalid Select Fields
+
+```{r}
+try(pro_query(entity = "works", select = c("id", "titel")))
+# Error: Invalid select field(s): id, titel.
+# Did you mean: id → ids, titel → title?
+# Valid select fields are defined in `opt_select_fields()`.
+```
+
+# Integration with openalexPro Workflow
+
+`pro_query()` is the first step in the typical `openalexPro` workflow:
+
+```{r}
+library(openalexPro)
+
+# Step 1: Build query
+urls <- pro_query(
+  entity = "works",
+  search = "machine learning healthcare",
+  from_publication_date = "2020-01-01",
+  type = "article",
+  select = c("ids", "title", "abstract", "publication_year")
+)
+
+# Step 2: Retrieve data
+# pro_request(urls, output_dir = "data/json")
+
+# Step 3: Convert to JSONL
+# pro_request_jsonl("data/json", "data/jsonl")
+
+# Step 4: Convert to Parquet
+# pro_request_jsonl_parquet("data/jsonl", "data/parquet")
+
+# Step 5: Query with DuckDB
+# ... analyze your data ...
+```
+
+# See Also
+
+- `opt_filter_names()` - List available filter names
+- `opt_select_fields()` - List available select fields
+- `pro_request()` - Execute API requests and save results
+- `pro_request_jsonl()` - Convert JSON to JSONL format
+- `pro_request_jsonl_parquet()` - Convert JSONL to Parquet format
+
+# References
+
+- [OpenAlex API Documentation](https://docs.openalex.org/)
+- [OpenAlex Filters](https://docs.openalex.org/how-to-use-the-api/get-lists-of-entities/filter-entity-lists)
+- [OpenAlex Select Fields](https://docs.openalex.org/how-to-use-the-api/get-lists-of-entities/select-fields)

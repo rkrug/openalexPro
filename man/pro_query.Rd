@@ -8,7 +8,6 @@ pro_query(
   entity = c("works", "authors", "venues", "institutions", "concepts", "publishers",
     "funders"),
   id = NULL,
-  multiple_id = FALSE,
   search = NULL,
   group_by = NULL,
   select = NULL,
@@ -24,10 +23,9 @@ pro_query(
 \item{entity}{Character; one of \code{"works"}, \code{"authors"}, \code{"venues"},
 \code{"institutions"}, \code{"concepts"}, \code{"publishers"}, \code{"funders"}.}
 
-\item{id}{Optional single ID (e.g., \code{"W1775749144"}) to fetch one entity.}
-
-\item{multiple_id}{Logical; if \code{TRUE} and \code{id} is a vector, the IDs are
-moved into the \code{ids.openalex} filter and \code{id} is cleared.}
+\item{id}{Optional ID or vector of IDs (e.g., \code{"W1775749144"}). If a single ID
+is provided, fetches one entity directly. If multiple IDs are provided, they are
+automatically moved into the \code{ids.openalex} filter.}
 
 \item{search}{Optional full-text search string.}
 
