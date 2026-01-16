@@ -15,7 +15,7 @@
 #'   2. the page othe json file represents is `2`
 #'   3. The resulting cvalus for `page` will be `Chunk_1_2`
 #'
-#' Upon completion, a file `00_completed` is c reated in the outpud directory.
+#' When starting the conversion, a file `00_in.progress` which is deleted upon completion.
 #'
 #' @param input_json The directory of JSON files returned from `pro_request(...,
 #'   json_dir = "FOLDER")`.
@@ -97,6 +97,7 @@ pro_request_jsonl <- function(
     }
   }
   dir.create(output, recursive = TRUE)
+  file.create(file.path("00_in.progress"))
 
   ## Read names of json files
   jsons <- list.files(
@@ -211,7 +212,7 @@ pro_request_jsonl <- function(
     unlink(input_json, recursive = TRUE, force = TRUE)
   }
 
-  file.create(file.path(output, "00_completed"))
+  unlink(file.path("00_in.progress"))
 
   return(invisible(normalizePath(output)))
 }

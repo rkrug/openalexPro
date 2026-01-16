@@ -62,14 +62,13 @@ test_that("pro_request_jsonl_parquet single identifier", {
   )
 
   # Check that the output file contains the expected data structure
+  x <- read_corpus(
+    output_parquet,
+    return_data = FALSE
+  )
   expect_snapshot({
-    x <- read_corpus(
-      output_parquet,
-      return_data = FALSE
-    )
     nrow(x)
-    names(x) |>
-      sort()
+    sort(names(x))
   })
 
   # Check that the output file contains the expected data

@@ -18,7 +18,7 @@
 #' If the `progressr` package is not available or `progress = FALSE`, the function
 #' falls back to a simple `txtProgressBar` (per-query) or no progress at all.
 #'
-#' Upon completion, a file `00_completed` is c reated in the outpud directory.
+#' When starting the download, a file `00_in.progress` which is deleted upon completion.
 #'
 #' @param query_url The URL of the API query or a list of URLs returned from `pro_query()`.
 #' @param pages The number of pages to be downloaded. The default is set to
@@ -206,6 +206,7 @@ pro_request <- function(
 
   # Preparations --------------------------------------------------------------
   dir.create(output, recursive = TRUE, showWarnings = FALSE)
+  file.create(file.path("00_in.progress"))
   output <- normalizePath(output)
 
   # if (is.function(api_key)) {
@@ -390,7 +391,7 @@ pro_request <- function(
     }
   }
 
-  file.create(file.path(output, "00_completed"))
+  unlink(file.path("00_in.progress"))
 
   output
 }

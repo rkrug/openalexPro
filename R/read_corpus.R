@@ -21,7 +21,7 @@ read_corpus <- function(
   corpus,
   return_data = FALSE
 ) {
-  result <- arrow::open_dataset(corpus)
+  result <- arrow::open_dataset(corpus, format = "parquet")
   ##
   if (return_data) {
     result <- dplyr::collect(result)

@@ -45,7 +45,7 @@ filtered out by using the "page". As an example:
 \item The resulting values for \code{page} will be \code{Chunk_1_2}
 }
 
-Upon completion, a file \verb{00_completed} is c reated in the outpud directory.
+When starting the conversion, a file \verb{00_in.progress} which is deleted upon completion.
 
 The function uses DuckDB to read the JSON files and to create the
 Apache Parquet files. The function creates a DuckDB connection in memory
