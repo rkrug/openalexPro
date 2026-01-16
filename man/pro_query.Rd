@@ -13,8 +13,6 @@ pro_query(
   select = NULL,
   options = NULL,
   endpoint = "https://api.openalex.org",
-  mailto = NULL,
-  user_agent = NULL,
   chunk_limit = 50L,
   ...
 )
@@ -37,11 +35,6 @@ automatically moved into the \code{ids.openalex} filter.}
 \code{list(per_page = 200, sort = "cited_by_count:desc", cursor = "*", sample = 100)}).}
 
 \item{endpoint}{Base API URL. Defaults to \code{"https://api.openalex.org"}.}
-
-\item{mailto}{Optional email to join the polite pool; added as a query parameter and
-appended to the \code{User-Agent}.}
-
-\item{user_agent}{Optional custom \code{User-Agent}.}
 
 \item{chunk_limit}{Number of DOIS or ids per chunk if chunked. Default: 50}
 

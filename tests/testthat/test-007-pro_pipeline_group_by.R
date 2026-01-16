@@ -24,8 +24,7 @@ test_that("pro_request `biodiversity` and group by `type`", {
       pages = 1,
       output = output_json,
       mailto = "test@example.com",
-      verbose = FALSE,
-      progress = FALSE
+      verbose = FALSE
     )
 
   # Check that the output file contains the expected data

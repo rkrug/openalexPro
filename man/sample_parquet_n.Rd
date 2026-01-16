@@ -82,14 +82,14 @@ connection yourself and pass it via \code{con}.
 # Sample 1,000 rows from a directory of Parquet files
 sample_df <- sample_parquet_duckdb(
   path = "spc_corpus/output/chapter_3/corpus/*.parquet",
-  n = 1000L,
+  n = 10000L,
   seed = 1234
 )
 
 # Sample only a subset of columns
 sample_df_small <- sample_parquet_duckdb(
   path = "spc_corpus/output/chapter_3/corpus/*.parquet",
-  n = 1000L,
+  n = 10000L,
   seed = 1234,
   select = c("id", "doi", "citation", "author_abbr", "display_name", "ab")
 )

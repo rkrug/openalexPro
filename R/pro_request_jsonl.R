@@ -97,7 +97,17 @@ pro_request_jsonl <- function(
     }
   }
   dir.create(output, recursive = TRUE)
-  file.create(file.path("00_in.progress"))
+  progress_file <- file.path(output, "00_in.progress")
+  file.create(progress_file)
+  success <- FALSE
+  on.exit(
+    {
+      if (isTRUE(success)) {
+        unlink(progress_file)
+      }
+    },
+    add = TRUE
+  )
 
   ## Read names of json files
   jsons <- list.files(
@@ -212,7 +222,7 @@ pro_request_jsonl <- function(
     unlink(input_json, recursive = TRUE, force = TRUE)
   }
 
-  unlink(file.path("00_in.progress"))
+  success <- TRUE
 
   return(invisible(normalizePath(output)))
 }

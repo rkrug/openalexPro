@@ -13,7 +13,6 @@ pro_request(
   api_key = Sys.getenv("openalexPro.apikey"),
   workers = 1,
   verbose = FALSE,
-  progress = TRUE,
   count_only = FALSE,
   error_log = NULL
 )
@@ -41,9 +40,6 @@ exists.}
 
 \item{verbose}{Logical indicating whether to show verbose messages.}
 
-\item{progress}{Logical default \code{TRUE} indicating whether to show a progress
-bar.}
-
 \item{count_only}{return count only as a named numeric vector or list.}
 
 \item{error_log}{location of error log of API calls. (default: \code{NULL} (none)).}
@@ -65,15 +61,6 @@ If query_url is a list, the function is called for each element of the list in p
 using a maximum of \code{workers} parallel R sessions. The results from the individual URLs
 in the list are returned in a folder named after the names of the list elements in the
 \code{output} folder.
-
-Nested progress bars:
-\itemize{
-\item outer bar: list elements (queries)
-\item inner bar: pages per query
-}
-
-If the \code{progressr} package is not available or \code{progress = FALSE}, the function
-falls back to a simple \code{txtProgressBar} (per-query) or no progress at all.
 
 When starting the download, a file \verb{00_in.progress} which is deleted upon completion.
 }

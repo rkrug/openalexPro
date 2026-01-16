@@ -9,27 +9,39 @@
 #' @keywords internal
 #' @noRd
 .oa_collapse <- function(x) {
-  if (is.null(x)) return(character(0))
+  if (is.null(x)) {
+    return(character(0))
+  }
   x <- x[!is.na(x)]
-  if (!length(x)) return(character(0))
-  if (is.logical(x)) x <- tolower(as.character(x))
+  if (!length(x)) {
+    return(character(0))
+  }
+  if (is.logical(x)) {
+    x <- tolower(as.character(x))
+  }
   if (length(x) == 1) as.character(x) else paste(x, collapse = "|")
 }
 
 #' @keywords internal
 #' @noRd
 .oa_build_filter <- function(fl) {
-  if (.is_empty(fl)) return(NULL)
+  if (.is_empty(fl)) {
+    return(NULL)
+  }
 
   # drop empty/all-NA entries
   fl <- Filter(function(v) !(length(v) == 0 || all(is.na(v))), fl)
-  if (.is_empty(fl)) return(NULL)
+  if (.is_empty(fl)) {
+    return(NULL)
+  }
 
   parts <- unlist(
     Map(
       function(k, v) {
         vv <- .oa_collapse(v)
-        if (.is_empty(vv)) return(character(0))
+        if (.is_empty(vv)) {
+          return(character(0))
+        }
         paste0(k, ":", vv)
       },
       names(fl),
@@ -70,7 +82,9 @@
   sug <- .fuzzy_suggest(bad, allowed)
   have <- !is.na(sug)
   paste0(
-    "Invalid ", field_type, ": ",
+    "Invalid ",
+    field_type,
+    ": ",
     paste(bad, collapse = ", "),
     ".",
     if (any(have)) {
@@ -82,7 +96,11 @@
     } else {
       ""
     },
-    "\nValid ", field_type, " are defined in `", helper_fn_name, "`."
+    "\nValid ",
+    field_type,
+    " are defined in `",
+    helper_fn_name,
+    "`."
   )
 }
 
@@ -90,27 +108,47 @@
 #' @noRd
 .validate_select <- function(select) {
   allowed <- opt_select_fields()
-  if (.is_empty(allowed) || .is_empty(select)) return(invisible(TRUE))
+  if (.is_empty(allowed) || .is_empty(select)) {
+    return(invisible(TRUE))
+  }
 
   bad <- setdiff(select, allowed)
-  if (.is_empty(bad)) return(invisible(TRUE))
+  if (.is_empty(bad)) {
+    return(invisible(TRUE))
+  }
 
-  msg <- .build_validation_error(bad, allowed, "select field(s)", "opt_select_fields()")
+  msg <- .build_validation_error(
+    bad,
+    allowed,
+    "select field(s)",
+    "opt_select_fields()"
+  )
   stop(msg, call. = FALSE)
 }
 
 #' @keywords internal
 #' @noRd
 .validate_filter <- function(fl) {
-  if (.is_empty(fl)) return(invisible(TRUE))
+  if (.is_empty(fl)) {
+    return(invisible(TRUE))
+  }
 
   allowed <- opt_filter_names()
-  if (.is_empty(allowed)) return(invisible(TRUE))
+  if (.is_empty(allowed)) {
+    return(invisible(TRUE))
+  }
 
   bad <- setdiff(names(fl), allowed)
-  if (.is_empty(bad)) return(invisible(TRUE))
+  if (.is_empty(bad)) {
+    return(invisible(TRUE))
+  }
 
-  msg <- .build_validation_error(bad, allowed, "filter name(s)", "opt_filter_names()")
+  msg <- .build_validation_error(
+    bad,
+    allowed,
+    "filter name(s)",
+    "opt_filter_names()"
+  )
   stop(msg, call. = FALSE)
 }
 
@@ -139,9 +177,6 @@
 #' @param options Optional named list of additional query parameters (e.g.,
 #'   \code{list(per_page = 200, sort = "cited_by_count:desc", cursor = "*", sample = 100)}).
 #' @param endpoint Base API URL. Defaults to \code{"https://api.openalex.org"}.
-#' @param mailto Optional email to join the polite pool; added as a query parameter and
-#'   appended to the \code{User-Agent}.
-#' @param user_agent Optional custom \code{User-Agent}.
 #' @param   chunk_limit Number of DOIS or ids per chunk if chunked. Default: 50
 #' @param ... Filters as named arguments. Values may be scalars or vectors (vectors
 #'   are collapsed with \code{"|"} to express OR).
@@ -183,8 +218,6 @@ pro_query <- function(
   select = NULL,
   options = NULL,
   endpoint = "https://api.openalex.org",
-  mailto = NULL,
-  user_agent = NULL,
   chunk_limit = 50L,
   ...
 ) {

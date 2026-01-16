@@ -42,9 +42,6 @@ exists.}
 
 \item{verbose}{Logical indicating whether to show verbose messages.}
 
-\item{progress}{Logical default \code{TRUE} indicating whether to show a progress
-bar.}
-
 \item{count_only}{Do not use it here. The function will abort if it set to
 \code{TRUE} and give a warning if \code{FALSE}}
 

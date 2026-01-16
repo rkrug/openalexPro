@@ -17,6 +17,10 @@ invisible(vcr::vcr_configure(
 try(
   {
     Sys.setenv(openalexPro.apikey = keyring::key_get("API_openalex"))
-    Sys.setenv(openalexPro.apikey = "Rainer@krugs.de")
+    Sys.setenv(openalexPro.email = "Rainer@krugs.de")
   }
 )
+
+# if (!openalexPro::pro_validate_credentials()) {
+#   stop("invalid credentials!")
+# }

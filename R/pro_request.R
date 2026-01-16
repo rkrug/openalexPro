@@ -11,13 +11,6 @@
 #' in the list are returned in a folder named after the names of the list elements in the
 #' `output` folder.
 #'
-#' Nested progress bars:
-#' * outer bar: list elements (queries)
-#' * inner bar: pages per query
-#'
-#' If the `progressr` package is not available or `progress = FALSE`, the function
-#' falls back to a simple `txtProgressBar` (per-query) or no progress at all.
-#'
 #' When starting the download, a file `00_in.progress` which is deleted upon completion.
 #'
 #' @param query_url The URL of the API query or a list of URLs returned from `pro_query()`.
@@ -34,8 +27,6 @@
 #' @param api_key The API key of the user.
 #' @param workers Number of parallel workers to use if `query_url` is a list. Defaults to 1.
 #' @param verbose Logical indicating whether to show verbose messages.
-#' @param progress Logical default `TRUE` indicating whether to show a progress
-#'   bar.
 #' @param count_only return count only as a named numeric vector or list.
 #' @param error_log location of error log of API calls. (default: `NULL` (none)).
 #'
@@ -45,11 +36,10 @@
 #'
 #' @md
 #'
-#' @importFrom utils tail setTxtProgressBar txtProgressBar packageVersion
+#' @importFrom utils tail packageVersion
 #' @importFrom httr2 req_url_query req_perform resp_body_json resp_body_string
 #' @importFrom future plan multisession sequential
 #' @importFrom future.apply future_lapply
-#' @importFrom progressr with_progress progressor
 #'
 #' @export
 pro_request <- function(
@@ -61,7 +51,6 @@ pro_request <- function(
   api_key = Sys.getenv("openalexPro.apikey"),
   workers = 1,
   verbose = FALSE,
-  progress = TRUE,
   count_only = FALSE,
   error_log = NULL
 ) {
@@ -70,7 +59,7 @@ pro_request <- function(
   }
 
   # ---------------------------------------------------------------------------
-  # LIST METHOD: multiple queries -> outer progress bar + futures
+  # LIST METHOD: multiple queries -> futures
   # ---------------------------------------------------------------------------
   if (is.list(query_url)) {
     old_plan <- future::plan()
@@ -82,94 +71,43 @@ pro_request <- function(
       future::plan(future::sequential)
     }
 
-    use_progressr <- isTRUE(progress) &&
-      requireNamespace("progressr", quietly = TRUE)
-
-    if (use_progressr) {
-      progressr::with_progress({
-        p_queries <- progressr::progressor(
-          steps = length(query_url),
-          message = "Queries"
-        )
-
-        result <- future.apply::future_lapply(
-          seq_along(query_url),
-          function(i) {
-            nm <- names(query_url)[i]
-            if (is.null(nm) || identical(nm, "")) {
-              nm <- paste0("query_", i)
-            }
-            p_queries(message = nm)
-
-            pro_request(
-              query_url = query_url[[i]],
-              pages = pages,
-              output = if (is.null(output)) NULL else file.path(output, nm),
-              overwrite = FALSE,
-              mailto = mailto,
-              api_key = api_key,
-              verbose = verbose,
-              progress = progress,
-              count_only = count_only,
-              error_log = error_log
-            )
-          },
-          future.seed = TRUE
-        )
-
-        if (count_only) {
-          # result is a list of numeric scalars
-          out <- unlist(result, use.names = FALSE)
-          names(out) <- if (is.null(names(query_url))) {
-            paste0("query_", seq_along(query_url))
-          } else {
-            names(query_url)
-          }
-          return(out)
-        } else {
-          return(output)
+    result <- future.apply::future_lapply(
+      seq_along(query_url),
+      function(i) {
+        nm <- names(query_url)[i]
+        if (is.null(nm) || identical(nm, "")) {
+          nm <- paste0("query_", i)
         }
-      })
-    } else {
-      result <- future.apply::future_lapply(
-        seq_along(query_url),
-        function(i) {
-          nm <- names(query_url)[i]
-          if (is.null(nm) || identical(nm, "")) {
-            nm <- paste0("query_", i)
-          }
-          pro_request(
-            query_url = query_url[[i]],
-            pages = pages,
-            output = if (is.null(output)) NULL else file.path(output, nm),
-            overwrite = FALSE,
-            mailto = mailto,
-            api_key = api_key,
-            verbose = verbose,
-            progress = progress,
-            count_only = count_only,
-            error_log = error_log
-          )
-        },
-        future.seed = TRUE
-      )
+        pro_request(
+          query_url = query_url[[i]],
+          pages = pages,
+          output = if (is.null(output)) NULL else file.path(output, nm),
+          overwrite = FALSE,
+          mailto = mailto,
+          api_key = api_key,
+          verbose = verbose,
+          count_only = count_only,
+          error_log = error_log
+        )
+      },
+      future.seed = TRUE
+    )
 
-      if (count_only) {
-        out <- unlist(result, use.names = FALSE)
-        names(out) <- if (is.null(names(query_url))) {
-          paste0("query_", seq_along(query_url))
-        } else {
-          names(query_url)
-        }
-        return(out)
+    if (count_only) {
+      out <- unlist(result, use.names = FALSE)
+      names(out) <- if (is.null(names(query_url))) {
+        paste0("query_", seq_along(query_url))
       } else {
-        return(output)
+        names(query_url)
       }
+      return(out)
+    } else {
+      return(output)
     }
   }
 
   # ---------------------------------------------------------------------------
-  # SCALAR METHOD: single query -> inner progress bar over pages
+  # SCALAR METHOD: single query
   # ---------------------------------------------------------------------------
   if (count_only) {
     out <- pro_count(
@@ -206,15 +144,19 @@ pro_request <- function(
 
   # Preparations --------------------------------------------------------------
   dir.create(output, recursive = TRUE, showWarnings = FALSE)
-  file.create(file.path("00_in.progress"))
-  output <- normalizePath(output)
+  progress_file <- file.path(output, "00_in.progress")
+  file.create(progress_file)
+  success <- FALSE
+  on.exit(
+    {
+      if (isTRUE(success)) {
+        unlink(progress_file)
+      }
+    },
+    add = TRUE
+  )
 
-  # if (is.function(api_key)) {
-  #   api_key <- api_key()
-  # }
-  # if (is.null(api_key)) {
-  #   api_key <- ""
-  # }
+  output <- normalizePath(output)
 
   if (grepl("group_by=", query_url, fixed = TRUE)) {
     page_prefix <- "group_by_page_"
@@ -252,23 +194,46 @@ pro_request <- function(
   single_record <- is.null(data$meta)
   if (single_record) {
     page_prefix <- "single_"
-    progress <- FALSE
-  }
-
-  # Precompute max_pages if we have meta
-  max_pages <- NA_integer_
-  if (
-    !single_record && !is.null(data$meta$count) && !is.null(data$meta$per_page)
-  ) {
-    max_pages <- ceiling(data$meta$count / data$meta$per_page)
-    if (!is.null(pages)) {
-      max_pages <- min(max_pages, pages)
-    }
   }
 
   # SINGLE-RECORD CASE --------------------------------------------------------
   if (single_record) {
-    page <- 1L
+    resp |>
+      httr2::resp_body_string() |>
+      writeLines(
+        con = file.path(
+          output,
+          paste0(page_prefix, "1.json")
+        )
+      )
+    success <- TRUE
+    return(output)
+  }
+
+  # PAGINATED CASE ------------------------------------------------------------
+  repeat {
+    if (!is.null(pages) && page > pages) {
+      break
+    }
+
+    if (verbose) {
+      message("Downloading page ", page)
+      message("URL: ", req$url)
+    }
+
+    resp <- api_call(
+      req,
+      error_log = error_log
+    )
+
+    data <- httr2::resp_body_json(resp)
+
+    # grouping returns at the moment a last page with no groups - this must
+    # not be saved!
+    if (isTRUE(data$meta$groups_count == 0)) {
+      break
+    }
+
     resp |>
       httr2::resp_body_string() |>
       writeLines(
@@ -277,121 +242,18 @@ pro_request <- function(
           paste0(page_prefix, page, ".json")
         )
       )
-    return(output)
-  }
 
-  # PAGINATED CASE ------------------------------------------------------------
-  use_progressr <- isTRUE(progress) &&
-    requireNamespace("progressr", quietly = TRUE)
-
-  if (use_progressr && !is.na(max_pages)) {
-    # Inner nested progress bar over pages
-    progressr::with_progress({
-      p_pages <- progressr::progressor(
-        steps = max_pages,
-        message = "Pages"
-      )
-
-      # Pagination loop
-      repeat {
-        if (!is.null(pages) && page > pages) {
-          break
-        }
-
-        if (verbose) {
-          message("\nDownloading page ", page)
-          message("URL: ", req$url)
-        }
-
-        p_pages(message = paste0("Page ", page))
-
-        resp <- api_call(
-          req,
-          error_log = error_log
-        )
-
-        data <- httr2::resp_body_json(resp)
-
-        # grouping returns at the moment a last page with no groups - this must
-        # not be saved!
-        if (isTRUE(data$meta$groups_count == 0)) {
-          break
-        }
-
-        resp |>
-          httr2::resp_body_string() |>
-          writeLines(
-            con = file.path(
-              output,
-              paste0(page_prefix, page, ".json")
-            )
-          )
-
-        if (is.null(data$meta$next_cursor)) {
-          break
-        }
-
-        req <- req |>
-          httr2::req_url_query(cursor = data$meta$next_cursor)
-
-        page <- page + 1L
-      }
-    })
-  } else {
-    # Fallback: txtProgressBar (if progress = TRUE and we know max_pages)
-    if (progress && !is.na(max_pages)) {
-      pb <- txtProgressBar(min = 0, max = max_pages, style = 3)
+    if (is.null(data$meta$next_cursor)) {
+      break
     }
 
-    # Pagination loop
-    repeat {
-      if (!is.null(pages) && page > pages) {
-        break
-      }
+    req <- req |>
+      httr2::req_url_query(cursor = data$meta$next_cursor)
 
-      if (verbose) {
-        message("\nDownloading page ", page)
-        message("URL: ", req$url)
-      }
-
-      if (progress && !is.na(max_pages)) {
-        setTxtProgressBar(pb, page)
-      }
-
-      resp <- api_call(
-        req,
-        error_log = error_log
-      )
-
-      data <- httr2::resp_body_json(resp)
-
-      # grouping returns at the moment a last page with no groups - this must
-      # not be saved!
-      if (isTRUE(data$meta$groups_count == 0)) {
-        break
-      }
-
-      resp |>
-        httr2::resp_body_string() |>
-        writeLines(
-          con = file.path(
-            output,
-            paste0(page_prefix, page, ".json")
-          )
-        )
-
-      if (is.null(data$meta$next_cursor)) {
-        break
-      }
-
-      req <- req |>
-        httr2::req_url_query(cursor = data$meta$next_cursor)
-
-      page <- page + 1L
-    }
+    page <- page + 1L
   }
 
-  unlink(file.path("00_in.progress"))
+  success <- TRUE
 
   output
 }

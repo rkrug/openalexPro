@@ -42,6 +42,7 @@ pro_count <- function(
       per_page = 1,
       select = "ids",
       page = 1,
+      mailto = mailto,
       api_key = api_key
     ) |>
     httr2::req_user_agent(paste(

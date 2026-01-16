@@ -89,4 +89,26 @@ http_interactions:
       string: |
         {"meta":{"count":408,"db_response_time_ms":42,"page":1,"per_page":1,"groups_count":null},"results":[{"ids":{"openalex":"https://openalex.org/W4235089722","doi":"https://doi.org/10.1111/1468-2346.00131"}}],"group_by":[]}
   recorded_at: 2025-11-12 16:39:14
+- request:
+    method: GET
+    uri: https://api.openalex.org/works?filter=title_and_abstract.search%3Abiodiversity+AND+finance%2Cto_publication_date%3A2010-01-01&per_page=1&select=ids&page=1&mailto=test%40example.com&api_key=%3Capi-key%3E
+  response:
+    status: 401
+    headers:
+      date: Fri, 16 Jan 2026 13:39:30 GMT
+      content-type: application/json
+      content-length: '68'
+      access-control-allow-origin: '*'
+      cache-control: no-store
+      access-control-allow-headers: Accept, Accept-Language, Accept-Encoding, Authorization,
+        Content-Type
+      access-control-allow-methods: GET, HEAD, POST, OPTIONS
+      access-control-expose-headers: Cache-Control, RateLimit-Limit, RateLimit-Remaining,
+        RateLimit-Reset, Retry-After
+      vary: accept-encoding
+      server: cloudflare
+      cf-ray: 9bee04f239ab039d-ZRH
+    body:
+      string: '{"error":"Invalid or missing API key","message":"API key not found"}'
+  recorded_at: 2026-01-16 13:39:30
 recorded_with: VCR-vcr/2.0.0

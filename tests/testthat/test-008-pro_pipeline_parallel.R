@@ -43,8 +43,7 @@ test_that("pro_request with url list  and parallel", {
     query_url = req,
     output = output_json,
     mailto = "test@example.com",
-    verbose = FALSE,
-    progress = FALSE
+    verbose = FALSE
   )
 
   # Check that the output file contains the expected data

@@ -88,14 +88,23 @@ pro_request_jsonl_parquet <- function(
         force = TRUE
       )
     }
-  } else {
-    dir.create(
-      output,
-      recursive = TRUE,
-      showWarnings = FALSE
-    )
-    file.create(file.path("00_in.progress"))
   }
+  dir.create(
+    output,
+    recursive = TRUE,
+    showWarnings = FALSE
+  )
+  progress_file <- file.path(output, "00_in.progress")
+  file.create(progress_file)
+  success <- FALSE
+  on.exit(
+    {
+      if (isTRUE(success)) {
+        unlink(progress_file)
+      }
+    },
+    add = TRUE
+  )
 
   ## Read names of json files
   jsons <- list.files(
@@ -175,7 +184,7 @@ pro_request_jsonl_parquet <- function(
     unlink(input_jsonl, recursive = TRUE, force = TRUE)
   }
 
-  unlink(file.path("00_in.progress"))
+  success <- TRUE
 
   return(invisible(normalizePath(output)))
 }
