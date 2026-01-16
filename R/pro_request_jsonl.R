@@ -131,6 +131,10 @@ pro_request_jsonl <- function(
     )
   ]
 
+  if (length(jsons) == 0) {
+    stop("No JSON files found in `input_json`!")
+  }
+
   types <- jsons |>
     basename() |>
     strsplit(split = "_") |>

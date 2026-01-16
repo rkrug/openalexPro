@@ -8,7 +8,7 @@ harmonize_parquet_schemata(root_dir, compression = "SNAPPY", verbose = TRUE)
 }
 \arguments{
 \item{root_dir}{Character path to the root directory containing Parquet
-files. Can be hive-partitioned (e.g. `page=1/`, `page=2/`, …) or flat;
+files. Can be hive-partitioned (e.g. `page=1/`, `page=2/`, ...) or flat;
 the function always scans recursively.}
 
 \item{compression}{Parquet compression codec. Default `"SNAPPY"`.}
@@ -27,7 +27,7 @@ files whose column types deviate from this global schema.
 Directory structure and file names are preserved. Only files with
 mismatched column types are rewritten.
 
-Typical use case: large JSON → Parquet ingestion pipelines where DuckDB
+Typical use case: large JSON -> Parquet ingestion pipelines where DuckDB
 infers slightly different types for rare fields across pages (e.g. `fwci`
 sometimes `INT`, sometimes `DOUBLE`).
 

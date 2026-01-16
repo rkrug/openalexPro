@@ -7,12 +7,12 @@
 #' Directory structure and file names are preserved. Only files with
 #' mismatched column types are rewritten.
 #'
-#' Typical use case: large JSON → Parquet ingestion pipelines where DuckDB
+#' Typical use case: large JSON -> Parquet ingestion pipelines where DuckDB
 #' infers slightly different types for rare fields across pages (e.g. `fwci`
 #' sometimes `INT`, sometimes `DOUBLE`).
 #'
 #' @param root_dir Character path to the root directory containing Parquet
-#'   files. Can be hive-partitioned (e.g. `page=1/`, `page=2/`, …) or flat;
+#'   files. Can be hive-partitioned (e.g. `page=1/`, `page=2/`, ...) or flat;
 #'   the function always scans recursively.
 #' @param compression Parquet compression codec. Default `"SNAPPY"`.
 #' @param verbose Logical; whether to report progress. Default `TRUE`.
@@ -83,15 +83,15 @@ harmonize_parquet_schemata <- function(
     stop("No .parquet files found under: ", root_dir)
   }
 
-  progress <- progressr::progressor(along = (files * 4) + 2)
-
   # -------------------------------------------------------------------
   # 1. Global unified schema across ALL parquet files (recursive scan)
   # -------------------------------------------------------------------
   glob <- file.path(root_dir, "**/*.parquet")
   glob_sql <- DBI::dbQuoteString(con, glob)
 
-  progress(message = "Infering global schene")
+  if (verbose) {
+    message("Inferring global schema...")
+  }
 
   global_schema_raw <- DBI::dbGetQuery(
     con,
@@ -132,12 +132,14 @@ harmonize_parquet_schemata <- function(
   # -------------------------------------------------------------------
   # 2. For each file: compare schema with global, rewrite if needed
   # -------------------------------------------------------------------
-  harmonize_single <- function(f, progress) {
+  harmonize_single <- function(f, idx, total) {
     f_norm <- normalizePath(f)
     f_sql <- DBI::dbQuoteString(con, f_norm)
-
     fn <- basename(f_norm)
-    progress(message = "{fn} --> reading scheme")
+
+    if (verbose) {
+      message("Processing ", idx, "/", total, ": ", fn)
+    }
 
     local_schema_raw <- DBI::dbGetQuery(
       con,
@@ -175,37 +177,35 @@ harmonize_parquet_schemata <- function(
       dplyr::filter(file_type != global_type, !is.na(global_type))
 
     if (nrow(diff_cols) == 0L) {
-      progress(amount = 3, "{fn} --> schema OK, no rewrite needed.")
       return(invisible(FALSE))
-    } else {
-      if (verbose) {
-        msg <- paste0(
-          " --> schema differs for columns: ",
-          paste(diff_cols$column_name, collapse = ", ")
-        )
-        message(fn, msg)
-      }
+    }
 
-      progress("{fn} --> schema differs - rewriting")
+    if (verbose) {
+      message(
+        "  Schema differs for columns: ",
+        paste(diff_cols$column_name, collapse = ", ")
+      )
+      message("  Rewriting...")
+    }
 
-      # Build CAST expressions for REPLACE (protecting identifiers)
-      cast_lines <- character(nrow(diff_cols))
-      for (i in seq_len(nrow(diff_cols))) {
-        col_name <- diff_cols$column_name[i]
-        col_type <- diff_cols$global_type[i]
-        col_id_sql <- DBI::dbQuoteIdentifier(con, col_name)
+    # Build CAST expressions for REPLACE (protecting identifiers)
+    cast_lines <- character(nrow(diff_cols))
+    for (i in seq_len(nrow(diff_cols))) {
+      col_name <- diff_cols$column_name[i]
+      col_type <- diff_cols$global_type[i]
+      col_id_sql <- DBI::dbQuoteIdentifier(con, col_name)
 
-        cast_lines[i] <- sprintf(
-          "CAST(%s AS %s) AS %s",
-          col_id_sql,
-          col_type,
-          col_id_sql
-        )
-      }
-      replace_expr <- paste(cast_lines, collapse = ",\n        ")
+      cast_lines[i] <- sprintf(
+        "CAST(%s AS %s) AS %s",
+        col_id_sql,
+        col_type,
+        col_id_sql
+      )
+    }
+    replace_expr <- paste(cast_lines, collapse = ",\n        ")
 
-      select_sql <- sprintf(
-        "
+    select_sql <- sprintf(
+      "
       SELECT
         *
         REPLACE (
@@ -213,51 +213,48 @@ harmonize_parquet_schemata <- function(
         )
       FROM parquet_scan(%s)
       ",
-        replace_expr,
-        f_sql
-      )
+      replace_expr,
+      f_sql
+    )
 
-      tmp_f <- paste0(f_norm, ".tmp")
-      tmp_f_sql <- DBI::dbQuoteString(con, tmp_f)
-      compression_sql <- DBI::dbQuoteString(con, compression)
+    tmp_f <- paste0(f_norm, ".tmp")
+    tmp_f_sql <- DBI::dbQuoteString(con, tmp_f)
+    compression_sql <- DBI::dbQuoteString(con, compression)
 
-      copy_sql <- sprintf(
-        "
+    copy_sql <- sprintf(
+      "
       COPY (
         %s
       ) TO %s
       (FORMAT PARQUET, COMPRESSION %s);
       ",
-        select_sql,
-        tmp_f_sql,
-        compression_sql
+      select_sql,
+      tmp_f_sql,
+      compression_sql
+    )
+
+    DBI::dbExecute(con, copy_sql)
+
+    ok_rm <- file.remove(f_norm)
+    ok_mv <- file.rename(tmp_f, f_norm)
+
+    if (!ok_rm || !ok_mv) {
+      stop(
+        "Failed to replace original file with harmonized version: ",
+        f_norm
       )
-
-      progress("{fn} --> schema differs, rewriting to temporary file: {tmp_f}")
-
-      DBI::dbExecute(con, copy_sql)
-
-      progress("{fn} --> schema differs, rewplacing original file")
-
-      ok_rm <- file.remove(f_norm)
-      ok_mv <- file.rename(tmp_f, f_norm)
-
-      if (!ok_rm || !ok_mv) {
-        stop(
-          "Failed to replace original file with harmonized version: ",
-          f_norm
-        )
-      }
-
-      invisible(TRUE)
     }
+
+    invisible(TRUE)
   }
 
-  for (f in files) {
-    harmonize_single(f, progress)
+  for (i in seq_along(files)) {
+    harmonize_single(files[i], i, length(files))
   }
 
-  progress(message = "Completed")
+  if (verbose) {
+    message("Completed")
+  }
 
   invisible(TRUE)
 }

@@ -126,6 +126,10 @@ pro_request_jsonl_parquet <- function(
     )
   ]
 
+  if (length(jsons) == 0) {
+    stop("No JSON files found in `input_jsonl`!")
+  }
+
   types <- jsons |>
     basename() |>
     strsplit(split = "_") |>
@@ -143,8 +147,6 @@ pro_request_jsonl_parquet <- function(
   if (types == "group") {
     types <- "group_by"
   }
-
-  if (types == "single") {}
 
   # Go through all jsons, i.e. one per page --------------------------------
   ### Names: results_page_x.json

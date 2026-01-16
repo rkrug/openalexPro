@@ -13,7 +13,6 @@ pro_fetch(
   api_key = Sys.getenv("openalexPro.apikey"),
   workers = 1,
   verbose = FALSE,
-  progress = TRUE,
   count_only,
   error_log = NULL
 )
