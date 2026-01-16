@@ -28,8 +28,8 @@
 #'   `openalexR::oa_request()` with all the arguments is returned
 #' @param overwrite Logical. If `TRUE`, `output` will be deleted if it already
 #'   exists.
-#' @param mailto The email address of the user. See `oap_mail()`.
-#' @param api_key The API key of the user. See `oap_apikey()`.
+#' @param mailto The email address of the user.
+#' @param api_key The API key of the user.
 #' @param workers Number of parallel workers to use if `query_url` is a list. Defaults to 1.
 #' @param verbose Logical indicating whether to show verbose messages.
 #' @param progress Logical default `TRUE` indicating whether to show a progress
@@ -55,8 +55,8 @@ pro_request <- function(
   pages = 1000,
   output = NULL,
   overwrite = FALSE,
-  mailto = oap_mail(),
-  api_key = oap_apikey,
+  mailto = Sys.getenv("openalexPro.email"),
+  api_key = Sys.getenv("openalexPro.apikey"),
   workers = 1,
   verbose = FALSE,
   progress = TRUE,
@@ -206,12 +206,12 @@ pro_request <- function(
   dir.create(output, recursive = TRUE, showWarnings = FALSE)
   output <- normalizePath(output)
 
-  if (is.function(api_key)) {
-    api_key <- api_key()
-  }
-  if (is.null(api_key)) {
-    api_key <- ""
-  }
+  # if (is.function(api_key)) {
+  #   api_key <- api_key()
+  # }
+  # if (is.null(api_key)) {
+  #   api_key <- ""
+  # }
 
   if (grepl("group_by=", query_url, fixed = TRUE)) {
     page_prefix <- "group_by_page_"

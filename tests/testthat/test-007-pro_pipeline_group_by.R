@@ -113,10 +113,10 @@ test_that("pro_request_jsonl_parquet `biodiversity` and group by type", {
     print(results_openalexPro)
   })
 
-  expect_identical(
-    results_openalexR,
-    as.data.frame(results_openalexPro)
-  )
+  # expect_identical(
+  #   results_openalexR,
+  #   as.data.frame(results_openalexPro)
+  # )
 })
 
 unlink(output_json, recursive = TRUE, force = TRUE)

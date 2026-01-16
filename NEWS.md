@@ -1,3 +1,7 @@
+# openalexPro 0.4.1
+* Changed api key and email handling. Removed oap_mail()_ and oap_apikey() and simplified handling of api key and email to only use 
+  environmental variables `openalexPro.email` and `openalexPro.apikey`
+  
 # openalexPro 0.4.0
 * CI and coverage tweaks for CRAN readiness.
 

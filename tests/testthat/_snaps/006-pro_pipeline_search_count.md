@@ -12,10 +12,10 @@
       count_oa
     Output
       $count
-      [1] 369
+      [1] 424
       
       $db_response_time_ms
-      [1] 138
+      [1] 24
       
       $page
       [1] 1

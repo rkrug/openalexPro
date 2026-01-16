@@ -9,8 +9,8 @@ pro_fetch(
   pages = 1000,
   project_folder = NULL,
   overwrite = FALSE,
-  mailto = oap_mail(),
-  api_key = oap_apikey,
+  mailto = Sys.getenv("openalexPro.email"),
+  api_key = Sys.getenv("openalexPro.apikey"),
   workers = 1,
   verbose = FALSE,
   progress = TRUE,
@@ -34,9 +34,9 @@ directory is created.}
 \item{overwrite}{Logical. If \code{TRUE}, \code{output} will be deleted if it already
 exists.}
 
-\item{mailto}{The email address of the user. See \code{oap_mail()}.}
+\item{mailto}{The email address of the user.}
 
-\item{api_key}{The API key of the user. See \code{oap_apikey()}.}
+\item{api_key}{The API key of the user.}
 
 \item{workers}{Number of parallel workers to use if \code{query_url} is a list. Defaults to 1.}
 

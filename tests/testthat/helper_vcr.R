@@ -1,5 +1,6 @@
 library("vcr")
 
+
 vcr_dir <- vcr::vcr_test_path("fixtures", "vcr")
 vcr::vcr_configure_log(file = file.path(vcr_dir, "vcr.log"))
 
@@ -14,12 +15,8 @@ invisible(vcr::vcr_configure(
 ))
 
 try(
-  options(openalexR.apikey = keyring::key_get("API_openalex")),
+  {
+    Sys.setenv(openalexPro.apikey = keyring::key_get("API_openalex"))
+    Sys.setenv(openalexPro.apikey = "Rainer@krugs.de")
+  }
 )
-
-if (is.null(oap_apikey())) {
-  options(openalexR.apikey = "<api-key>")
-}
-if (is.null(oap_mail())) {
-  options(openalexR.mailto = "rainer@krugs.de")
-}
