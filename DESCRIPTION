@@ -12,6 +12,7 @@ Depends:
     R (>= 4.1.1)
 Imports:
     arrow,
+    cli,
     DBI,
     dplyr,
     duckdb,
@@ -19,6 +20,7 @@ Imports:
     future.apply,
     httr2,
     jqr,
+    progressr,
     rlang
 Additional_repositories: 
     https://ropensci.r-universe.dev

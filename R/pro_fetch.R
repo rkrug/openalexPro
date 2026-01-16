@@ -46,6 +46,7 @@ pro_fetch <- function(
   api_key = Sys.getenv("openalexPro.apikey"),
   workers = 1,
   verbose = FALSE,
+  progress = TRUE,
   count_only,
   error_log = NULL
 ) {
@@ -76,12 +77,14 @@ pro_fetch <- function(
     api_key = api_key,
     workers = workers,
     verbose = verbose,
+    progress = progress,
     count_only = FALSE,
     error_log = error_log
   ) |>
     pro_request_jsonl(
       output = file.path(project_folder, "jsonl"),
       overwrite = overwrite,
+      progress = progress,
       delete_input = FALSE,
       workers = workers
     ) |>
@@ -89,6 +92,7 @@ pro_fetch <- function(
       output = file.path(project_folder, "parquet"),
       overwrite = overwrite,
       verbose = verbose,
+      progress = progress,
       delete_input = FALSE
     )
 }

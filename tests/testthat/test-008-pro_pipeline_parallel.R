@@ -43,7 +43,8 @@ test_that("pro_request with url list  and parallel", {
     query_url = req,
     output = output_json,
     mailto = "test@example.com",
-    verbose = FALSE
+    verbose = FALSE,
+    progress = TRUE
   )
 
   # Check that the output file contains the expected data
@@ -68,7 +69,8 @@ test_that("pro_request_jsonl with subfolders", {
   output_jsonl <- output_json |>
     pro_request_jsonl(
       output = output_jsonl,
-      verbose = FALSE
+      verbose = FALSE,
+      progress = TRUE
     )
 
   # Check that the output file contains the expected data
@@ -94,7 +96,8 @@ test_that("pro_request_jsonl_parquet with subfolders", {
   output_parquet <- output_jsonl |>
     pro_request_jsonl_parquet(
       output = output_parquet,
-      verbose = FALSE
+      verbose = FALSE,
+      progress = TRUE
     )
 
   # Check that the output file exists

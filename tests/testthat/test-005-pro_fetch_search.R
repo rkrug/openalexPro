@@ -21,7 +21,8 @@ test_that("pro_fetch search `biodiversity AND fiance`", {
       pages = 1,
       project_folder = output_dir,
       mailto = "test@example.com",
-      verbose = FALSE
+      verbose = FALSE,
+      progress = TRUE
     )
 
   # Check that the output file contains the expected data

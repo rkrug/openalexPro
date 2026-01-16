@@ -24,7 +24,8 @@ test_that("pro_request search `biodiversity AND fiance`", {
       pages = 1,
       output = output_json,
       mailto = "test@example.com",
-      verbose = FALSE
+      verbose = FALSE,
+      progress = TRUE
     )
 
   # Check that the output file contains the expected data
@@ -39,7 +40,8 @@ test_that("pro_request_jsonl search `biodiversity AND finance`", {
   output_jsonl <- output_json |>
     pro_request_jsonl(
       output = output_jsonl,
-      verbose = FALSE
+      verbose = FALSE,
+      progress = TRUE
     )
 
   # Check that the output file contains the expected data
@@ -54,7 +56,8 @@ test_that("pro_request_jsonl_parquet search `biodiversity AND finance`", {
   output_parquet <- output_jsonl |>
     pro_request_jsonl_parquet(
       output = output_parquet,
-      verbose = FALSE
+      verbose = FALSE,
+      progress = TRUE
     )
 
   # Check that the output file exists

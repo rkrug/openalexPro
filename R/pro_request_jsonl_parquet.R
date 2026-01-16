@@ -22,6 +22,7 @@
 #' @param overwrite Logical indicating whether to overwrite `output`.
 #' @param verbose Logical indicating whether to show a verbose information.
 #'   Defaults to `TRUE`
+#' @param progress Logical indicating whether to show a progress bar. Default `TRUE`.
 #' @param delete_input Determines if the `input_jsonl` should be deleted
 #'   afterwards. Defaults to `FALSE`.
 #'
@@ -35,6 +36,7 @@
 #'
 #' @importFrom duckdb duckdb
 #' @importFrom DBI dbConnect dbDisconnect dbExecute
+#' @importFrom cli cli_progress_bar cli_progress_update cli_progress_done cli_alert_info
 #'
 #' @md
 #'
@@ -45,6 +47,7 @@ pro_request_jsonl_parquet <- function(
   output = NULL,
   overwrite = FALSE,
   verbose = TRUE,
+  progress = TRUE,
   delete_input = FALSE
 ) {
   # Argument Checks --------------------------------------------------------
@@ -150,6 +153,15 @@ pro_request_jsonl_parquet <- function(
 
   # Go through all jsons, i.e. one per page --------------------------------
   ### Names: results_page_x.json
+
+  # Setup progress bar (sequential loop uses cli directly)
+  if (progress) {
+    cli::cli_progress_bar(
+      total = length(jsons),
+      format = "Converting to Parquet {cli::pb_bar} {cli::pb_current}/{cli::pb_total} [{cli::pb_elapsed}]"
+    )
+  }
+
   for (i in seq_along(jsons)) {
     fn <- jsons[i]
     if (verbose) {
@@ -164,7 +176,7 @@ pro_request_jsonl_parquet <- function(
               COPY (
                 SELECT
                   *
-                FROM 
+                FROM
                   read_json_auto( '%s' )
               ) TO
                 '%s'
@@ -180,6 +192,14 @@ pro_request_jsonl_parquet <- function(
       },
       silent = !verbose
     )
+
+    if (progress) {
+      cli::cli_progress_update()
+    }
+  }
+
+  if (progress) {
+    cli::cli_progress_done()
   }
 
   if (delete_input) {

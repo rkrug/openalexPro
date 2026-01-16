@@ -13,6 +13,7 @@ pro_request(
   api_key = Sys.getenv("openalexPro.apikey"),
   workers = 1,
   verbose = FALSE,
+  progress = TRUE,
   count_only = FALSE,
   error_log = NULL
 )
@@ -39,6 +40,8 @@ exists.}
 \item{workers}{Number of parallel workers to use if \code{query_url} is a list. Defaults to 1.}
 
 \item{verbose}{Logical indicating whether to show verbose messages.}
+
+\item{progress}{Logical indicating whether to show a progress bar. Default \code{TRUE}.}
 
 \item{count_only}{return count only as a named numeric vector or list.}
 

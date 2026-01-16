@@ -15,7 +15,8 @@
 #'   files. Can be hive-partitioned (e.g. `page=1/`, `page=2/`, ...) or flat;
 #'   the function always scans recursively.
 #' @param compression Parquet compression codec. Default `"SNAPPY"`.
-#' @param verbose Logical; whether to report progress. Default `TRUE`.
+#' @param verbose Logical; whether to report detailed messages. Default `TRUE`.
+#' @param progress Logical; whether to show a progress bar. Default `TRUE`.
 #'
 #' @return Invisibly returns `TRUE` on success.
 #'
@@ -58,11 +59,13 @@
 #' @importFrom DBI dbConnect dbDisconnect dbExecute dbGetQuery dbQuoteIdentifier dbQuoteString
 #' @importFrom dplyr transmute inner_join filter
 #' @importFrom rlang .data
+#' @importFrom cli cli_progress_bar cli_progress_update cli_progress_done
 #' @export
 harmonize_parquet_schemata <- function(
   root_dir,
   compression = "SNAPPY",
-  verbose = TRUE
+  verbose = TRUE,
+  progress = TRUE
 ) {
   root_dir <- normalizePath(root_dir, mustWork = TRUE)
 
@@ -248,8 +251,22 @@ harmonize_parquet_schemata <- function(
     invisible(TRUE)
   }
 
+  if (progress) {
+    cli::cli_progress_bar(
+      total = length(files),
+      format = "Harmonizing schemas {cli::pb_bar} {cli::pb_current}/{cli::pb_total} [{cli::pb_elapsed}]"
+    )
+  }
+
   for (i in seq_along(files)) {
     harmonize_single(files[i], i, length(files))
+    if (progress) {
+      cli::cli_progress_update()
+    }
+  }
+
+  if (progress) {
+    cli::cli_progress_done()
   }
 
   if (verbose) {

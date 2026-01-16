@@ -9,6 +9,7 @@ pro_request_jsonl_parquet(
   output = NULL,
   overwrite = FALSE,
   verbose = TRUE,
+  progress = TRUE,
   delete_input = FALSE
 )
 }
@@ -23,6 +24,8 @@ directory.}
 
 \item{verbose}{Logical indicating whether to show a verbose information.
 Defaults to \code{TRUE}}
+
+\item{progress}{Logical indicating whether to show a progress bar. Default \code{TRUE}.}
 
 \item{delete_input}{Determines if the \code{input_jsonl} should be deleted
 afterwards. Defaults to \code{FALSE}.}

@@ -10,6 +10,7 @@ pro_request_jsonl(
   add_columns = list(),
   overwrite = FALSE,
   verbose = TRUE,
+  progress = TRUE,
   delete_input = FALSE,
   workers = 1
 )
@@ -27,6 +28,8 @@ nave to be provided as a named list, e./g. \code{list(column_1 = "value_1", colu
 
 \item{verbose}{Logical indicating whether to show a verbose information.
 Defaults to \code{TRUE}}
+
+\item{progress}{Logical indicating whether to show a progress bar. Default \code{TRUE}.}
 
 \item{delete_input}{Determines if the \code{input_json} should be deleted
 afterwards. Defaults to \code{FALSE}.}

@@ -1,6 +1,6 @@
 # openalexPro 0.4.1
 
-* Removed progressr dewpendance
+* Standardised progressbar handling
 * Changed default pages from 1,000 to 10,000
 * Refactored `pro_query` and removed `multiple_ids` argument using Claude and expanded tests and added vignette.
 * Added creation of `00_completed` in output directory of `json`, `jsonl` and `parquet` folders upon successful completion

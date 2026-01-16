@@ -4,7 +4,12 @@
 \alias{harmonize_parquet_schemata}
 \title{Harmonize Parquet Schemas In-Place}
 \usage{
-harmonize_parquet_schemata(root_dir, compression = "SNAPPY", verbose = TRUE)
+harmonize_parquet_schemata(
+  root_dir,
+  compression = "SNAPPY",
+  verbose = TRUE,
+  progress = TRUE
+)
 }
 \arguments{
 \item{root_dir}{Character path to the root directory containing Parquet
@@ -13,7 +18,9 @@ the function always scans recursively.}
 
 \item{compression}{Parquet compression codec. Default `"SNAPPY"`.}
 
-\item{verbose}{Logical; whether to report progress. Default `TRUE`.}
+\item{verbose}{Logical; whether to report detailed messages. Default `TRUE`.}
+
+\item{progress}{Logical; whether to show a progress bar. Default `TRUE`.}
 }
 \value{
 Invisibly returns `TRUE` on success.

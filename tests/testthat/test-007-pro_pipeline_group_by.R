@@ -24,7 +24,8 @@ test_that("pro_request `biodiversity` and group by `type`", {
       pages = 1,
       output = output_json,
       mailto = "test@example.com",
-      verbose = FALSE
+      verbose = FALSE,
+      progress = TRUE
     )
 
   # Check that the output file contains the expected data
@@ -50,7 +51,8 @@ test_that("pro_request_jsonl `biodiversity` and group by type", {
   output_jsonl <- output_json |>
     pro_request_jsonl(
       output = output_jsonl,
-      verbose = FALSE
+      verbose = FALSE,
+      progress = TRUE
     )
 
   # Check that the output file contains the expected data
@@ -67,7 +69,8 @@ test_that("pro_request_jsonl_parquet `biodiversity` and group by type", {
   output_parquet <- output_jsonl |>
     pro_request_jsonl_parquet(
       output = output_parquet,
-      verbose = FALSE
+      verbose = FALSE,
+      progress = TRUE
     )
 
   # Check that the output file exists
