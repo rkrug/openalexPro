@@ -66,53 +66,53 @@ test_that("pro_request_jsonl_parquet search `biodiversity AND finance`", {
   )
 })
 
-test_that("pro_request_jsonl_parquet and openalexR::oa_fetch() return same results", {
-  testthat::skip("Skipping comparison test with openalexR::oa_fetch() for now")
+# test_that("pro_request_jsonl_parquet and openalexR::oa_fetch() return same results", {
+#   testthat::skip("Skipping comparison test with openalexR::oa_fetch() for now")
 
-  # Get search results from openalexR::oa_fetch(output = "tibble") for
-  # comparison
+#   # Get search results from openalexR::oa_fetch(output = "tibble") for
+#   # comparison
 
-  vcr::local_cassette("oa_fetch_biodiversity_AND_finance")
-  results_openalexR <- openalexR::oa_fetch(
-    title_and_abstract.search = "biodiversity AND finance",
-    to_publication_date = "2010-01-01",
-    output = "tibble",
-    verbose = FALSE
-  )
+#   vcr::local_cassette("oa_fetch_biodiversity_AND_finance")
+#   results_openalexR <- openalexR::oa_fetch(
+#     title_and_abstract.search = "biodiversity AND finance",
+#     to_publication_date = "2010-01-01",
+#     output = "tibble",
+#     verbose = FALSE
+#   )
 
-  # Check that the output file contains the expected data structure
-  expect_snapshot({
-    results_openalexPro <- read_corpus(
-      output_parquet,
-      return_data = FALSE
-    )
-    nrow(results_openalexPro)
-    names(results_openalexPro) |>
-      sort()
+#   # Check that the output file contains the expected data structure
+#   expect_snapshot({
+#     results_openalexPro <- read_corpus(
+#       output_parquet,
+#       return_data = FALSE
+#     )
+#     nrow(results_openalexPro)
+#     names(results_openalexPro) |>
+#       sort()
 
-    results_openalexPro <- results_openalexPro |>
-      dplyr::select(id) |>
-      dplyr::collect()
+#     results_openalexPro <- results_openalexPro |>
+#       dplyr::select(id) |>
+#       dplyr::collect()
 
-    setdiff(results_openalexR$id, results_openalexPro$id) |>
-      sort() |>
-      print()
+#     setdiff(results_openalexR$id, results_openalexPro$id) |>
+#       sort() |>
+#       print()
 
-    setdiff(results_openalexPro$id, results_openalexR$id) |>
-      sort() |>
-      print()
+#     setdiff(results_openalexPro$id, results_openalexR$id) |>
+#       sort() |>
+#       print()
 
-    intersect(results_openalexPro$id, results_openalexR$id) |>
-      sort() |>
-      print()
-  })
+#     intersect(results_openalexPro$id, results_openalexR$id) |>
+#       sort() |>
+#       print()
+#   })
 
-  expect_true(
-    setequal(results_openalexR$id, results_openalexPro$id)
-  )
+#   expect_true(
+#     setequal(results_openalexR$id, results_openalexPro$id)
+#   )
 
-  #   # expect_snapshot_file(file.path(output_json, "results_page_1.json"))
-})
+#   #   # expect_snapshot_file(file.path(output_json, "results_page_1.json"))
+# })
 
 unlink(output_json, recursive = TRUE, force = TRUE)
 unlink(output_jsonl, recursive = TRUE, force = TRUE)

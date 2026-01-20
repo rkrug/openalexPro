@@ -10,7 +10,8 @@ pro_request_jsonl_parquet(
   overwrite = FALSE,
   verbose = TRUE,
   progress = TRUE,
-  delete_input = FALSE
+  delete_input = FALSE,
+  sample_size = 1000
 )
 }
 \arguments{
@@ -29,6 +30,11 @@ Defaults to \code{TRUE}}
 
 \item{delete_input}{Determines if the \code{input_jsonl} should be deleted
 afterwards. Defaults to \code{FALSE}.}
+
+\item{sample_size}{Number of records to sample from each file when inferring
+the unified schema. Higher values give more accurate schema inference but
+use more memory. Default is 1000. Set to -1 to read all records (may be slow
+for large files).}
 }
 \value{
 The function does returns the output invisibly.
@@ -52,7 +58,13 @@ When starting the conversion, a file \verb{00_in.progress} which is deleted upon
 
 The function uses DuckDB to read the JSON files and to create the
 Apache Parquet files. The function creates a DuckDB connection in memory
-and readsds the JSON files into DuckDB when needed. Then it creates a SQL
+and reads the JSON files into DuckDB when needed. Then it creates a SQL
 query to convert the JSON files to Apache Parquet files and to copy the
 result to the specified directory.
+
+To ensure consistent schemas across all Parquet files, the function first
+infers a unified schema by sampling records from all JSONL files. This
+prevents type mismatches (e.g., a column being \code{struct} in one file but
+\code{string} in another) that would cause errors when reading the combined
+Parquet dataset.
 }

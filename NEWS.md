@@ -4,8 +4,13 @@
 * Changed default pages from 1,000 to 10,000
 * Refactored `pro_query` and removed `multiple_ids` argument using Claude and expanded tests and added vignette.
 * Added creation of `00_completed` in output directory of `json`, `jsonl` and `parquet` folders upon successful completion
-* Changed api key and email handling. Removed oap_mail()_ and oap_apikey() and simplified handling of api key and email to only use 
+* Changed api key and email handling. Removed oap_mail()_ and oap_apikey() and simplified handling of api key and email to only use
   environmental variables `openalexPro.email` and `openalexPro.apikey`
+* Added unified schema inference to `pro_request_jsonl_parquet()` to prevent schema conflicts when reading
+  combined Parquet datasets. New `sample_size` parameter controls schema inference sampling. This fixes
+  "Unsupported cast from string to struct" errors when fields have different types across JSONL files
+  (e.g., `apc_paid` being `null` in some files and a struct in others).
+* Removed `harmonize_parquet_schemata()` as it is no longer needed with the new unified schema inference.
   
 # openalexPro 0.4.0
 * CI and coverage tweaks for CRAN readiness.

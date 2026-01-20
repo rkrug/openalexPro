@@ -1,5 +1,5 @@
 library(testthat)
-suppressPackageStartupMessages(library(openalexR))
+
 # library(httptest)
 
 # Normal Search `biodiversity AND finance`-------------------------------------
