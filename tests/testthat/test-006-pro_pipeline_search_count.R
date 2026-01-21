@@ -24,7 +24,6 @@ test_that("pro_request search count `biodiversity AND fiance`", {
       output = output_json,
       mailto = "test@example.com",
       verbose = FALSE,
-      progress = FALSE,
       count_only = TRUE
     )
 
@@ -47,7 +46,6 @@ test_that("pro_request search count and openalexR::oa_fetch() return same result
       output = output_json,
       mailto = "test@example.com",
       verbose = FALSE,
-      progress = FALSE,
       count_only = TRUE
     )
   # Get search results from openalexR::oa_fetch(output = "tibble") for

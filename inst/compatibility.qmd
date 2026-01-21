@@ -28,7 +28,7 @@ try(
 ```{r}
 #| label: setup
 
-library(openalexPro2)
+library(openalexPro)
 library(openalexR)
 library(dplyr)
 ```
@@ -66,7 +66,7 @@ if (!file.exists(fn)) {
 fetchR <- readRDS(fn)
 ```
 
-Now we will do the same using the `openalexPro2` pipeline (JSON -> JSONL -> Parquet):
+Now we will do the same using the `openalexPro` pipeline (JSON -> JSONL -> Parquet):
 
 ```{r}
 #| label: openalexPro_fetch
@@ -131,7 +131,7 @@ if (!file.exists(fn)) {
 snowballR <- readRDS(fn)
 ```
 
-Now we will do the same using `openalexPro2::pro_snowball()`.
+Now we will do the same using `openalexSnowball::pro_snowball()`.
 
 ```{r}
 #| label: openalexPro_pro_snowball
@@ -139,7 +139,7 @@ Now we will do the same using `openalexPro2::pro_snowball()`.
 snowballPro <- file.path("openalexPro", "data", "snowballPro")
 
 if (!dir.exists(snowballPro)) {
-  snowballPro <- pro_snowball(
+  snowballPro <- openalexSnowball::pro_snowball(
     identifier = params$identifier,
     output = snowballPro,
     verbose = params$verbose
@@ -152,7 +152,7 @@ if (!dir.exists(snowballPro)) {
 
 ### Works retrieved (`id`s)
 
-Works retrieved using `openalexR::oa_fetch()` and not in the `openalexPro2` result:
+Works retrieved using `openalexR::oa_fetch()` and not in the `openalexPro` result:
 
 ```{r}
 setdiff(
@@ -164,7 +164,7 @@ setdiff(
 )
 ```
 
-Works retrieved using the `openalexPro2` pipeline and not in `openalexR::oa_fetch()`:
+Works retrieved using the `openalexPro` pipeline and not in `openalexR::oa_fetch()`:
 
 ```{r}
 setdiff(
@@ -218,13 +218,13 @@ setdiff(
 
 First we check if the same papers are retrieved:.
 
-The following works are in `openalexR::oa_snowball()` but not in `openalexPro2::pro_snowball()`:
+The following works are in `openalexR::oa_snowball()` but not in `openalexSnowball::pro_snowball()`:
 
 ```{r}
 
 setdiff(
   snowballR$nodes$id,
-  read_snowball(snowballPro, return_data = FALSE)$nodes |>
+  openalexSnowball::read_snowball(snowballPro, return_data = FALSE)$nodes |>
     dplyr::select(id) |>
     dplyr::mutate(
       id = paste0("https://openalex.org/", id)
@@ -234,11 +234,11 @@ setdiff(
 )
 ```
 
-The following works are in `openalexR::oa_snowball()` but not in `openalexPro2::pro_snowball()`:
+The following works are in `openalexR::oa_snowball()` but not in `openalexSnowball::pro_snowball()`:
 
 ```{r}
 setdiff(
-  read_snowball(snowballPro, return_data = FALSE)$nodes |>
+  openalexSnowball::read_snowball(snowballPro, return_data = FALSE)$nodes |>
     dplyr::select(id) |>
     dplyr::mutate(
       id = paste0("https://openalex.org/", id)
@@ -256,7 +256,7 @@ Both should be empty!
 
 #### Edges Identified
 
-The following edges are in `openalexR::oa_snowball()` but not in `openalexPro2::pro_snowball()`:
+The following edges are in `openalexR::oa_snowball()` but not in `openalexSnowball::pro_snowball()`:
 
 ```{r}
 setdiff(
@@ -265,7 +265,7 @@ setdiff(
     from, 
     to
   ),
-  read_snowball(snowballPro, return_data = FALSE)$edges |>
+  openalexSnowball::read_snowball(snowballPro, return_data = FALSE)$edges |>
     dplyr::filter(edge_type == "core") |>
     dplyr::select(
       from,
@@ -283,11 +283,11 @@ setdiff(
 )
 ```
   
-The following works are in `openalexR::oa_snowball()` but not in `openalexPro2::pro_snowball()`:
+The following works are in `openalexR::oa_snowball()` but not in `openalexSnowball::pro_snowball()`:
 
 ```{r}
 setdiff(
-  read_snowball(snowballPro, return_data = FALSE)$edges |>
+  openalexSnowball::read_snowball(snowballPro, return_data = FALSE)$edges |>
     dplyr::filter(edge_type == "core") |>
     dplyr::select(
       from,

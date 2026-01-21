@@ -1,7 +1,6 @@
 # pro_request_jsonl_parquet single identifier
 
     Code
-      x <- read_corpus(output_parquet, return_data = FALSE)
       nrow(x)
     Output
       [1] 1

@@ -2,6 +2,12 @@
 
 #' @keywords internal
 #' @noRd
+.is_empty <- function(x) {
+  is.null(x) || !length(x)
+}
+
+#' @keywords internal
+#' @noRd
 .oa_collapse <- function(x) {
   if (is.null(x)) {
     return(character(0))
@@ -19,12 +25,13 @@
 #' @keywords internal
 #' @noRd
 .oa_build_filter <- function(fl) {
-  if (is.null(fl) || !length(fl)) {
+  if (.is_empty(fl)) {
     return(NULL)
   }
+
   # drop empty/all-NA entries
   fl <- Filter(function(v) !(length(v) == 0 || all(is.na(v))), fl)
-  if (!length(fl)) {
+  if (.is_empty(fl)) {
     return(NULL)
   }
 
@@ -32,7 +39,7 @@
     Map(
       function(k, v) {
         vv <- .oa_collapse(v)
-        if (!length(vv)) {
+        if (.is_empty(vv)) {
           return(character(0))
         }
         paste0(k, ":", vv)
@@ -46,25 +53,12 @@
   if (length(parts)) paste(parts, collapse = ",") else NULL
 }
 
-#' @keywords internal
-#' @noRd
-.oa_build_select <- function(select) {
-  if (is.null(select) || !length(select)) {
-    return(NULL)
-  }
-  paste(select, collapse = ",")
-}
-
-#' @keywords internal
-#' @noRd
-`%||%` <- function(a, b) if (is.null(a)) b else a
-
 # validation --------------------------------------------------------------
 
 #' @keywords internal
 #' @noRd
 .fuzzy_suggest <- function(bad, allowed, max_dist = 3L) {
-  if (is.null(allowed) || !length(allowed) || !length(bad)) {
+  if (.is_empty(allowed) || .is_empty(bad)) {
     return(rep(NA_character_, length(bad)))
   }
   vapply(
@@ -84,22 +78,13 @@
 
 #' @keywords internal
 #' @noRd
-.validate_select <- function(select) {
-  allowed <- opt_select_fields()
-  if (
-    is.null(allowed) || !length(allowed) || is.null(select) || !length(select)
-  ) {
-    return(invisible(TRUE))
-  }
-  bad <- setdiff(select, allowed)
-  if (!length(bad)) {
-    return(invisible(TRUE))
-  }
-
+.build_validation_error <- function(bad, allowed, field_type, helper_fn_name) {
   sug <- .fuzzy_suggest(bad, allowed)
   have <- !is.na(sug)
-  msg <- paste0(
-    "Invalid select field(s): ",
+  paste0(
+    "Invalid ",
+    field_type,
+    ": ",
     paste(bad, collapse = ", "),
     ".",
     if (any(have)) {
@@ -111,7 +96,32 @@
     } else {
       ""
     },
-    "\nValid select fields are defined in `opt_select_fields()`."
+    "\nValid ",
+    field_type,
+    " are defined in `",
+    helper_fn_name,
+    "`."
+  )
+}
+
+#' @keywords internal
+#' @noRd
+.validate_select <- function(select) {
+  allowed <- opt_select_fields()
+  if (.is_empty(allowed) || .is_empty(select)) {
+    return(invisible(TRUE))
+  }
+
+  bad <- setdiff(select, allowed)
+  if (.is_empty(bad)) {
+    return(invisible(TRUE))
+  }
+
+  msg <- .build_validation_error(
+    bad,
+    allowed,
+    "select field(s)",
+    "opt_select_fields()"
   )
   stop(msg, call. = FALSE)
 }
@@ -119,35 +129,25 @@
 #' @keywords internal
 #' @noRd
 .validate_filter <- function(fl) {
-  if (is.null(fl) || !length(fl)) {
+  if (.is_empty(fl)) {
     return(invisible(TRUE))
   }
+
   allowed <- opt_filter_names()
-  if (is.null(allowed) || !length(allowed)) {
+  if (.is_empty(allowed)) {
     return(invisible(TRUE))
   }
 
   bad <- setdiff(names(fl), allowed)
-  if (!length(bad)) {
+  if (.is_empty(bad)) {
     return(invisible(TRUE))
   }
 
-  sug <- .fuzzy_suggest(bad, allowed)
-  have <- !is.na(sug)
-  msg <- paste0(
-    "Invalid filter name(s): ",
-    paste(bad, collapse = ", "),
-    ".",
-    if (any(have)) {
-      paste0(
-        "\nDid you mean: ",
-        paste(paste0(bad[have], " \u2192 ", sug[have]), collapse = ", "),
-        "?"
-      )
-    } else {
-      ""
-    },
-    "\nValid filter names are defined in `opt_filter_names()`."
+  msg <- .build_validation_error(
+    bad,
+    allowed,
+    "filter name(s)",
+    "opt_filter_names()"
   )
   stop(msg, call. = FALSE)
 }
@@ -168,18 +168,15 @@
 #'
 #' @param entity Character; one of \code{"works"}, \code{"authors"}, \code{"venues"},
 #'   \code{"institutions"}, \code{"concepts"}, \code{"publishers"}, \code{"funders"}.
-#' @param id Optional single ID (e.g., \code{"W1775749144"}) to fetch one entity.
-#' @param multiple_id Logical; if \code{TRUE} and \code{id} is a vector, the IDs are
-#'   moved into the \code{ids.openalex} filter and \code{id} is cleared.
+#' @param id Optional ID or vector of IDs (e.g., \code{"W1775749144"}). If a single ID
+#'   is provided, fetches one entity directly. If multiple IDs are provided, they are
+#'   automatically moved into the \code{ids.openalex} filter.
 #' @param search Optional full-text search string.
 #' @param group_by Optional field to group by (facets), e.g. \code{"type"}.
 #' @param select Optional character vector of fields to return.
 #' @param options Optional named list of additional query parameters (e.g.,
 #'   \code{list(per_page = 200, sort = "cited_by_count:desc", cursor = "*", sample = 100)}).
 #' @param endpoint Base API URL. Defaults to \code{"https://api.openalex.org"}.
-#' @param mailto Optional email to join the polite pool; added as a query parameter and
-#'   appended to the \code{User-Agent}.
-#' @param user_agent Optional custom \code{User-Agent}.
 #' @param   chunk_limit Number of DOIS or ids per chunk if chunked. Default: 50
 #' @param ... Filters as named arguments. Values may be scalars or vectors (vectors
 #'   are collapsed with \code{"|"} to express OR).
@@ -216,18 +213,15 @@ pro_query <- function(
     "funders"
   ),
   id = NULL,
-  multiple_id = FALSE,
   search = NULL,
   group_by = NULL,
   select = NULL,
   options = NULL,
   endpoint = "https://api.openalex.org",
-  mailto = NULL,
-  user_agent = NULL,
   chunk_limit = 50L,
   ...
 ) {
-  entities <- c(
+  VALID_ENTITIES <- c(
     "works",
     "authors",
     "venues",
@@ -236,13 +230,13 @@ pro_query <- function(
     "publishers",
     "funders"
   )
-  entity <- match.arg(tolower(entity), entities)
+  entity <- match.arg(tolower(entity), VALID_ENTITIES)
 
   # gather filters via ...
   filter <- list(...)
 
-  # move vector IDs into filter if requested
-  if (!is.null(id) && multiple_id) {
+  # move multiple IDs into filter automatically
+  if (length(id) > 1) {
     filter <- c(filter, list(`ids.openalex` = unique(id)))
     id <- NULL
   }
@@ -252,6 +246,8 @@ pro_query <- function(
   .validate_select(select)
 
   # prepare chunking ------------------------------------------------------
+  # Split filters with large value lists (e.g., DOIs, IDs) into multiple requests
+  # to avoid exceeding API limits
 
   chunk_targets <- c(
     "openalex",
@@ -263,38 +259,37 @@ pro_query <- function(
 
   filter_batches <- list(filter)
   if (length(filter)) {
-    filter_batches <- list(filter)
     for (key in intersect(names(filter), chunk_targets)) {
-      next_batches <- list()
-      for (current in filter_batches) {
-        values <- current[[key]]
+      new_batches <- list()
+      for (current_filter in filter_batches) {
+        values <- current_filter[[key]]
         values <- values[!is.na(values)]
         if (length(values) > chunk_limit) {
           splits <- split(
             values,
             ceiling(seq_along(values) / chunk_limit)
           )
-          next_batches <- c(
-            next_batches,
+          new_batches <- c(
+            new_batches,
             lapply(splits, function(chunk) {
-              current[[key]] <- chunk
-              current
+              current_filter[[key]] <- chunk
+              current_filter
             })
           )
         } else {
-          next_batches <- c(next_batches, list(current))
+          new_batches <- c(new_batches, list(current_filter))
         }
       }
-      filter_batches <- next_batches
+      filter_batches <- new_batches
     }
   }
 
-  if (!length(filter_batches)) {
+  if (.is_empty(filter_batches)) {
     filter_batches <- list(filter)
   }
 
   # build strings
-  select_str <- .oa_build_select(select)
+  select_str <- if (!.is_empty(select)) paste(select, collapse = ",") else NULL
 
   # base request + path
   req_base <- httr2::request(endpoint)

@@ -6,11 +6,11 @@
 \usage{
 pro_request(
   query_url,
-  pages = 1000,
+  pages = 1e+05,
   output = NULL,
   overwrite = FALSE,
-  mailto = oap_mail(),
-  api_key = oap_apikey,
+  mailto = Sys.getenv("openalexPro.email"),
+  api_key = Sys.getenv("openalexPro.apikey"),
   workers = 1,
   verbose = FALSE,
   progress = TRUE,
@@ -22,9 +22,9 @@ pro_request(
 \item{query_url}{The URL of the API query or a list of URLs returned from \code{pro_query()}.}
 
 \item{pages}{The number of pages to be downloaded. The default is set to
-1000, which would be 2,000,000 works. It is recommended to not increase it
-beyond 1000 due to server load and to use the snapshot instead. If \code{NULL},
-all pages will be downloaded. Default: 1000.}
+10000, which would be 2,000,000 works. It is recommended to not increase it
+beyond 100000 due to server load and to use the snapshot instead. If \code{NULL},
+all pages will be downloaded. Default: 100000.}
 
 \item{output}{directory where the JSON files are saved. Default is a
 temporary directory. If \code{NULL}, the return value from call to
@@ -33,16 +33,15 @@ temporary directory. If \code{NULL}, the return value from call to
 \item{overwrite}{Logical. If \code{TRUE}, \code{output} will be deleted if it already
 exists.}
 
-\item{mailto}{The email address of the user. See \code{oap_mail()}.}
+\item{mailto}{The email address of the user.}
 
-\item{api_key}{The API key of the user. See \code{oap_apikey()}.}
+\item{api_key}{The API key of the user.}
 
 \item{workers}{Number of parallel workers to use if \code{query_url} is a list. Defaults to 1.}
 
 \item{verbose}{Logical indicating whether to show verbose messages.}
 
-\item{progress}{Logical default \code{TRUE} indicating whether to show a progress
-bar.}
+\item{progress}{Logical indicating whether to show a progress bar. Default \code{TRUE}.}
 
 \item{count_only}{return count only as a named numeric vector or list.}
 
@@ -56,7 +55,7 @@ of the works from the specified query_url(s).
 \description{
 This function adds one argument to \code{openalexR::oa_request()}, namely
 \code{output}. When specified, all return values from OpenAlex will be saved as
-jaon files in that directory and the return value is the directory of the
+json files in that directory and the return value is the directory of the
 json files.
 }
 \details{
@@ -65,4 +64,6 @@ If query_url is a list, the function is called for each element of the list in p
 using a maximum of \code{workers} parallel R sessions. The results from the individual URLs
 in the list are returned in a folder named after the names of the list elements in the
 \code{output} folder.
+
+When starting the download, a file \verb{00_in.progress} which is deleted upon completion.
 }

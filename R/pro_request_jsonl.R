@@ -15,6 +15,7 @@
 #'   2. the page othe json file represents is `2`
 #'   3. The resulting cvalus for `page` will be `Chunk_1_2`
 #'
+#' When starting the conversion, a file `00_in.progress` which is deleted upon completion.
 #'
 #' @param input_json The directory of JSON files returned from `pro_request(...,
 #'   json_dir = "FOLDER")`.
@@ -26,8 +27,10 @@
 #' @param overwrite Logical indicating whether to overwrite `output`.
 #' @param verbose Logical indicating whether to show a verbose information.
 #'   Defaults to `TRUE`
+#' @param progress Logical indicating whether to show a progress bar. Default `TRUE`.
 #' @param delete_input Determines if the `input_json` should be deleted
 #'   afterwards. Defaults to `FALSE`.
+#' @param workers Number of parallel workers to use. Defaults to 1.
 #'
 #' @return The function does returns the output invisibly.
 #'
@@ -39,6 +42,9 @@
 #'
 #' @importFrom duckdb duckdb
 #' @importFrom DBI dbConnect dbDisconnect dbExecute
+#' @importFrom future.apply future_lapply
+#' @importFrom cli cli_progress_bar cli_progress_update cli_progress_done cli_alert_info
+#' @importFrom progressr with_progress progressor handlers
 #'
 #' @md
 #'
@@ -58,7 +64,9 @@ pro_request_jsonl <- function(
   add_columns = list(),
   overwrite = FALSE,
   verbose = TRUE,
-  delete_input = FALSE
+  progress = TRUE,
+  delete_input = FALSE,
+  workers = 1
 ) {
   # Argument checks --------------------------------------------------------
 
@@ -93,6 +101,17 @@ pro_request_jsonl <- function(
     }
   }
   dir.create(output, recursive = TRUE)
+  progress_file <- file.path(output, "00_in.progress")
+  file.create(progress_file)
+  success <- FALSE
+  on.exit(
+    {
+      if (isTRUE(success)) {
+        unlink(progress_file)
+      }
+    },
+    add = TRUE
+  )
 
   ## Read names of json files
   jsons <- list.files(
@@ -116,6 +135,10 @@ pro_request_jsonl <- function(
     )
   ]
 
+  if (length(jsons) == 0) {
+    stop("No JSON files found in `input_json`!")
+  }
+
   types <- jsons |>
     basename() |>
     strsplit(split = "_") |>
@@ -137,51 +160,78 @@ pro_request_jsonl <- function(
   # Go through all jsons, i.e. one per page --------------------------------
   ### Names: results_page_x.json
 
-  for (i in seq_along(jsons)) {
-    fn <- jsons[i]
-    if (verbose) {
-      message("Preparing ", i, " of ", length(jsons), " : ", fn)
-    }
-
-    ## Extract page number into pn
-    pn <- basename(fn) |>
-      strsplit(split = "_")
-    pn <- pn[[1]]
-
-    # pn <- pn[[1]][length(pn[[1]])] |>
-    pn <- pn[length(pn)] |>
-      gsub(pattern = ".json", replacement = "")
-
-    if (has_subdirs) {
-      jsonl <- file.path(output, basename(dirname(fn)), basename(fn))
-      pn <- basename(dirname(fn))
-    } else {
-      jsonl <- file.path(output, basename(fn))
-      pn = pn
-    }
-    dir.create(dirname(jsonl), recursive = TRUE, showWarnings = FALSE)
-
-    try(
-      {
-        ## do the following in the json:"
-        ## - Convert `inverted_abstract_index` to `abstract`
-        ## - remove `inverted_abstract_index`
-        ## - add `page` = pn
-        jq_execute(
-          input_json = fn,
-          output_jsonl = jsonl,
-          add_columns = add_columns,
-          jq_filter = NULL,
-          page = pn,
-          type = types
-        )
-        if (file.size(jsonl) < 5) {
-          unlink(jsonl)
-        }
-      },
-      silent = !verbose
+  old_plan <- future::plan()
+  on.exit(future::plan(old_plan), add = TRUE)
+  if (workers > 1) {
+    future::plan(
+      future::multisession,
+      workers = workers
+    )
+  } else {
+    future::plan(
+      future::sequential
     )
   }
+
+  # Setup progress bar
+  if (progress) {
+    cli::cli_alert_info("Converting {length(jsons)} JSON files to JSONL")
+    progressr::handlers("cli")
+  }
+
+  progressr::with_progress({
+    p <- if (progress) progressr::progressor(steps = length(jsons)) else NULL
+
+    future.apply::future_lapply(seq_along(jsons), function(i) {
+      fn <- jsons[i]
+      if (verbose) {
+        message("Preparing ", i, " of ", length(jsons), " : ", fn)
+      }
+
+      ## Extract page number into pn
+      pn <- basename(fn) |>
+        strsplit(split = "_")
+      pn <- pn[[1]]
+
+      pn <- pn[length(pn)] |>
+        gsub(pattern = ".json", replacement = "")
+
+      if (has_subdirs) {
+        jsonl <- file.path(output, basename(dirname(fn)), basename(fn))
+        pn <- basename(dirname(fn))
+      } else {
+        jsonl <- file.path(output, basename(fn))
+        pn <- pn
+      }
+      dir.create(dirname(jsonl), recursive = TRUE, showWarnings = FALSE)
+
+      try(
+        {
+          ## do the following in the json:"
+          ## - Convert `inverted_abstract_index` to `abstract`
+          ## - remove `inverted_abstract_index`
+          ## - add `page` = pn
+          jq_execute(
+            input_json = fn,
+            output_jsonl = jsonl,
+            add_columns = add_columns,
+            jq_filter = NULL,
+            page = pn,
+            type = types
+          )
+          if (file.size(jsonl) < 5) {
+            unlink(jsonl)
+          }
+        },
+        silent = !verbose
+      )
+
+      # Update progress
+      if (!is.null(p)) p()
+
+      invisible(NULL)
+    })
+  }, enable = progress)
 
   if (verbose) {
     message("Done")
@@ -190,6 +240,8 @@ pro_request_jsonl <- function(
   if (delete_input) {
     unlink(input_json, recursive = TRUE, force = TRUE)
   }
+
+  success <- TRUE
 
   return(invisible(normalizePath(output)))
 }

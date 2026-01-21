@@ -28,13 +28,6 @@
       [1] "results_page_1.json" "results_page_2.json" "results_page_1.json"
       [4] "results_page_2.json" "results_page_1.json" "results_page_2.json"
       [7] "results_page_1.json" "results_page_2.json"
-    Code
-      as.vector(tools::md5sum(fns))
-    Output
-      [1] "bbc3769fdfa764e82195af1d51b76d44" "b749026ad415a43a2c65b7ed8c385ea9"
-      [3] "3413151208c51578004e8f2fd98bc3e1" "68f1d1244df3d5873265c3bcc6e1a26e"
-      [5] "68743054ff1907c4377eb14a217deb25" "77f5e88e9f2260abfb919eb83370d4fa"
-      [7] "23e508d89f1b2601287fcbbe7d654db8" "772ec0fea46d4366a1ffbb69dd3e5806"
 
 # pro_request_jsonl with subfolders
 
@@ -43,11 +36,6 @@
     Output
       [1] "results_page_1.json" "results_page_1.json" "results_page_1.json"
       [4] "results_page_1.json"
-    Code
-      as.vector(tools::md5sum(fns))
-    Output
-      [1] "986a593874eda35d584d7ca6cdeb5dec" "cd4d002b7a1768e6bc96e243154a8964"
-      [3] "fc557dd43e49202011bf9a8dce3e1c67" "ed491a130855098745e57f83f6cb5fb8"
 
 # pro_request_jsonl_parquet with subfolders
 
@@ -56,11 +44,6 @@
     Output
       [1] "results_page_1.json" "results_page_1.json" "results_page_1.json"
       [4] "results_page_1.json"
-    Code
-      as.vector(tools::md5sum(fns))
-    Output
-      [1] "986a593874eda35d584d7ca6cdeb5dec" "cd4d002b7a1768e6bc96e243154a8964"
-      [3] "fc557dd43e49202011bf9a8dce3e1c67" "ed491a130855098745e57f83f6cb5fb8"
     Code
       p <- arrow::open_dataset(output_parquet)
       p

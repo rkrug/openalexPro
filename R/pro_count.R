@@ -7,9 +7,9 @@
 #' @param query_url Character string containing the fully constructed OpenAlex
 #'   PRO endpoint URL.
 #' @param mailto Character string used for the API `mailto` query parameter and
-#'   the request `User-Agent`. Defaults to the configured `oap_mail()`.
+#'   the request `User-Agent`. Defaults to the configured `Sys.getenv("openalexPro.email")`.
 #' @param api_key Either a character string API key or a function returning one.
-#'   Defaults to `oap_apikey()`, and gracefully handles `NULL` or lazy evaluation.
+#'   Defaults to `Sys.getenv("openalexPro.apikey")`, and gracefully handles `NULL` or lazy evaluation.
 #' @param error_log location of error log of API calls. (default: `NULL` (none)).
 #'
 #' @return A data.frame containing `count`, `db_response_time_ms`,
@@ -26,22 +26,23 @@
 #' }
 pro_count <- function(
   query_url,
-  mailto = oap_mail(),
-  api_key = oap_apikey(),
+  mailto = Sys.getenv("openalexPro.email"),
+  api_key = Sys.getenv("openalexPro.apikey"),
   error_log = NULL
 ) {
-  if (is.function(api_key)) {
-    api_key <- api_key()
-  }
-  if (is.null(api_key)) {
-    api_key <- ""
-  }
+  # if (is.function(api_key)) {
+  #   api_key <- api_key()
+  # }
+  # if (is.null(api_key)) {
+  #   api_key <- ""
+  # }
 
   req <- httr2::request(query_url) |>
     httr2::req_url_query(
       per_page = 1,
       select = "ids",
       page = 1,
+      mailto = mailto,
       api_key = api_key
     ) |>
     httr2::req_user_agent(paste(

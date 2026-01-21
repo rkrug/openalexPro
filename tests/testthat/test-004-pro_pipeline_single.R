@@ -23,28 +23,31 @@ test_that("pro_request single identifier", {
       output = output_json,
       mailto = "test@example.com",
       verbose = FALSE,
-      progress = FALSE
+      progress = TRUE
     )
 
-  # Check that the output file contains the expected data
+  # Check that the output file contains the expected data (platform-agnostic)
   expect_snapshot_file(
     file.path(output_json, "single_1.json"),
-    name = "json"
+    name = "json",
+    compare = compare_json
   )
 })
 
 test_that("pro_request_jsonl single identifier", {
-  # Convert to parquet
+  # Convert to jsonl
   output_jsonl <- output_json |>
     pro_request_jsonl(
       output = output_jsonl,
-      verbose = FALSE
+      verbose = FALSE,
+      progress = TRUE
     )
 
-  # Check that the output file contains the expected data
+  # Check that the output file contains the expected data (platform-agnostic)
   expect_snapshot_file(
     file.path(output_jsonl, "single_1.json"),
-    name = "jsonl"
+    name = "jsonl",
+    compare = compare_jsonl
   )
 })
 
@@ -53,7 +56,8 @@ test_that("pro_request_jsonl_parquet single identifier", {
   output_parquet <- output_jsonl |>
     pro_request_jsonl_parquet(
       output = output_parquet,
-      verbose = FALSE
+      verbose = FALSE,
+      progress = TRUE
     )
 
   # Check that the output file exists
@@ -62,14 +66,13 @@ test_that("pro_request_jsonl_parquet single identifier", {
   )
 
   # Check that the output file contains the expected data structure
+  x <- read_corpus(
+    output_parquet,
+    return_data = FALSE
+  )
   expect_snapshot({
-    x <- read_corpus(
-      output_parquet,
-      return_data = FALSE
-    )
     nrow(x)
-    names(x) |>
-      sort()
+    sort(names(x))
   })
 
   # Check that the output file contains the expected data

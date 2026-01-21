@@ -10,7 +10,9 @@ pro_request_jsonl(
   add_columns = list(),
   overwrite = FALSE,
   verbose = TRUE,
-  delete_input = FALSE
+  progress = TRUE,
+  delete_input = FALSE,
+  workers = 1
 )
 }
 \arguments{
@@ -27,8 +29,12 @@ nave to be provided as a named list, e./g. \code{list(column_1 = "value_1", colu
 \item{verbose}{Logical indicating whether to show a verbose information.
 Defaults to \code{TRUE}}
 
+\item{progress}{Logical indicating whether to show a progress bar. Default \code{TRUE}.}
+
 \item{delete_input}{Determines if the \code{input_json} should be deleted
 afterwards. Defaults to \code{FALSE}.}
+
+\item{workers}{Number of parallel workers to use. Defaults to 1.}
 }
 \value{
 The function does returns the output invisibly.
@@ -51,6 +57,8 @@ As an example:
 \item the page othe json file represents is \code{2}
 \item The resulting cvalus for \code{page} will be \code{Chunk_1_2}
 }
+
+When starting the conversion, a file \verb{00_in.progress} which is deleted upon completion.
 
 The function uses DuckDB to read the JSON files and to create the
 Apache Parquet files. The function creates a DuckDB connection in memory

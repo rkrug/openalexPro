@@ -6,11 +6,11 @@
 \usage{
 pro_fetch(
   query_url,
-  pages = 1000,
-  output = NULL,
+  pages = 10000,
+  project_folder = NULL,
   overwrite = FALSE,
-  mailto = oap_mail(),
-  api_key = oap_apikey,
+  mailto = Sys.getenv("openalexPro.email"),
+  api_key = Sys.getenv("openalexPro.apikey"),
   workers = 1,
   verbose = FALSE,
   progress = TRUE,
@@ -22,11 +22,11 @@ pro_fetch(
 \item{query_url}{The URL of the API query or a list of URLs returned from \code{pro_query()}.}
 
 \item{pages}{The number of pages to be downloaded. The default is set to
-1000, which would be 2,000,000 works. It is recommended to not increase it
-beyond 1000 due to server load and to use the snapshot instead. If \code{NULL},
-all pages will be downloaded. Default: 1000.}
+10000, which would be 2,000,000 works. It is recommended to not increase it
+beyond 100000 due to server load and to use the snapshot instead. If \code{NULL},
+all pages will be downloaded. Default: 100000.}
 
-\item{output}{Directory where all intermediate (\code{json},
+\item{project_folder}{Directory where all intermediate (\code{json},
 \code{jsonl}) and final (\code{parquet}) results are stored.
 If it does not exist, it is created. If \code{NULL}, a temporary
 directory is created.}
@@ -34,16 +34,15 @@ directory is created.}
 \item{overwrite}{Logical. If \code{TRUE}, \code{output} will be deleted if it already
 exists.}
 
-\item{mailto}{The email address of the user. See \code{oap_mail()}.}
+\item{mailto}{The email address of the user.}
 
-\item{api_key}{The API key of the user. See \code{oap_apikey()}.}
+\item{api_key}{The API key of the user.}
 
 \item{workers}{Number of parallel workers to use if \code{query_url} is a list. Defaults to 1.}
 
 \item{verbose}{Logical indicating whether to show verbose messages.}
 
-\item{progress}{Logical default \code{TRUE} indicating whether to show a progress
-bar.}
+\item{progress}{Logical indicating whether to show a progress bar. Default \code{TRUE}.}
 
 \item{count_only}{Do not use it here. The function will abort if it set to
 \code{TRUE} and give a warning if \code{FALSE}}
@@ -52,7 +51,7 @@ bar.}
 }
 \value{
 Invisibly, the normalized path of the \code{parquet} subfolder
-inside \code{output}, i.e. the value returned by
+inside \code{project_folder}, i.e. the value returned by
 \code{pro_request_jsonl_parquet()}.
 }
 \description{
@@ -64,7 +63,7 @@ Convenience wrapper around \code{\link{pro_request}},
 The function
 \itemize{
 \item downloads records from OpenAlex via \code{pro_request()} into a
-\code{"json"} subfolder of \code{output},
+\code{"json"} subfolder of \code{project_folder},
 \item converts the JSON files to \code{jsonl} via
 \code{pro_request_jsonl()} into a \code{"jsonl"} subfolder, and
 \item converts the jsonl files to an Apache Parquet dataset via

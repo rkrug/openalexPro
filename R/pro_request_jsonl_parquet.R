@@ -13,6 +13,7 @@
 #' 2. the page othe json file represents is `2`
 #' 3. The resulting values for `page` will be `Chunk_1_2`
 #'
+#' When starting the conversion, a file `00_in.progress` which is deleted upon completion.
 #'
 #' @param input_jsonl The directory of JSON files returned from
 #'   `pro_request(..., json_dir = "FOLDER")`.
@@ -21,19 +22,31 @@
 #' @param overwrite Logical indicating whether to overwrite `output`.
 #' @param verbose Logical indicating whether to show a verbose information.
 #'   Defaults to `TRUE`
+#' @param progress Logical indicating whether to show a progress bar. Default `TRUE`.
 #' @param delete_input Determines if the `input_jsonl` should be deleted
 #'   afterwards. Defaults to `FALSE`.
+#' @param sample_size Number of records to sample from each file when inferring
+#'   the unified schema. Higher values give more accurate schema inference but
+#'   use more memory. Default is 1000. Set to -1 to read all records (may be slow
+#'   for large files).
 #'
 #' @return The function does returns the output invisibly.
 #'
 #' @details The function uses DuckDB to read the JSON files and to create the
 #'   Apache Parquet files. The function creates a DuckDB connection in memory
-#'   and readsds the JSON files into DuckDB when needed. Then it creates a SQL
+#'   and reads the JSON files into DuckDB when needed. Then it creates a SQL
 #'   query to convert the JSON files to Apache Parquet files and to copy the
 #'   result to the specified directory.
 #'
+#'   To ensure consistent schemas across all Parquet files, the function first
+#'   infers a unified schema by sampling records from all JSONL files. This
+#'   prevents type mismatches (e.g., a column being `struct` in one file but
+#'   `string` in another) that would cause errors when reading the combined
+#'   Parquet dataset.
+#'
 #' @importFrom duckdb duckdb
-#' @importFrom DBI dbConnect dbDisconnect dbExecute
+#' @importFrom DBI dbConnect dbDisconnect dbExecute dbGetQuery
+#' @importFrom cli cli_progress_bar cli_progress_update cli_progress_done cli_alert_info
 #'
 #' @md
 #'
@@ -42,9 +55,12 @@
 pro_request_jsonl_parquet <- function(
   input_jsonl = NULL,
   output = NULL,
+
   overwrite = FALSE,
   verbose = TRUE,
-  delete_input = FALSE
+  progress = TRUE,
+  delete_input = FALSE,
+  sample_size = 1000
 ) {
   # Argument Checks --------------------------------------------------------
 
@@ -87,13 +103,23 @@ pro_request_jsonl_parquet <- function(
         force = TRUE
       )
     }
-  } else {
-    dir.create(
-      output,
-      recursive = TRUE,
-      showWarnings = FALSE
-    )
   }
+  dir.create(
+    output,
+    recursive = TRUE,
+    showWarnings = FALSE
+  )
+  progress_file <- file.path(output, "00_in.progress")
+  file.create(progress_file)
+  success <- FALSE
+  on.exit(
+    {
+      if (isTRUE(success)) {
+        unlink(progress_file)
+      }
+    },
+    add = TRUE
+  )
 
   ## Read names of json files
   jsons <- list.files(
@@ -115,6 +141,10 @@ pro_request_jsonl_parquet <- function(
     )
   ]
 
+  if (length(jsons) == 0) {
+    stop("No JSON files found in `input_jsonl`!")
+  }
+
   types <- jsons |>
     basename() |>
     strsplit(split = "_") |>
@@ -133,10 +163,79 @@ pro_request_jsonl_parquet <- function(
     types <- "group_by"
   }
 
-  if (types == "single") {}
+  # Infer unified schema from all JSONL files ------------------------------
+  if (verbose) {
+    message("Inferring unified schema from all JSONL files...")
+  }
+
+  glob_pattern <- file.path(input_jsonl, "**/*.json")
+
+  # Build sample limit clause
+  sample_clause <- if (sample_size > 0) {
+    sprintf("LIMIT %d", sample_size)
+  } else {
+    ""
+  }
+
+  # Infer unified schema by reading a sample from all files together
+
+  # DuckDB's read_json_auto with union_by_name handles schema unification
+  unified_schema_sql <- sprintf(
+    "
+    DESCRIBE
+    SELECT *
+    FROM read_json_auto('%s', union_by_name = true, sample_size = %d)
+    %s
+    ",
+    glob_pattern,
+    if (sample_size > 0) sample_size else -1,
+    sample_clause
+  )
+
+  unified_schema <- tryCatch(
+    {
+      DBI::dbGetQuery(con, unified_schema_sql)
+    },
+    error = function(e) {
+      if (verbose) {
+        message("Could not infer unified schema, falling back to per-file inference: ", e$message)
+      }
+      NULL
+    }
+  )
+
+  # Build column definitions for read_json if we have a unified schema
+  columns_clause <- NULL
+  if (!is.null(unified_schema) && nrow(unified_schema) > 0) {
+    # Get column names - DuckDB may use different field names
+    name_col <- if ("column_name" %in% names(unified_schema)) "column_name" else "name"
+    type_col <- if ("column_type" %in% names(unified_schema)) "column_type" else "type"
+
+    col_defs <- mapply(
+      function(nm, tp) sprintf("'%s': '%s'", nm, tp),
+      unified_schema[[name_col]],
+      unified_schema[[type_col]],
+      SIMPLIFY = TRUE,
+      USE.NAMES = FALSE
+    )
+    columns_clause <- paste0("{", paste(col_defs, collapse = ", "), "}")
+
+    if (verbose) {
+      message("Unified schema inferred with ", nrow(unified_schema), " columns")
+    }
+  }
 
   # Go through all jsons, i.e. one per page --------------------------------
   ### Names: results_page_x.json
+
+  # Setup progress bar (sequential loop uses cli directly)
+  if (progress) {
+    cli::cli_progress_bar(
+      total = length(jsons),
+      format = "Converting to Parquet {cli::pb_bar} {cli::pb_current}/{cli::pb_total} [{cli::pb_elapsed}]"
+    )
+  }
+
   for (i in seq_along(jsons)) {
     fn <- jsons[i]
     if (verbose) {
@@ -145,33 +244,62 @@ pro_request_jsonl_parquet <- function(
 
     try(
       {
-        ## save as page partitioned parquet
-        sprintf(
-          "
-              COPY (
-                SELECT
-                  *
-                FROM 
-                  read_json_auto( '%s' )
-              ) TO
-                '%s'
-              (FORMAT PARQUET, COMPRESSION SNAPPY, PARTITION_BY 'page', APPEND)
-          ",
-          fn,
-          output
-        ) |>
-          DBI::dbExecute(conn = con)
+        # Use read_json with explicit columns if we have a unified schema,
+        # otherwise fall back to read_json_auto
+        if (!is.null(columns_clause)) {
+          sql <- sprintf(
+            "
+                COPY (
+                  SELECT
+                    *
+                  FROM
+                    read_json('%s', columns = %s, auto_detect = true)
+                ) TO
+                  '%s'
+                (FORMAT PARQUET, COMPRESSION SNAPPY, PARTITION_BY 'page', APPEND)
+            ",
+            fn,
+            columns_clause,
+            output
+          )
+        } else {
+          sql <- sprintf(
+            "
+                COPY (
+                  SELECT
+                    *
+                  FROM
+                    read_json_auto('%s')
+                ) TO
+                  '%s'
+                (FORMAT PARQUET, COMPRESSION SNAPPY, PARTITION_BY 'page', APPEND)
+            ",
+            fn,
+            output
+          )
+        }
+        DBI::dbExecute(conn = con, sql)
         if (verbose) {
           message("   Done")
         }
       },
       silent = !verbose
     )
+
+    if (progress) {
+      cli::cli_progress_update()
+    }
+  }
+
+  if (progress) {
+    cli::cli_progress_done()
   }
 
   if (delete_input) {
     unlink(input_jsonl, recursive = TRUE, force = TRUE)
   }
+
+  success <- TRUE
 
   return(invisible(normalizePath(output)))
 }

@@ -8,14 +8,11 @@ pro_query(
   entity = c("works", "authors", "venues", "institutions", "concepts", "publishers",
     "funders"),
   id = NULL,
-  multiple_id = FALSE,
   search = NULL,
   group_by = NULL,
   select = NULL,
   options = NULL,
   endpoint = "https://api.openalex.org",
-  mailto = NULL,
-  user_agent = NULL,
   chunk_limit = 50L,
   ...
 )
@@ -24,10 +21,9 @@ pro_query(
 \item{entity}{Character; one of \code{"works"}, \code{"authors"}, \code{"venues"},
 \code{"institutions"}, \code{"concepts"}, \code{"publishers"}, \code{"funders"}.}
 
-\item{id}{Optional single ID (e.g., \code{"W1775749144"}) to fetch one entity.}
-
-\item{multiple_id}{Logical; if \code{TRUE} and \code{id} is a vector, the IDs are
-moved into the \code{ids.openalex} filter and \code{id} is cleared.}
+\item{id}{Optional ID or vector of IDs (e.g., \code{"W1775749144"}). If a single ID
+is provided, fetches one entity directly. If multiple IDs are provided, they are
+automatically moved into the \code{ids.openalex} filter.}
 
 \item{search}{Optional full-text search string.}
 
@@ -39,11 +35,6 @@ moved into the \code{ids.openalex} filter and \code{id} is cleared.}
 \code{list(per_page = 200, sort = "cited_by_count:desc", cursor = "*", sample = 100)}).}
 
 \item{endpoint}{Base API URL. Defaults to \code{"https://api.openalex.org"}.}
-
-\item{mailto}{Optional email to join the polite pool; added as a query parameter and
-appended to the \code{User-Agent}.}
-
-\item{user_agent}{Optional custom \code{User-Agent}.}
 
 \item{chunk_limit}{Number of DOIS or ids per chunk if chunked. Default: 50}
 

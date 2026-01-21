@@ -1,10 +1,10 @@
 library(testthat)
-suppressPackageStartupMessages(library(openalexR))
+
 # library(httptest)
 
 # Normal Search `biodiversity AND finance`-------------------------------------
 
-output_dir <- file.path(tempdir(), "output")
+output_dir <- file.path(tempdir(), "project_folder")
 # output_dir = "~/Documents/GitHub/openalexPro/search"
 
 unlink(output_dir, recursive = TRUE, force = TRUE)
@@ -19,22 +19,24 @@ test_that("pro_fetch search `biodiversity AND fiance`", {
   ) |>
     pro_fetch(
       pages = 1,
-      output = output_dir,
+      project_folder = output_dir,
       mailto = "test@example.com",
       verbose = FALSE,
-      progress = FALSE
+      progress = TRUE
     )
 
-  # Check that the output file contains the expected data
+  # Check that the output file contains the expected data (platform-agnostic)
   expect_snapshot_file(
     path = file.path(output_dir, "json", "results_page_1.json"),
-    name = "json"
+    name = "json",
+    compare = compare_json
   )
 
-  # Check that the output file contains the expected data
+  # Check that the output file contains the expected data (platform-agnostic)
   expect_snapshot_file(
     file.path(output_dir, "jsonl", "results_page_1.json"),
-    name = "jsonl"
+    name = "jsonl",
+    compare = compare_jsonl
   )
 
   # Check that the output file exists
