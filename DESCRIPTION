@@ -25,6 +25,7 @@ Imports:
 Additional_repositories: 
     https://ropensci.r-universe.dev
 Suggests: 
+    jsonlite,
     keyring,
     knitr,
     openalexR (>= 1.4.0),
