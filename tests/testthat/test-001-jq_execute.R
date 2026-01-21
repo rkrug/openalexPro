@@ -19,8 +19,8 @@ testthat::test_that("jq_execute correctly and writes output to JSONL file", {
     output_jsonl = output_jsonl_default
   )
 
-  # Check if the output JSONL file matches the snapshot
-  expect_snapshot_file(output_jsonl_default)
+  # Check if the output JSONL file matches the snapshot (platform-agnostic)
+  expect_snapshot_file(output_jsonl_default, compare = compare_jsonl)
 
   # Execute jq_execute
   jq_execute(
@@ -29,8 +29,8 @@ testthat::test_that("jq_execute correctly and writes output to JSONL file", {
     page = 2
   )
 
-  # Check if the output JSONL file matches the snapshot
-  expect_snapshot_file(output_jsonl_page)
+  # Check if the output JSONL file matches the snapshot (platform-agnostic)
+  expect_snapshot_file(output_jsonl_page, compare = compare_jsonl)
 
   # Execute jq_execute
   jq_execute(
@@ -39,11 +39,11 @@ testthat::test_that("jq_execute correctly and writes output to JSONL file", {
     jq_filter = ".results[] | select(.id == 1)"
   )
 
-  # Check if the output JSONL file matches the snapshot
-  expect_snapshot_file(output_jsonl_filter)
+  # Check if the output JSONL file matches the snapshot (platform-agnostic)
+  expect_snapshot_file(output_jsonl_filter, compare = compare_jsonl)
 
   # Clean up temporary files
   unlink(output_jsonl_default)
   unlink(output_jsonl_page)
-  unlink(output_jsonl_page)
+  unlink(output_jsonl_filter)
 })

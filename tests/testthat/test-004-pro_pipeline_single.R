@@ -26,15 +26,16 @@ test_that("pro_request single identifier", {
       progress = TRUE
     )
 
-  # Check that the output file contains the expected data
+  # Check that the output file contains the expected data (platform-agnostic)
   expect_snapshot_file(
     file.path(output_json, "single_1.json"),
-    name = "json"
+    name = "json",
+    compare = compare_json
   )
 })
 
 test_that("pro_request_jsonl single identifier", {
-  # Convert to parquet
+  # Convert to jsonl
   output_jsonl <- output_json |>
     pro_request_jsonl(
       output = output_jsonl,
@@ -42,10 +43,11 @@ test_that("pro_request_jsonl single identifier", {
       progress = TRUE
     )
 
-  # Check that the output file contains the expected data
+  # Check that the output file contains the expected data (platform-agnostic)
   expect_snapshot_file(
     file.path(output_jsonl, "single_1.json"),
-    name = "jsonl"
+    name = "jsonl",
+    compare = compare_jsonl
   )
 })
 

@@ -28,15 +28,16 @@ test_that("pro_request search `biodiversity AND fiance`", {
       progress = TRUE
     )
 
-  # Check that the output file contains the expected data
+  # Check that the output file contains the expected data (platform-agnostic)
   expect_snapshot_file(
     path = file.path(output_json, "results_page_1.json"),
-    name = "json"
+    name = "json",
+    compare = compare_json
   )
 })
 
 test_that("pro_request_jsonl search `biodiversity AND finance`", {
-  # Convert to parquet
+  # Convert to jsonl
   output_jsonl <- output_json |>
     pro_request_jsonl(
       output = output_jsonl,
@@ -44,10 +45,11 @@ test_that("pro_request_jsonl search `biodiversity AND finance`", {
       progress = TRUE
     )
 
-  # Check that the output file contains the expected data
+  # Check that the output file contains the expected data (platform-agnostic)
   expect_snapshot_file(
     file.path(output_jsonl, "results_page_1.json"),
-    name = "jsonl"
+    name = "jsonl",
+    compare = compare_jsonl
   )
 })
 

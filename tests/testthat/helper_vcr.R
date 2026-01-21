@@ -1,5 +1,43 @@
 library("vcr")
 
+# Platform-agnostic JSON comparison for expect_snapshot_file()
+# Parses JSON and compares as R objects, ignoring formatting differences
+compare_json <- function(old, new) {
+  old_parsed <- jsonlite::read_json(old, simplifyVector = FALSE)
+  new_parsed <- jsonlite::read_json(new, simplifyVector = FALSE)
+  identical(old_parsed, new_parsed)
+}
+
+# Platform-agnostic JSONL comparison for expect_snapshot_file()
+# Parses each line as JSON and compares as R objects
+compare_jsonl <- function(old, new) {
+  parse_jsonl <- function(path) {
+    lines <- readLines(path, warn = FALSE)
+    lines <- lines[nchar(trimws(lines)) > 0]
+    lapply(lines, jsonlite::fromJSON, simplifyVector = FALSE)
+  }
+  identical(parse_jsonl(old), parse_jsonl(new))
+}
+
+# Factory function to create a JSON comparator that ignores specified fields
+# Usage: compare = compare_json_ignore(c("db_response_time_ms", "updated_date"))
+compare_json_ignore <- function(ignore_fields) {
+  remove_fields <- function(obj, fields) {
+    if (is.null(obj) || length(fields) == 0) return(obj)
+    if (is.list(obj)) {
+      obj <- obj[!names(obj) %in% fields]
+      obj <- lapply(obj, remove_fields, fields = fields)
+    }
+    obj
+  }
+  function(old, new) {
+    old_parsed <- jsonlite::read_json(old, simplifyVector = FALSE)
+    new_parsed <- jsonlite::read_json(new, simplifyVector = FALSE)
+    old_clean <- remove_fields(old_parsed, ignore_fields)
+    new_clean <- remove_fields(new_parsed, ignore_fields)
+    identical(old_clean, new_clean)
+  }
+}
 
 vcr_dir <- vcr::vcr_test_path("fixtures", "vcr")
 vcr::vcr_configure_log(file = file.path(vcr_dir, "vcr.log"))

@@ -25,16 +25,18 @@ test_that("pro_fetch search `biodiversity AND fiance`", {
       progress = TRUE
     )
 
-  # Check that the output file contains the expected data
+  # Check that the output file contains the expected data (platform-agnostic)
   expect_snapshot_file(
     path = file.path(output_dir, "json", "results_page_1.json"),
-    name = "json"
+    name = "json",
+    compare = compare_json
   )
 
-  # Check that the output file contains the expected data
+  # Check that the output file contains the expected data (platform-agnostic)
   expect_snapshot_file(
     file.path(output_dir, "jsonl", "results_page_1.json"),
-    name = "jsonl"
+    name = "jsonl",
+    compare = compare_jsonl
   )
 
   # Check that the output file exists

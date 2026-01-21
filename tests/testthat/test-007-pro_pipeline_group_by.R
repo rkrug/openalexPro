@@ -28,26 +28,18 @@ test_that("pro_request `biodiversity` and group by `type`", {
       progress = TRUE
     )
 
-  # Check that the output file contains the expected data
+  # Check that the output file contains the expected data (platform-agnostic)
+  # Ignore db_response_time_ms which varies between runs
   expect_snapshot_file(
     file.path(output_json, "group_by_page_1.json"),
     name = "json",
-    transform = function(x) {
-      # x is a character vector of lines
-      gsub(
-        '"db_response_time_ms"\\s*:\\s*[0-9]+',
-        '"db_response_time_ms": 0', # or 0, or whatever constant
-        x
-      )
-    }
+    compare = compare_json_ignore("db_response_time_ms")
   )
-
-  # Clean up temporary files
 })
 
 
 test_that("pro_request_jsonl `biodiversity` and group by type", {
-  # Convert to parquet
+  # Convert to jsonl
   output_jsonl <- output_json |>
     pro_request_jsonl(
       output = output_jsonl,
@@ -55,13 +47,12 @@ test_that("pro_request_jsonl `biodiversity` and group by type", {
       progress = TRUE
     )
 
-  # Check that the output file contains the expected data
+  # Check that the output file contains the expected data (platform-agnostic)
   expect_snapshot_file(
     file.path(output_jsonl, "group_by_page_1.json"),
-    name = "jsonl"
+    name = "jsonl",
+    compare = compare_jsonl
   )
-
-  # Clean up temporary files
 })
 
 test_that("pro_request_jsonl_parquet `biodiversity` and group by type", {

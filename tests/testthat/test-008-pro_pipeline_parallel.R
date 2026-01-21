@@ -57,13 +57,14 @@ test_that("pro_request with url list  and parallel", {
   for (fn in fns) {
     expect_snapshot_file(
       fn,
-      name = paste0("json", "_", basename(dirname(fn)), "_", basename(fn))
+      name = paste0("json", "_", basename(dirname(fn)), "_", basename(fn)),
+      compare = compare_json
     )
   }
 })
 
 test_that("pro_request_jsonl with subfolders", {
-  # Convert to parquet
+  # Convert to jsonl
   output_jsonl <- output_json |>
     pro_request_jsonl(
       output = output_jsonl,
@@ -81,7 +82,8 @@ test_that("pro_request_jsonl with subfolders", {
   for (fn in fns) {
     expect_snapshot_file(
       fn,
-      name = paste0("jsonl", "_", basename(dirname(fn)), "_", basename(fn))
+      name = paste0("jsonl", "_", basename(dirname(fn)), "_", basename(fn)),
+      compare = compare_jsonl
     )
   }
 })
