@@ -1,10 +1,23 @@
 library("vcr")
 
+# Normalize numeric types recursively (integer -> numeric)
+# This handles the 0 vs 0.0 difference across platforms
+normalize_numerics <- function(obj) {
+  if (is.null(obj)) return(obj)
+  if (is.list(obj)) {
+    return(lapply(obj, normalize_numerics))
+  }
+  if (is.integer(obj)) {
+    return(as.numeric(obj))
+  }
+  obj
+}
+
 # Platform-agnostic JSON comparison for expect_snapshot_file()
 # Parses JSON and compares as R objects, ignoring formatting differences
 compare_json <- function(old, new) {
-  old_parsed <- jsonlite::read_json(old, simplifyVector = FALSE)
-  new_parsed <- jsonlite::read_json(new, simplifyVector = FALSE)
+  old_parsed <- normalize_numerics(jsonlite::read_json(old, simplifyVector = FALSE))
+  new_parsed <- normalize_numerics(jsonlite::read_json(new, simplifyVector = FALSE))
   identical(old_parsed, new_parsed)
 }
 
@@ -14,7 +27,9 @@ compare_jsonl <- function(old, new) {
   parse_jsonl <- function(path) {
     lines <- readLines(path, warn = FALSE)
     lines <- lines[nchar(trimws(lines)) > 0]
-    lapply(lines, jsonlite::fromJSON, simplifyVector = FALSE)
+    lapply(lines, function(line) {
+      normalize_numerics(jsonlite::fromJSON(line, simplifyVector = FALSE))
+    })
   }
   identical(parse_jsonl(old), parse_jsonl(new))
 }
@@ -31,8 +46,8 @@ compare_json_ignore <- function(ignore_fields) {
     obj
   }
   function(old, new) {
-    old_parsed <- jsonlite::read_json(old, simplifyVector = FALSE)
-    new_parsed <- jsonlite::read_json(new, simplifyVector = FALSE)
+    old_parsed <- normalize_numerics(jsonlite::read_json(old, simplifyVector = FALSE))
+    new_parsed <- normalize_numerics(jsonlite::read_json(new, simplifyVector = FALSE))
     old_clean <- remove_fields(old_parsed, ignore_fields)
     new_clean <- remove_fields(new_parsed, ignore_fields)
     identical(old_clean, new_clean)
