@@ -15,9 +15,9 @@
 #'
 #' @param query_url The URL of the API query or a list of URLs returned from `pro_query()`.
 #' @param pages The number of pages to be downloaded. The default is set to
-#'   0, which would be 2,000,000 works. It is recommended to not increase it
-#'   beyond 10000 due to server load and to use the snapshot instead. If `NULL`,
-#'   all pages will be downloaded. Default: 10000.
+#'   10000, which would be 2,000,000 works. It is recommended to not increase it
+#'   beyond 100000 due to server load and to use the snapshot instead. If `NULL`,
+#'   all pages will be downloaded. Default: 100000.
 #' @param output directory where the JSON files are saved. Default is a
 #'   temporary directory. If `NULL`, the return value from call to
 #'   `openalexR::oa_request()` with all the arguments is returned
@@ -47,7 +47,7 @@
 #' @export
 pro_request <- function(
   query_url,
-  pages = 10000,
+  pages = 100000,
   output = NULL,
   overwrite = FALSE,
   mailto = Sys.getenv("openalexPro.email"),
@@ -100,9 +100,13 @@ pro_request <- function(
     # Calculate total pages for progress bar
     if (progress) {
       cli::cli_alert_info("Fetching query counts...")
-      counts <- vapply(query_url, function(url) {
-        pro_count(url, mailto = mailto, api_key = api_key)$count
-      }, numeric(1))
+      counts <- vapply(
+        query_url,
+        function(url) {
+          pro_count(url, mailto = mailto, api_key = api_key)$count
+        },
+        numeric(1)
+      )
 
       per_page <- 200
       max_pages_per_query <- if (is.null(pages)) Inf else pages
@@ -117,37 +121,40 @@ pro_request <- function(
 
     # Run parallel downloads with progress
     # Note: auto_finish = FALSE prevents warnings when actual pages differ from estimate
-    progressr::with_progress({
-      p <- if (progress) {
-        progressr::progressor(steps = total_pages, auto_finish = FALSE)
-      } else {
-        NULL
-      }
+    progressr::with_progress(
+      {
+        p <- if (progress) {
+          progressr::progressor(steps = total_pages, auto_finish = FALSE)
+        } else {
+          NULL
+        }
 
-      result <- future.apply::future_lapply(
-        seq_along(query_url),
-        function(i) {
-          nm <- names(query_url)[i]
-          if (is.null(nm) || identical(nm, "")) {
-            nm <- paste0("query_", i)
-          }
-          query_output <- if (is.null(output)) NULL else file.path(output, nm)
+        result <- future.apply::future_lapply(
+          seq_along(query_url),
+          function(i) {
+            nm <- names(query_url)[i]
+            if (is.null(nm) || identical(nm, "")) {
+              nm <- paste0("query_", i)
+            }
+            query_output <- if (is.null(output)) NULL else file.path(output, nm)
 
-          fetch_query_pages(
-            query_url = query_url[[i]],
-            pages = pages,
-            output = query_output,
-            overwrite = FALSE,
-            mailto = mailto,
-            api_key = api_key,
-            verbose = verbose,
-            error_log = error_log,
-            progressor = p
-          )
-        },
-        future.seed = TRUE
-      )
-    }, enable = progress)
+            fetch_query_pages(
+              query_url = query_url[[i]],
+              pages = pages,
+              output = query_output,
+              overwrite = FALSE,
+              mailto = mailto,
+              api_key = api_key,
+              verbose = verbose,
+              error_log = error_log,
+              progressor = p
+            )
+          },
+          future.seed = TRUE
+        )
+      },
+      enable = progress
+    )
 
     return(output)
   }
@@ -296,7 +303,9 @@ fetch_query_pages <- function(
           paste0(page_prefix, "1.json")
         )
       )
-    if (!is.null(progressor)) progressor()
+    if (!is.null(progressor)) {
+      progressor()
+    }
     success <- TRUE
     return(output)
   }

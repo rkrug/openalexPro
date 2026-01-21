@@ -11,6 +11,8 @@
   "Unsupported cast from string to struct" errors when fields have different types across JSONL files
   (e.g., `apc_paid` being `null` in some files and a struct in others).
 * Removed `harmonize_parquet_schemata()` as it is no longer needed with the new unified schema inference.
+* Increased default n umber of pages to be read by `request_json()` from 1000 to 10000 to allow the initially planned 2,000,000
+  work download.
   
 # openalexPro 0.4.0
 * CI and coverage tweaks for CRAN readiness.
