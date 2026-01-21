@@ -208,81 +208,11 @@ function reads the corpus either as a arrow `Dataset` object if
 a `data.frame`, i.e. a data table, if `return_data = TRUE`, in which
 case the whole dataset is loaded into memory.
 
-## Basic Workflow for Snowball Searches
+## Snowball Searches
 
-As the function
-[`openalexR::oa_snowball()`](https://docs.ropensci.org/openalexR/reference/oa_snowball.html),
-`openalexPro` provides a snowball function which stores the results
-again in a parquet database, but which can be red in a compatible firmat
-as in
-[`openalexR::oa_snowball()`](https://docs.ropensci.org/openalexR/reference/oa_snowball.html).
-
-Snowball searches based on following the citation graph and identify the
-cited and citing works, starting from a set of key-works.
-
-### 1. Define Keypapers
-
-The keypapers can be identified by either their DOIs or their OpenAlex
-ids.
-
-### 2. Do the snowball search
-
-The snowball search creates several sub-folders in the `output` folder
-(assumed it is called `snowball`):
-
-    snowball/
-    ├── cited_json/
-    ├── cited_jsonl/
-    ├── citing_json/
-    ├── citing_jsonl/
-    ├── edges/
-    ├── keypaper_json/
-    ├── keypaper_jsonl/
-    ├── keypaper_parquet/
-    └── nodes/
-
-These contain the following files:
-
-- **raw `json` files returned** (`cited_json`, `citing_json`,
-  `keypaper_json`),
-- **processsed `json` files** (`cited_jsonl`, `citing_jsonl`,
-  `keypaper_jsonl`),
-- **`parquet` database of the keypaper** (`keypaper_parquet`) and the
-- **`nodes` and `edges`** of the snowball search as `parquet` databases.
-
-#### Use OpenAlex ids
-
-``` r
-snowball_dir <- "./snowball_ids"
-snowball_docs <- pro_snowball(
-  identifier = c("W2741809807", "W2755950973"),
-  output = snowball_dir,
-  verbose = TRUE
-)
-```
-
-#### Use DOIs
-
-``` r
-snowball_dir_dois <- "./snowball_dois"
-oa_snowball(
-  doi = c("10.1016/j.joi.2017.08.007", "10.7717/peerj.4375"),
-  output = snowball_dir_dois,
-  verbose = TRUE
-)
-```
-
-### Convenience Function to Read the Retrieved Data (`openalexPro::read_snowball()`)
-
-The function
-[`read_snowball()`](https://rkrug.github.io/openalexPro/reference/read_snowball.md)
-reads the snowball search. The function returns, if `return_data = TRUE`
-either a `list` which contains an list two elements, `nodes` and
-`edges`. This structure of this list is functional identical to the one
-returned by
-[`openalexR::oa_snowball()`](https://docs.ropensci.org/openalexR/reference/oa_snowball.html)
-in regards to network structure. If `return_data = FALSE` it returns a
-`dataset` object
+Snowball search functionality has moved to the separate
+[`openalexSnowball`](https://github.com/rkrug/openalexSnowball) package,
+which depends on `openalexPro` for the underlying pipeline.
 
 # Package index
 
@@ -299,15 +229,6 @@ in regards to network structure. If `return_data = FALSE` it returns a
 
 - [`load_sql_file()`](https://rkrug.github.io/openalexPro/reference/load_sql_file.md)
   : Load a SQL file
-
-- [`normalize_parquet()`](https://rkrug.github.io/openalexPro/reference/normalize_parquet.md)
-  : Normalize parquet files
-
-- [`oap_apikey()`](https://rkrug.github.io/openalexPro/reference/oap_apikey.md)
-  : Get the OpenAlex API key for requests
-
-- [`oap_mail()`](https://rkrug.github.io/openalexPro/reference/oap_mail.md)
-  : Get the contact email for OpenAlex requests
 
 - [`opt_filter_names()`](https://rkrug.github.io/openalexPro/reference/opt_filter_names.md)
   : Get available filter names from OpenAlex API
@@ -333,26 +254,20 @@ in regards to network structure. If `return_data = FALSE` it returns a
 - [`pro_request_jsonl_parquet()`](https://rkrug.github.io/openalexPro/reference/pro_request_jsonl_parquet.md)
   : Convert JSON files to Apache Parquet files
 
-- [`pro_snowball()`](https://rkrug.github.io/openalexPro/reference/pro_snowball.md)
-  : A function to perform a snowball search and convert the result to a
-  tibble/data frame.
-
-- [`pro_snowball_extract_edges()`](https://rkrug.github.io/openalexPro/reference/pro_snowball_extract_edges.md)
-  : A function to extract the edges from a parquet database containing
-  the nodes
-
-- [`pro_snowball_get_nodes()`](https://rkrug.github.io/openalexPro/reference/pro_snowball_get_nodes.md)
-  : A function to get the nodes for a snowball search
+- [`pro_validate_credentials()`](https://rkrug.github.io/openalexPro/reference/pro_validate_credentials.md)
+  : Validate OpenAlex credentials
 
 - [`read_corpus()`](https://rkrug.github.io/openalexPro/reference/read_corpus.md)
   : Read corpus from Parquet Dataset
 
-- [`read_snowball()`](https://rkrug.github.io/openalexPro/reference/read_snowball.md)
-  : Read snowball from Parquet Dataset
+- [`sample_parquet_n()`](https://rkrug.github.io/openalexPro/reference/sample_parquet_n.md)
+  : Sample rows from Parquet files using DuckDB reservoir sampling
 
 # Articles
 
 ### All vignettes
 
+- [Building OpenAlex API Queries with
+  \`pro_query()\`](https://rkrug.github.io/openalexPro/articles/pro_query.md):
 - [Workflow using
   \`openalexPro2\`](https://rkrug.github.io/openalexPro/articles/Workflow.md):

@@ -14,15 +14,6 @@
 - [`load_sql_file()`](https://rkrug.github.io/openalexPro/reference/load_sql_file.md)
   : Load a SQL file
 
-- [`normalize_parquet()`](https://rkrug.github.io/openalexPro/reference/normalize_parquet.md)
-  : Normalize parquet files
-
-- [`oap_apikey()`](https://rkrug.github.io/openalexPro/reference/oap_apikey.md)
-  : Get the OpenAlex API key for requests
-
-- [`oap_mail()`](https://rkrug.github.io/openalexPro/reference/oap_mail.md)
-  : Get the contact email for OpenAlex requests
-
 - [`opt_filter_names()`](https://rkrug.github.io/openalexPro/reference/opt_filter_names.md)
   : Get available filter names from OpenAlex API
 
@@ -47,19 +38,11 @@
 - [`pro_request_jsonl_parquet()`](https://rkrug.github.io/openalexPro/reference/pro_request_jsonl_parquet.md)
   : Convert JSON files to Apache Parquet files
 
-- [`pro_snowball()`](https://rkrug.github.io/openalexPro/reference/pro_snowball.md)
-  : A function to perform a snowball search and convert the result to a
-  tibble/data frame.
-
-- [`pro_snowball_extract_edges()`](https://rkrug.github.io/openalexPro/reference/pro_snowball_extract_edges.md)
-  : A function to extract the edges from a parquet database containing
-  the nodes
-
-- [`pro_snowball_get_nodes()`](https://rkrug.github.io/openalexPro/reference/pro_snowball_get_nodes.md)
-  : A function to get the nodes for a snowball search
+- [`pro_validate_credentials()`](https://rkrug.github.io/openalexPro/reference/pro_validate_credentials.md)
+  : Validate OpenAlex credentials
 
 - [`read_corpus()`](https://rkrug.github.io/openalexPro/reference/read_corpus.md)
   : Read corpus from Parquet Dataset
 
-- [`read_snowball()`](https://rkrug.github.io/openalexPro/reference/read_snowball.md)
-  : Read snowball from Parquet Dataset
+- [`sample_parquet_n()`](https://rkrug.github.io/openalexPro/reference/sample_parquet_n.md)
+  : Sample rows from Parquet files using DuckDB reservoir sampling

@@ -11,11 +11,11 @@ and
 ``` r
 pro_fetch(
   query_url,
-  pages = 1000,
-  output = NULL,
+  pages = 10000,
+  project_folder = NULL,
   overwrite = FALSE,
-  mailto = oap_mail(),
-  api_key = oap_apikey,
+  mailto = Sys.getenv("openalexPro.email"),
+  api_key = Sys.getenv("openalexPro.apikey"),
   workers = 1,
   verbose = FALSE,
   progress = TRUE,
@@ -33,12 +33,12 @@ pro_fetch(
 
 - pages:
 
-  The number of pages to be downloaded. The default is set to 1000,
+  The number of pages to be downloaded. The default is set to 10000,
   which would be 2,000,000 works. It is recommended to not increase it
-  beyond 1000 due to server load and to use the snapshot instead. If
-  `NULL`, all pages will be downloaded. Default: 1000.
+  beyond 100000 due to server load and to use the snapshot instead. If
+  `NULL`, all pages will be downloaded. Default: 100000.
 
-- output:
+- project_folder:
 
   Directory where all intermediate (`json`, `jsonl`) and final
   (`parquet`) results are stored. If it does not exist, it is created.
@@ -50,13 +50,11 @@ pro_fetch(
 
 - mailto:
 
-  The email address of the user. See
-  [`oap_mail()`](https://rkrug.github.io/openalexPro/reference/oap_mail.md).
+  The email address of the user.
 
 - api_key:
 
-  The API key of the user. See
-  [`oap_apikey()`](https://rkrug.github.io/openalexPro/reference/oap_apikey.md).
+  The API key of the user.
 
 - workers:
 
@@ -69,7 +67,7 @@ pro_fetch(
 
 - progress:
 
-  Logical default `TRUE` indicating whether to show a progress bar.
+  Logical indicating whether to show a progress bar. Default `TRUE`.
 
 - count_only:
 
@@ -83,7 +81,7 @@ pro_fetch(
 ## Value
 
 Invisibly, the normalized path of the `parquet` subfolder inside
-`output`, i.e. the value returned by
+`project_folder`, i.e. the value returned by
 [`pro_request_jsonl_parquet()`](https://rkrug.github.io/openalexPro/reference/pro_request_jsonl_parquet.md).
 
 ## Details
@@ -92,7 +90,7 @@ The function
 
 - downloads records from OpenAlex via
   [`pro_request()`](https://rkrug.github.io/openalexPro/reference/pro_request.md)
-  into a `"json"` subfolder of `output`,
+  into a `"json"` subfolder of `project_folder`,
 
 - converts the JSON files to `jsonl` via
   [`pro_request_jsonl()`](https://rkrug.github.io/openalexPro/reference/pro_request_jsonl.md)

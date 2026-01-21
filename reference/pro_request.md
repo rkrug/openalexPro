@@ -3,7 +3,7 @@
 This function adds one argument to
 [`openalexR::oa_request()`](https://docs.ropensci.org/openalexR/reference/oa_request.html),
 namely `output`. When specified, all return values from OpenAlex will be
-saved as jaon files in that directory and the return value is the
+saved as json files in that directory and the return value is the
 directory of the json files.
 
 ## Usage
@@ -11,11 +11,11 @@ directory of the json files.
 ``` r
 pro_request(
   query_url,
-  pages = 1000,
+  pages = 1e+05,
   output = NULL,
   overwrite = FALSE,
-  mailto = oap_mail(),
-  api_key = oap_apikey,
+  mailto = Sys.getenv("openalexPro.email"),
+  api_key = Sys.getenv("openalexPro.apikey"),
   workers = 1,
   verbose = FALSE,
   progress = TRUE,
@@ -33,10 +33,10 @@ pro_request(
 
 - pages:
 
-  The number of pages to be downloaded. The default is set to 1000,
+  The number of pages to be downloaded. The default is set to 10000,
   which would be 2,000,000 works. It is recommended to not increase it
-  beyond 1000 due to server load and to use the snapshot instead. If
-  `NULL`, all pages will be downloaded. Default: 1000.
+  beyond 100000 due to server load and to use the snapshot instead. If
+  `NULL`, all pages will be downloaded. Default: 100000.
 
 - output:
 
@@ -51,13 +51,11 @@ pro_request(
 
 - mailto:
 
-  The email address of the user. See
-  [`oap_mail()`](https://rkrug.github.io/openalexPro/reference/oap_mail.md).
+  The email address of the user.
 
 - api_key:
 
-  The API key of the user. See
-  [`oap_apikey()`](https://rkrug.github.io/openalexPro/reference/oap_apikey.md).
+  The API key of the user.
 
 - workers:
 
@@ -70,7 +68,7 @@ pro_request(
 
 - progress:
 
-  Logical default `TRUE` indicating whether to show a progress bar.
+  Logical indicating whether to show a progress bar. Default `TRUE`.
 
 - count_only:
 
@@ -95,3 +93,6 @@ If query_url is a list, the function is called for each element of the
 list in parallel using a maximum of `workers` parallel R sessions. The
 results from the individual URLs in the list are returned in a folder
 named after the names of the list elements in the `output` folder.
+
+When starting the download, a file `00_in.progress` which is deleted
+upon completion.

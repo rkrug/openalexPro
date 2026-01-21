@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">openalexPro</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,9 +35,11 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="articles/Workflow.html">Workflow using `openalexPro2`</a></li>
+<li><a class="dropdown-item" href="articles/pro_query.html">Building OpenAlex API Queries with `pro_query()`</a></li>
+    <li><a class="dropdown-item" href="articles/Workflow.html">Workflow using `openalexPro2`</a></li>
   </ul>
 </li>
+<li class="nav-item"><a class="nav-link" href="news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
 <li class="nav-item"><form class="form-inline" role="search">
@@ -160,68 +162,9 @@
 </div>
 </div>
 <div class="section level2">
-<h2 id="basic-workflow-for-snowball-searches">Basic Workflow for Snowball Searches<a class="anchor" aria-label="anchor" href="#basic-workflow-for-snowball-searches"></a>
+<h2 id="snowball-searches">Snowball Searches<a class="anchor" aria-label="anchor" href="#snowball-searches"></a>
 </h2>
-<p>As the function <code><a href="https://docs.ropensci.org/openalexR/reference/oa_snowball.html" class="external-link">openalexR::oa_snowball()</a></code>, <code>openalexPro</code> provides a snowball function which stores the results again in a parquet database, but which can be red in a compatible firmat as in <code><a href="https://docs.ropensci.org/openalexR/reference/oa_snowball.html" class="external-link">openalexR::oa_snowball()</a></code>.</p>
-<p>Snowball searches based on following the citation graph and identify the cited and citing works, starting from a set of key-works.</p>
-<div class="section level3">
-<h3 id="id_1-define-keypapers">1. Define Keypapers<a class="anchor" aria-label="anchor" href="#id_1-define-keypapers"></a>
-</h3>
-<p>The keypapers can be identified by either their DOIs or their OpenAlex ids.</p>
-</div>
-<div class="section level3">
-<h3 id="id_2-do-the-snowball-search">2. Do the snowball search<a class="anchor" aria-label="anchor" href="#id_2-do-the-snowball-search"></a>
-</h3>
-<p>The snowball search creates several sub-folders in the <code>output</code> folder (assumed it is called <code>snowball</code>):</p>
-<pre><code>snowball/
-├── cited_json/
-├── cited_jsonl/
-├── citing_json/
-├── citing_jsonl/
-├── edges/
-├── keypaper_json/
-├── keypaper_jsonl/
-├── keypaper_parquet/
-└── nodes/</code></pre>
-<p>These contain the following files:</p>
-<ul>
-<li>
-<strong>raw <code>json</code> files returned</strong> (<code>cited_json</code>, <code>citing_json</code>, <code>keypaper_json</code>),</li>
-<li>
-<strong>processsed <code>json</code> files</strong> (<code>cited_jsonl</code>, <code>citing_jsonl</code>, <code>keypaper_jsonl</code>),</li>
-<li>
-<strong><code>parquet</code> database of the keypaper</strong> (<code>keypaper_parquet</code>) and the</li>
-<li>
-<strong><code>nodes</code> and <code>edges</code></strong> of the snowball search as <code>parquet</code> databases.</li>
-</ul>
-<div class="section level4">
-<h4 id="use-openalex-ids">Use OpenAlex ids<a class="anchor" aria-label="anchor" href="#use-openalex-ids"></a>
-</h4>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">snowball_dir</span> <span class="op">&lt;-</span> <span class="st">"./snowball_ids"</span></span>
-<span><span class="va">snowball_docs</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/pro_snowball.html">pro_snowball</a></span><span class="op">(</span></span>
-<span>  identifier <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"W2741809807"</span>, <span class="st">"W2755950973"</span><span class="op">)</span>,</span>
-<span>  output <span class="op">=</span> <span class="va">snowball_dir</span>,</span>
-<span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level4">
-<h4 id="use-dois">Use DOIs<a class="anchor" aria-label="anchor" href="#use-dois"></a>
-</h4>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">snowball_dir_dois</span> <span class="op">&lt;-</span> <span class="st">"./snowball_dois"</span></span>
-<span><span class="fu">oa_snowball</span><span class="op">(</span></span>
-<span>  doi <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"10.1016/j.joi.2017.08.007"</span>, <span class="st">"10.7717/peerj.4375"</span><span class="op">)</span>,</span>
-<span>  output <span class="op">=</span> <span class="va">snowball_dir_dois</span>,</span>
-<span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-</div>
-</div>
-<div class="section level3">
-<h3 id="convenience-function-to-read-the-retrieved-data-openalexproread_snowball">Convenience Function to Read the Retrieved Data (<code>openalexPro::read_snowball()</code>)<a class="anchor" aria-label="anchor" href="#convenience-function-to-read-the-retrieved-data-openalexproread_snowball"></a>
-</h3>
-<p>The function <code><a href="reference/read_snowball.html">read_snowball()</a></code> reads the snowball search. The function returns, if <code>return_data = TRUE</code> either a <code>list</code> which contains an list two elements, <code>nodes</code> and <code>edges</code>. This structure of this list is functional identical to the one returned by <code><a href="https://docs.ropensci.org/openalexR/reference/oa_snowball.html" class="external-link">openalexR::oa_snowball()</a></code> in regards to network structure. If <code>return_data = FALSE</code> it returns a <code>dataset</code> object</p>
-</div>
+<p>Snowball search functionality has moved to the separate <a href="https://github.com/rkrug/openalexSnowball" class="external-link"><code>openalexSnowball</code></a> package, which depends on <code>openalexPro</code> for the underlying pipeline.</p>
 </div>
 </div>
 

@@ -17,7 +17,9 @@ pro_request_jsonl(
   add_columns = list(),
   overwrite = FALSE,
   verbose = TRUE,
-  delete_input = FALSE
+  progress = TRUE,
+  delete_input = FALSE,
+  workers = 1
 )
 ```
 
@@ -49,10 +51,18 @@ pro_request_jsonl(
   Logical indicating whether to show a verbose information. Defaults to
   `TRUE`
 
+- progress:
+
+  Logical indicating whether to show a progress bar. Default `TRUE`.
+
 - delete_input:
 
   Determines if the `input_json` should be deleted afterwards. Defaults
   to `FALSE`.
+
+- workers:
+
+  Number of parallel workers to use. Defaults to 1.
 
 ## Value
 
@@ -72,6 +82,9 @@ example:
 2.  the page othe json file represents is `2`
 
 3.  The resulting cvalus for `page` will be `Chunk_1_2`
+
+When starting the conversion, a file `00_in.progress` which is deleted
+upon completion.
 
 The function uses DuckDB to read the JSON files and to create the Apache
 Parquet files. The function creates a DuckDB connection in memory and

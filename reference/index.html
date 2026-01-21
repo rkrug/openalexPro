@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">openalexPro</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -18,8 +18,10 @@
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/Workflow.html">Workflow using `openalexPro2`</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/pro_query.html">Building OpenAlex API Queries with `pro_query()`</a></li>
+    <li><a class="dropdown-item" href="../articles/Workflow.html">Workflow using `openalexPro2`</a></li>
   </ul></li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/rkrug/openalexPro/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
@@ -74,27 +76,6 @@
 
         <dt>
 
-          <code><a href="normalize_parquet.html">normalize_parquet()</a></code>
-
-        </dt>
-        <dd>Normalize parquet files</dd>
-
-        <dt>
-
-          <code><a href="oap_apikey.html">oap_apikey()</a></code>
-
-        </dt>
-        <dd>Get the OpenAlex API key for requests</dd>
-
-        <dt>
-
-          <code><a href="oap_mail.html">oap_mail()</a></code>
-
-        </dt>
-        <dd>Get the contact email for OpenAlex requests</dd>
-
-        <dt>
-
           <code><a href="opt_filter_names.html">opt_filter_names()</a></code>
 
         </dt>
@@ -144,24 +125,10 @@
 
         <dt>
 
-          <code><a href="pro_snowball.html">pro_snowball()</a></code>
+          <code><a href="pro_validate_credentials.html">pro_validate_credentials()</a></code>
 
         </dt>
-        <dd>A function to perform a snowball search and convert the result to a tibble/data frame.</dd>
-
-        <dt>
-
-          <code><a href="pro_snowball_extract_edges.html">pro_snowball_extract_edges()</a></code>
-
-        </dt>
-        <dd>A function to extract the edges from a parquet database containing the nodes</dd>
-
-        <dt>
-
-          <code><a href="pro_snowball_get_nodes.html">pro_snowball_get_nodes()</a></code>
-
-        </dt>
-        <dd>A function to get the nodes for a snowball search</dd>
+        <dd>Validate OpenAlex credentials</dd>
 
         <dt>
 
@@ -172,10 +139,10 @@
 
         <dt>
 
-          <code><a href="read_snowball.html">read_snowball()</a></code>
+          <code><a href="sample_parquet_n.html">sample_parquet_n()</a></code>
 
         </dt>
-        <dd>Read snowball from Parquet Dataset</dd>
+        <dd>Sample rows from Parquet files using DuckDB reservoir sampling</dd>
       </dl></div>
   </main></div>
 

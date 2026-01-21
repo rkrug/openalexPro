@@ -11,14 +11,11 @@ pro_query(
   entity = c("works", "authors", "venues", "institutions", "concepts", "publishers",
     "funders"),
   id = NULL,
-  multiple_id = FALSE,
   search = NULL,
   group_by = NULL,
   select = NULL,
   options = NULL,
   endpoint = "https://api.openalex.org",
-  mailto = NULL,
-  user_agent = NULL,
   chunk_limit = 50L,
   ...
 )
@@ -33,12 +30,9 @@ pro_query(
 
 - id:
 
-  Optional single ID (e.g., `"W1775749144"`) to fetch one entity.
-
-- multiple_id:
-
-  Logical; if `TRUE` and `id` is a vector, the IDs are moved into the
-  `ids.openalex` filter and `id` is cleared.
+  Optional ID or vector of IDs (e.g., `"W1775749144"`). If a single ID
+  is provided, fetches one entity directly. If multiple IDs are
+  provided, they are automatically moved into the `ids.openalex` filter.
 
 - search:
 
@@ -60,15 +54,6 @@ pro_query(
 - endpoint:
 
   Base API URL. Defaults to `"https://api.openalex.org"`.
-
-- mailto:
-
-  Optional email to join the polite pool; added as a query parameter and
-  appended to the `User-Agent`.
-
-- user_agent:
-
-  Optional custom `User-Agent`.
 
 - chunk_limit:
 

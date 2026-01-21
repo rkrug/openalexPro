@@ -15,7 +15,7 @@ results of a list of initial queries passed to pro_request() are maintained."></
 
     <a class="navbar-brand me-2" href="../index.html">openalexPro</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -26,8 +26,10 @@ results of a list of initial queries passed to pro_request() are maintained."></
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/Workflow.html">Workflow using `openalexPro2`</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/pro_query.html">Building OpenAlex API Queries with `pro_query()`</a></li>
+    <li><a class="dropdown-item" href="../articles/Workflow.html">Workflow using `openalexPro2`</a></li>
   </ul></li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/rkrug/openalexPro/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
@@ -60,7 +62,9 @@ results of a list of initial queries passed to <code><a href="pro_request.html">
 <span>  add_columns <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  overwrite <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  delete_input <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  progress <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  delete_input <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  workers <span class="op">=</span> <span class="fl">1</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -91,9 +95,17 @@ nave to be provided as a named list, e./g. <code>list(column_1 = "value_1", colu
 Defaults to <code>TRUE</code></p></dd>
 
 
+<dt id="arg-progress">progress<a class="anchor" aria-label="anchor" href="#arg-progress"></a></dt>
+<dd><p>Logical indicating whether to show a progress bar. Default <code>TRUE</code>.</p></dd>
+
+
 <dt id="arg-delete-input">delete_input<a class="anchor" aria-label="anchor" href="#arg-delete-input"></a></dt>
 <dd><p>Determines if the <code>input_json</code> should be deleted
 afterwards. Defaults to <code>FALSE</code>.</p></dd>
+
+
+<dt id="arg-workers">workers<a class="anchor" aria-label="anchor" href="#arg-workers"></a></dt>
+<dd><p>Number of parallel workers to use. Defaults to 1.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -109,7 +121,8 @@ The folder/filename is converted to a value named <code>page</code>
 As an example:</p><ol><li><p>the subfolder in the <code>output</code> folder is called <code>Chunk_1</code></p></li>
 <li><p>the page othe json file represents is <code>2</code></p></li>
 <li><p>The resulting cvalus for <code>page</code> will be <code>Chunk_1_2</code></p></li>
-</ol><p>The function uses DuckDB to read the JSON files and to create the
+</ol><p>When starting the conversion, a file <code>00_in.progress</code> which is deleted upon completion.</p>
+<p>The function uses DuckDB to read the JSON files and to create the
 Apache Parquet files. The function creates a DuckDB connection in memory
 and readsds the JSON files into DuckDB when needed. Then it creates a SQL
 query to convert the JSON files to Apache Parquet files and to copy the

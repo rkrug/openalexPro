@@ -9,8 +9,8 @@ is requested and the first page is fetched to minimise API usage.
 ``` r
 pro_count(
   query_url,
-  mailto = oap_mail(),
-  api_key = oap_apikey(),
+  mailto = Sys.getenv("openalexPro.email"),
+  api_key = Sys.getenv("openalexPro.apikey"),
   error_log = NULL
 )
 ```
@@ -25,13 +25,14 @@ pro_count(
 - mailto:
 
   Character string used for the API \`mailto\` query parameter and the
-  request \`User-Agent\`. Defaults to the configured \`oap_mail()\`.
+  request \`User-Agent\`. Defaults to the configured
+  \`Sys.getenv("openalexPro.email")\`.
 
 - api_key:
 
   Either a character string API key or a function returning one.
-  Defaults to \`oap_apikey()\`, and gracefully handles \`NULL\` or lazy
-  evaluation.
+  Defaults to \`Sys.getenv("openalexPro.apikey")\`, and gracefully
+  handles \`NULL\` or lazy evaluation.
 
 - error_log:
 
