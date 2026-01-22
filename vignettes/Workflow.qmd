@@ -50,7 +50,7 @@ flowchart TD
 | Approach | When to Use |
 |----------|-------------|
 | **Simple**: `pro_fetch()` | Quick analysis, standard workflow, getting started |
-| **Advanced**: Individual functions | Large datasets, custom processing, parallel optimization, debugging |
+| **Advanced**: Individual functions | Custom processing from downloaded json, more control, advanced workflows |
 
 # Simple Approach: `pro_fetch()`
 
@@ -93,7 +93,13 @@ url <- pro_query(
   search = "climate change adaptation",
   from_publication_date = "2023-01-01",
   type = "article",
-  select = c("ids", "title", "publication_year", "cited_by_count", "authorships")
+  select = c(
+    "ids",
+    "title",
+    "publication_year",
+    "cited_by_count",
+    "authorships"
+  )
 )
 
 # Fetch everything in one call
@@ -106,12 +112,15 @@ parquet_path <- pro_fetch(
 # Analyze with DuckDB
 library(duckdb)
 con <- dbConnect(duckdb())
-results <- dbGetQuery(con, "
+results <- dbGetQuery(
+  con,
+  "
   SELECT title, cited_by_count
   FROM read_parquet('climate_research/parquet/**/*.parquet')
   ORDER BY cited_by_count DESC
   LIMIT 10
-")
+"
+)
 dbDisconnect(con)
 ```
 
@@ -191,9 +200,9 @@ print(paste("Results:", count$count))
 pro_request(
   query_url = url,
   output = "data/json",
-  pages = 10000,         # Max pages (default)
-  progress = TRUE,       # Show progress bar
-  workers = 1            # Parallel workers for chunked queries
+  pages = 10000, # Max pages (default)
+  progress = TRUE, # Show progress bar
+  workers = 1 # Parallel workers for chunked queries
 )
 ```
 
@@ -216,8 +225,8 @@ pro_request_jsonl(
   input_json = "data/json",
   output = "data/jsonl",
   progress = TRUE,
-  workers = 4,           # Use 4 parallel workers
-  delete_input = FALSE   # Keep JSON files
+  workers = 4, # Use 4 parallel workers
+  delete_input = FALSE # Keep JSON files
 )
 ```
 
@@ -260,8 +269,8 @@ pro_request_jsonl_parquet(
   input_jsonl = "data/jsonl",
   output = "data/parquet",
   progress = TRUE,
-  sample_size = 1000,    # Records to sample for schema inference
-  delete_input = FALSE   # Keep JSONL files
+  sample_size = 1000, # Records to sample for schema inference
+  delete_input = FALSE # Keep JSONL files
 )
 ```
 
@@ -307,30 +316,39 @@ library(DBI)
 con <- dbConnect(duckdb())
 
 # Top cited papers
-top_cited <- dbGetQuery(con, "
+top_cited <- dbGetQuery(
+  con,
+  "
   SELECT title, publication_year, cited_by_count
   FROM read_parquet('data/parquet/**/*.parquet')
   WHERE cited_by_count IS NOT NULL
   ORDER BY cited_by_count DESC
   LIMIT 20
-")
+"
+)
 
 # Papers per year
-by_year <- dbGetQuery(con, "
+by_year <- dbGetQuery(
+  con,
+  "
   SELECT publication_year, COUNT(*) as count
   FROM read_parquet('data/parquet/**/*.parquet')
   GROUP BY publication_year
   ORDER BY publication_year
-")
+"
+)
 
 # Search abstracts
-keyword_search <- dbGetQuery(con, "
+keyword_search <- dbGetQuery(
+  con,
+  "
   SELECT title, abstract, cited_by_count
   FROM read_parquet('data/parquet/**/*.parquet')
   WHERE abstract LIKE '%machine learning%'
   ORDER BY cited_by_count DESC
   LIMIT 10
-")
+"
+)
 
 dbDisconnect(con)
 ```
@@ -372,7 +390,7 @@ flowchart TD
 
 ```{r}
 # Large DOI list - automatically chunked
-dois <- readLines("my_dois.txt")  # 1000+ DOIs
+dois <- readLines("my_dois.txt") # 1000+ DOIs
 
 urls <- pro_query(
   entity = "works",
@@ -384,7 +402,7 @@ urls <- pro_query(
 pro_request(
   query_url = urls,
   output = "data/json",
-  workers = 4,           # 4 parallel downloads
+  workers = 4, # 4 parallel downloads
   progress = TRUE
 )
 
@@ -392,7 +410,7 @@ pro_request(
 pro_request_jsonl(
   input_json = "data/json",
   output = "data/jsonl",
-  workers = 4,           # 4 parallel conversions
+  workers = 4, # 4 parallel conversions
   progress = TRUE
 )
 ```
@@ -406,14 +424,14 @@ For very large datasets, delete intermediate files:
 pro_request_jsonl(
   input_json = "data/json",
   output = "data/jsonl",
-  delete_input = TRUE    # Remove JSON files
+  delete_input = TRUE # Remove JSON files
 )
 
 # Delete JSONL after Parquet conversion
 pro_request_jsonl_parquet(
   input_jsonl = "data/jsonl",
   output = "data/parquet",
-  delete_input = TRUE    # Remove JSONL files
+  delete_input = TRUE # Remove JSONL files
 )
 ```
 
@@ -479,7 +497,9 @@ for (name in names(urls)) {
 library(duckdb)
 con <- dbConnect(duckdb())
 
-comparison <- dbGetQuery(con, "
+comparison <- dbGetQuery(
+  con,
+  "
   SELECT
     'MIT' as institution,
     COUNT(*) as papers,
@@ -497,7 +517,8 @@ comparison <- dbGetQuery(con, "
     COUNT(*),
     AVG(cited_by_count)
   FROM read_parquet('institutions/Harvard/parquet/**/*.parquet')
-")
+"
+)
 
 dbDisconnect(con)
 ```
@@ -586,7 +607,9 @@ library(duckdb)
 con <- dbConnect(duckdb())
 
 # Unnest concepts and count
-concept_counts <- dbGetQuery(con, "
+concept_counts <- dbGetQuery(
+  con,
+  "
   WITH unnested AS (
     SELECT
       id,
@@ -601,7 +624,8 @@ concept_counts <- dbGetQuery(con, "
   GROUP BY concept.display_name, concept.level
   ORDER BY count DESC
   LIMIT 50
-")
+"
+)
 
 dbDisconnect(con)
 ```

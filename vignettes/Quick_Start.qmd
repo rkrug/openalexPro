@@ -46,7 +46,7 @@ flowchart LR
     API --> Query
     Query --> Fetch
     Fetch --> Parquet
-    Parquet --> DuckDB
+    %% Parquet --> DuckDB
 
     style OpenAlex fill:#e1f5e1
     style openalexPro fill:#cce5ff
@@ -146,7 +146,7 @@ flowchart TD
     style Output fill:#e1f5e1
 ```
 
-# Analyze with DuckDB
+# Analysis Example: Analyse with DuckDB
 
 ```{r}
 library(duckdb)
