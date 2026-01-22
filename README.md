@@ -5,25 +5,23 @@ author: Rainer M Krug
 format: gfm
 ---
 [![name status badge](https://rkrug.r-universe.dev/badges/:name)](https://rkrug.r-universe.dev/)
-
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17453180.svg)](https://doi.org/10.5281/zenodo.17453180)
-
 [![openalexPro status badge](https://rkrug.r-universe.dev/openalexPro/badges/version)](https://rkrug.r-universe.dev/openalexPro)
-
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17453180.svg)](https://doi.org/10.5281/zenodo.17453180)
 [![Codecov test coverage](https://codecov.io/gh/rkrug/openalexPro/graph/badge.svg)](https://app.codecov.io/gh/rkrug/openalexPro)
 
 # Disclaimer
 
+The package is provided **as is** and the authors do not take any responsibility for any damages or losses arising from its use. The software is provided without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose, and non-infringement. Use at your own risk.
 
+The authors are not affiliated with [OpenAlex](https://openalex.org) in any way.
 
 # LLM Usage Disclosure
 
-Code and documentation in this project have been generated with the assistance of the codex LLM tools in Positron. All content and code is based on conceptuaisayion by the authors and has been thoroughly reviewed and edited by humans afterwards.
+Code and documentation in this project have been generated with the assistance of the codex LLM tools as well as Claude code in Positron. All content and code is based on conceptualisation by the authors and has been thoroughly reviewed and edited by humans afterwards.
 
 # Introduction
 
-This package builds on the package [openalexR](https://github.com/openalex/openalexR) but provides a more advanced approach to retrieve works from OpenAlex. In contrast to `openalexR`, which does all processing and conversions in memory. Doing all processing in memory has advantages for smaller smaller number of records retrieved from [OpenAlex](https://openalex.org), but limits te number of works which can be retrieved due to memory limitations. Even before the limit is reached, the often occurring new allocation of memory slows down the processing.
-In a first step, In contrast, `openalexPro` uses a on disc processing approach where the data is processed by number of records returned per call, i.e. a per page processing approach. 
+This package builds on the package [openalexR](https://github.com/ropensci/openalexR) but provides a more advanced approach to retrieve works from OpenAlex. In contrast to `openalexR`, which does all processing and conversions in memory, `openalexPro` uses an on-disc processing approach where the data is processed by number of records returned per call, i.e. a per-page processing approach. Doing all processing in memory has advantages for smaller numbers of records retrieved from [OpenAlex](https://openalex.org), but limits the number of works which can be retrieved due to memory limitations. Even before the limit is reached, the often occurring new allocation of memory slows down the processing. 
 
 # Design Principles
 The retrieval of works and the initial processing / preparation can be split into these three steps:
@@ -32,15 +30,15 @@ In a first step (`openalexPro::pro_request()`), each page from the API call is s
 
 In a second step (`openalexPro::pro_request_jsonl()`), the json files are processed on a per file basis using the `jq` command-line json processor. In this step the abstract text is re-constructed, a citation string for each work is generated, and optionally add a `page` field is added. It writes the resulting json file as a newline-delimited JSON (.jsonl), suitable for further processing using `arrow` or DuckDB.
 
-Int the third (and final) step (`openalexPro::pro_request_jsonl_parquet()`) converts the jsonl files into a parquet database partitioned by `page` using the `duckdb` package. Again, as the processing is done per page as well, the conversion is not limited by memory.
+In the third (and final) step (`openalexPro::pro_request_jsonl_parquet()`) converts the jsonl files into a parquet database partitioned by `page` using the `duckdb` package. Again, as the processing is done per page as well, the conversion is not limited by memory.
 
 
-This approach results in a stable pipeline which works for the retrieval of small as well as large to huge corpora. As the processing is done in per page (which have a maximum of 200 works), the scaling should be more or less linear  (in one application, more then 4 million works were retrieved without problems). 
+This approach results in a stable pipeline which works for the retrieval of small as well as large to huge corpora. As the processing is done per page (which have a maximum of 200 works), the scaling should be more or less linear (in one application, more than 4 million works were retrieved without problems). 
 
 One point which needs to be taken into consideration when retrieving huge corpora, are rate limits by OpenAlex (see [here](https://docs.openalex.org/how-to-use-the-api/rate-limits-and-authentication) and [here](https://help.openalex.org/hc/en-us/articles/24397762024087-Pricing) for further details). 
 
 
-The final format which is used in this package to save the retrieved data is the `parquet` format which is space efficient and allows on disc processing, therefor there is no need to load the complete data into memory (see [here](https://parquet.apache.org/docs/) for a detailed description of the format as well as the [r-package `arrow`](https://arrow.apache.org/docs/r/)). To use the on disc processing in R, the `arrow` packages interfaces directly with `dplyr`, so that one can do a lot of processing before retrieving the actual data into memory (see the section on [dplyr and arrow](https://r4ds.hadley.nz/arrow.html#using-dplyr-with-arrow) as well more general the [arrow chapter](https://r4ds.hadley.nz/arrow.html) in Hadleys Wickhams [R for Data Science (2e) book]()https://r4ds.hadley.nz).
+The final format which is used in this package to save the retrieved data is the `parquet` format which is space efficient and allows on disc processing, therefor there is no need to load the complete data into memory (see [here](https://parquet.apache.org/docs/) for a detailed description of the format as well as the [r-package `arrow`](https://arrow.apache.org/docs/r/)). To use the on disc processing in R, the `arrow` packages interfaces directly with `dplyr`, so that one can do a lot of processing before retrieving the actual data into memory (see the section on [dplyr and arrow](https://r4ds.hadley.nz/arrow.html#using-dplyr-with-arrow) as well more general the [arrow chapter](https://r4ds.hadley.nz/arrow.html) in Hadley Wickham's [R for Data Science (2e)](https://r4ds.hadley.nz) book.
 
 # Quickstart
 
@@ -54,23 +52,49 @@ install.packages('openalexPro', repos = c('https://rkrug.r-universe.dev', 'https
 
 The "development" version can be installed from github.
 **This is generally not recommended!**
-Unless you need bleeding edge functionality and can deal with changing function definitions, or whant to test new functionality, is this not recommended.
+Unless you need bleeding edge functionality and can deal with changing function definitions, or want to test new functionality, this is not recommended.
 
 ```r
 remotes::install_github("rkrug/openalexPro", ref = "dev")
 ```
 
-## Basic Workflow for Searches
+## Simplest Approach: `pro_fetch()`
 
-First, the package needs to be loaded
+For most use cases, `pro_fetch()` handles everything in one call:
+
+```r
+library(openalexPro)
+
+# Build query
+url <- pro_query(
+  entity = "works",
+  search = "climate change",
+  from_publication_date = "2023-01-01",
+  type = "article",
+  select = c("ids", "title", "publication_year", "cited_by_count")
+)
+
+# Download, transform, and convert to Parquet in one step
+pro_fetch(
+  query_url = url,
+  project_folder = "my_climate_data",
+  progress = TRUE
+)
+```
+
+Your data is now ready in `my_climate_data/parquet/`.
+
+## Advanced Workflow (Individual Functions)
+
+For more control over the pipeline, use the individual functions:
 
 ```r
 library(openalexPro)
 ```
 
-### 1. Define query (`openalexPro:pro_query()`)
+### 1. Define query (`openalexPro::pro_query()`)
 
-The query is defined using the function `openalexPro:pro_query()`. It follows the logic and arguments of `openalexR::oa_query()`. In addition to `openalexR::oa_query()`, the names of filters as well as fields selected for retrieval are verified before sending them to OpenAlex. 
+The query is defined using the function `openalexPro::pro_query()`. It follows the logic and arguments of `openalexR::oa_query()`. In addition to `openalexR::oa_query()`, the names of filters as well as fields selected for retrieval are verified before sending them to OpenAlex. 
 
 The supported filter names can be retrieved by running
 
@@ -114,9 +138,9 @@ Will retrieve the records and save them into the folder specified in output. One
 This step prepares the json files for the final ingestion into a `parquet` database:
 
 ```r
-openalex_jsonl_folder <- openalexPoro2::pro_request_jsonl(
+openalex_jsonl_folder <- openalexPro::pro_request_jsonl(
   input_json = "json_files",
-  output = json_extracted,
+  output = "jsonl_files",
   verbose = TRUE
 )
 ```
@@ -130,7 +154,7 @@ Here the files are converted into a parquet page partitioned dataset saved as in
 ```r
 parquet <- "./parquet"
 openalexPro::pro_request_jsonl_parquet(
-  json_dir = json_extracted,
+  input_jsonl = "jsonl_files",
   output = parquet,
   verbose = TRUE
 )
