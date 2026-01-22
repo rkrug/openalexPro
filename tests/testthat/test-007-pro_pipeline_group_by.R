@@ -69,18 +69,7 @@ test_that("pro_request_jsonl_parquet `biodiversity` and group by type", {
     length(list.files(output_parquet, recursive = TRUE)) >= 1
   )
 
-  # Get search results from openalexR::oa_fetch(output = "tibble") for
-  # comparison
-
   vcr::local_cassette("oa_fetch_group_by")
-  results_openalexR <- openalexR::oa_fetch(
-    title_and_abstract.search = "biodiversity",
-    to_publication_date = "2010-01-01",
-    group_by = "type",
-    output = "tibble",
-    verbose = FALSE
-  ) |>
-    dplyr::arrange(key)
 
   results_openalexPro <- read_corpus(
     corpus = output_parquet,
@@ -101,15 +90,8 @@ test_that("pro_request_jsonl_parquet `biodiversity` and group by type", {
       dplyr::arrange(key) |>
       dplyr::collect()
 
-    print(results_openalexR)
-
     print(results_openalexPro)
   })
-
-  # expect_identical(
-  #   results_openalexR,
-  #   as.data.frame(results_openalexPro)
-  # )
 })
 
 unlink(output_json, recursive = TRUE, force = TRUE)

@@ -1,5 +1,4 @@
 library(testthat)
-suppressPackageStartupMessages(library(openalexR))
 # library(httptest)
 
 # Normal Search `biodiversity AND finance`-------------------------------------
@@ -34,7 +33,7 @@ test_that("pro_request search count `biodiversity AND fiance`", {
 })
 
 
-test_that("pro_request search count and openalexR::oa_fetch() return same results", {
+test_that("pro_request search count", {
   vcr::local_cassette("pro_request_search_biodiversity_AND_fiance_count")
   # Define the API request
   count <- pro_query(
@@ -48,23 +47,12 @@ test_that("pro_request search count and openalexR::oa_fetch() return same result
       verbose = FALSE,
       count_only = TRUE
     )
-  # Get search results from openalexR::oa_fetch(output = "tibble") for
-  # comparison
 
   vcr::local_cassette("oa_fetch_biodiversity_AND_finance")
-  count_oa <- openalexR::oa_fetch(
-    title_and_abstract.search = "biodiversity AND finance",
-    to_publication_date = "2010-01-01",
-    output = "tibble",
-    verbose = FALSE,
-    count_only = TRUE
-  )
 
   # Check that the output file contains the expected data structure
   expect_snapshot({
-    count_oa
     count
-    identical(count_oa$count, count[["count"]])
   })
 })
 

@@ -23,23 +23,6 @@ Code and documentation in this project have been generated with the assistance o
 
 This package builds on the package [openalexR](https://github.com/ropensci/openalexR) but provides a more advanced approach to retrieve works from OpenAlex. In contrast to `openalexR`, which does all processing and conversions in memory, `openalexPro` uses an on-disc processing approach where the data is processed by number of records returned per call, i.e. a per-page processing approach. Doing all processing in memory has advantages for smaller numbers of records retrieved from [OpenAlex](https://openalex.org), but limits the number of works which can be retrieved due to memory limitations. Even before the limit is reached, the often occurring new allocation of memory slows down the processing. 
 
-# Design Principles
-The retrieval of works and the initial processing / preparation can be split into these three steps:
-
-In a first step (`openalexPro::pro_request()`), each page from the API call is saved into an individual json file as returned by the API. The number of retrieved records is effectively only limited by the space on the drive where the json files are saved. As the complete responses including metadata are saved, one could end here and use custom made code to further process the responses, i.e. ingest it into a database. 
-
-In a second step (`openalexPro::pro_request_jsonl()`), the json files are processed on a per file basis using the `jq` command-line json processor. In this step the abstract text is re-constructed, a citation string for each work is generated, and optionally add a `page` field is added. It writes the resulting json file as a newline-delimited JSON (.jsonl), suitable for further processing using `arrow` or DuckDB.
-
-In the third (and final) step (`openalexPro::pro_request_jsonl_parquet()`) converts the jsonl files into a parquet database partitioned by `page` using the `duckdb` package. Again, as the processing is done per page as well, the conversion is not limited by memory.
-
-
-This approach results in a stable pipeline which works for the retrieval of small as well as large to huge corpora. As the processing is done per page (which have a maximum of 200 works), the scaling should be more or less linear (in one application, more than 4 million works were retrieved without problems). 
-
-One point which needs to be taken into consideration when retrieving huge corpora, are rate limits by OpenAlex (see [here](https://docs.openalex.org/how-to-use-the-api/rate-limits-and-authentication) and [here](https://help.openalex.org/hc/en-us/articles/24397762024087-Pricing) for further details). 
-
-
-The final format which is used in this package to save the retrieved data is the `parquet` format which is space efficient and allows on disc processing, therefor there is no need to load the complete data into memory (see [here](https://parquet.apache.org/docs/) for a detailed description of the format as well as the [r-package `arrow`](https://arrow.apache.org/docs/r/)). To use the on disc processing in R, the `arrow` packages interfaces directly with `dplyr`, so that one can do a lot of processing before retrieving the actual data into memory (see the section on [dplyr and arrow](https://r4ds.hadley.nz/arrow.html#using-dplyr-with-arrow) as well more general the [arrow chapter](https://r4ds.hadley.nz/arrow.html) in Hadley Wickham's [R for Data Science (2e)](https://r4ds.hadley.nz) book.
-
 # Quickstart
 
 ## Installation
@@ -164,7 +147,24 @@ openalexPro::pro_request_jsonl_parquet(
 The `read_corpus()` function reads the corpus either as a arrow `Dataset` object if `return_data = FALSE`, which is essentially metadata to the dataset,  or a `data.frame`, i.e. a data table, if `return_data = TRUE`, in which case the whole dataset is loaded into memory.
 
 
-## Snowball Searches
+# Design Principles
+The retrieval of works and the initial processing / preparation can be split into these three steps:
+
+In a first step (`openalexPro::pro_request()`), each page from the API call is saved into an individual json file as returned by the API. The number of retrieved records is effectively only limited by the space on the drive where the json files are saved. As the complete responses including metadata are saved, one could end here and use custom made code to further process the responses, i.e. ingest it into a database. 
+
+In a second step (`openalexPro::pro_request_jsonl()`), the json files are processed on a per file basis using the `jq` command-line json processor. In this step the abstract text is re-constructed, a citation string for each work is generated, and optionally add a `page` field is added. It writes the resulting json file as a newline-delimited JSON (.jsonl), suitable for further processing using `arrow` or DuckDB.
+
+In the third (and final) step (`openalexPro::pro_request_jsonl_parquet()`) converts the jsonl files into a parquet database partitioned by `page` using the `duckdb` package. Again, as the processing is done per page as well, the conversion is not limited by memory.
+
+
+This approach results in a stable pipeline which works for the retrieval of small as well as large to huge corpora. As the processing is done per page (which have a maximum of 200 works), the scaling should be more or less linear (in one application, more than 4 million works were retrieved without problems). 
+
+One point which needs to be taken into consideration when retrieving huge corpora, are rate limits by OpenAlex (see [here](https://docs.openalex.org/how-to-use-the-api/rate-limits-and-authentication) and [here](https://help.openalex.org/hc/en-us/articles/24397762024087-Pricing) for further details). 
+
+
+The final format which is used in this package to save the retrieved data is the `parquet` format which is space efficient and allows on disc processing, therefor there is no need to load the complete data into memory (see [here](https://parquet.apache.org/docs/) for a detailed description of the format as well as the [r-package `arrow`](https://arrow.apache.org/docs/r/)). To use the on disc processing in R, the `arrow` packages interfaces directly with `dplyr`, so that one can do a lot of processing before retrieving the actual data into memory (see the section on [dplyr and arrow](https://r4ds.hadley.nz/arrow.html#using-dplyr-with-arrow) as well more general the [arrow chapter](https://r4ds.hadley.nz/arrow.html) in Hadley Wickham's [R for Data Science (2e)](https://r4ds.hadley.nz) book.
+
+# Snowball Searches
 
 Snowball search functionality has moved to the separate
 [`openalexSnowball`](https://github.com/rkrug/openalexSnowball) package, which
