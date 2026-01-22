@@ -1,11 +1,9 @@
-#' `openalexR::oa_request()` with additional argument
+#' Fetch works from OpenAlex
 #'
-#' This function adds one argument to `openalexR::oa_request()`, namely
-#' `output`. When specified, all return values from OpenAlex will be saved as
-#' json files in that directory and the return value is the directory of the
+#' All returned values from OpenAlex will be saved as
+#' json files in the `output` directory and the return value is the directory of the
 #' json files.
 #'
-#' For the documentation please see `openalexR::oa_request()`
 #' If query_url is a list, the function is called for each element of the list in parallel
 #' using a maximum of `workers` parallel R sessions. The results from the individual URLs
 #' in the list are returned in a folder named after the names of the list elements in the
@@ -19,8 +17,7 @@
 #'   beyond 100000 due to server load and to use the snapshot instead. If `NULL`,
 #'   all pages will be downloaded. Default: 100000.
 #' @param output directory where the JSON files are saved. Default is a
-#'   temporary directory. If `NULL`, the return value from call to
-#'   `openalexR::oa_request()` with all the arguments is returned
+#'   temporary directory. Needs to be specified.
 #' @param overwrite Logical. If `TRUE`, `output` will be deleted if it already
 #'   exists.
 #' @param mailto The email address of the user.

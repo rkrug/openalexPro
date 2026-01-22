@@ -2,7 +2,7 @@
 % Please edit documentation in R/pro_request.R
 \name{pro_request}
 \alias{pro_request}
-\title{\code{openalexR::oa_request()} with additional argument}
+\title{Fetch works from OpenAlex}
 \usage{
 pro_request(
   query_url,
@@ -27,8 +27,7 @@ beyond 100000 due to server load and to use the snapshot instead. If \code{NULL}
 all pages will be downloaded. Default: 100000.}
 
 \item{output}{directory where the JSON files are saved. Default is a
-temporary directory. If \code{NULL}, the return value from call to
-\code{openalexR::oa_request()} with all the arguments is returned}
+temporary directory. Needs to be specified.}
 
 \item{overwrite}{Logical. If \code{TRUE}, \code{output} will be deleted if it already
 exists.}
@@ -53,13 +52,11 @@ normalized \code{output}. If \code{count_only} is \code{TRUE}, a named numeric v
 of the works from the specified query_url(s).
 }
 \description{
-This function adds one argument to \code{openalexR::oa_request()}, namely
-\code{output}. When specified, all return values from OpenAlex will be saved as
-json files in that directory and the return value is the directory of the
+All returned values from OpenAlex will be saved as
+json files in the \code{output} directory and the return value is the directory of the
 json files.
 }
 \details{
-For the documentation please see \code{openalexR::oa_request()}
 If query_url is a list, the function is called for each element of the list in parallel
 using a maximum of \code{workers} parallel R sessions. The results from the individual URLs
 in the list are returned in a folder named after the names of the list elements in the
