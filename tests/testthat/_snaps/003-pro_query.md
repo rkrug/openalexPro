@@ -21,3 +21,10 @@
     Output
       [1] "https://api.openalex.org/works?filter=from_publication_date%3A2020-01-01%2Clanguage%3Aen%7Cde%2Ctype%3Aarticle&search=biodiversity&select=ids%2Ctitle%2Cpublication_year&per_page=5&sort=cited_by_count%3Adesc"
 
+# pro_query and legacy query return identical URLs (single id)
+
+    Code
+      url_pro
+    Output
+      [1] "https://api.openalex.org/works/W1775749144?select=ids%2Ctitle"
+
