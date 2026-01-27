@@ -3,7 +3,6 @@
 export(compatibility_report)
 export(extract_doi)
 export(jq_execute)
-export(load_sql_file)
 export(opt_filter_names)
 export(opt_select_fields)
 export(pro_fetch)

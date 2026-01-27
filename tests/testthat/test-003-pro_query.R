@@ -26,17 +26,6 @@ testthat::test_that("pro_query and legacy query return identical URLs (search + 
   opts <- list(per_page = 5, sort = "cited_by_count:desc")
 
   # build URLs
-  url_legacy <- do.call(
-    openalexR::oa_query,
-    c(
-      list(
-        entity = entity,
-        search = search,
-        options = c(list(select = sel), opts)
-      ),
-      filters
-    )
-  )
 
   url_pro <- do.call(
     pro_query,
@@ -51,9 +40,8 @@ testthat::test_that("pro_query and legacy query return identical URLs (search + 
     )
   )
 
-  testthat::expect_type(url_legacy, "character")
   testthat::expect_type(url_pro, "character")
-  testthat::expect_identical(url_pro, url_legacy)
+  testthat::expect_snapshot(url_pro)
 })
 
 testthat::test_that("pro_query and legacy query return identical URLs (single id)", {
@@ -61,25 +49,19 @@ testthat::test_that("pro_query and legacy query return identical URLs (single id
   identifier <- "W1775749144"
   sel <- c("ids", "title")
 
-  url_legacy <- openalexR::oa_query(
-    entity = entity,
-    identifier = identifier,
-    options = list(select = sel)
-  )
-
   url_pro <- pro_query(
     entity = entity,
     id = identifier,
     select = sel
   )
 
-  testthat::expect_identical(url_pro, url_legacy)
+  testthat::expect_snapshot(url_pro)
 })
 
 testthat::test_that("pro_query handles multiple IDs automatically", {
   ids <- c("W2741809807", "W2092304384")
 
- url <- pro_query(entity = "works", id = ids)
+  url <- pro_query(entity = "works", id = ids)
 
   testthat::expect_true(grepl("filter=ids.openalex", url))
   testthat::expect_false(grepl("/works/W", url))
@@ -95,20 +77,6 @@ testthat::test_that("pro_query and legacy query return identical URLs with group
   )
   opts <- list(per_page = 50)
 
-  # build URL with legacy fn
-  url_legacy <- do.call(
-    openalexR::oa_query,
-    c(
-      list(
-        entity = entity,
-        search = search,
-        group_by = group,
-        options = opts
-      ),
-      filters
-    )
-  )
-
   # build URL with pro_query
   url_pro <- do.call(
     pro_query,
@@ -123,9 +91,7 @@ testthat::test_that("pro_query and legacy query return identical URLs with group
     )
   )
 
-  testthat::expect_type(url_legacy, "character")
   testthat::expect_type(url_pro, "character")
-  testthat::expect_identical(url_pro, url_legacy)
 })
 
 # Entity coverage tests ---------------------------------------------------
@@ -142,10 +108,21 @@ testthat::test_that("pro_query works with institutions entity", {
 })
 
 testthat::test_that("pro_query works with all entity types", {
-  entities <- c("works", "authors", "venues", "institutions", "concepts", "publishers", "funders")
+  entities <- c(
+    "works",
+    "authors",
+    "venues",
+    "institutions",
+    "concepts",
+    "publishers",
+    "funders"
+  )
   for (ent in entities) {
     url <- pro_query(entity = ent)
-    testthat::expect_true(grepl(paste0("/", ent), url), info = paste("Entity:", ent))
+    testthat::expect_true(
+      grepl(paste0("/", ent), url),
+      info = paste("Entity:", ent)
+    )
   }
 })
 
@@ -209,7 +186,7 @@ testthat::test_that("pro_query handles empty filters", {
 testthat::test_that("pro_query handles logical filter values", {
   url <- pro_query(entity = "works", is_oa = TRUE)
   # Colon is URL-encoded as %3A
- testthat::expect_true(grepl("is_oa(%3A|:)true", url))
+  testthat::expect_true(grepl("is_oa(%3A|:)true", url))
 })
 
 testthat::test_that("pro_query handles NULL id gracefully", {

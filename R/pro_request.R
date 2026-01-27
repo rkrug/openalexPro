@@ -1,11 +1,9 @@
-#' `openalexR::oa_request()` with additional argument
+#' Fetch works from OpenAlex
 #'
-#' This function adds one argument to `openalexR::oa_request()`, namely
-#' `output`. When specified, all return values from OpenAlex will be saved as
-#' json files in that directory and the return value is the directory of the
+#' All returned values from OpenAlex will be saved as
+#' json files in the `output` directory and the return value is the directory of the
 #' json files.
 #'
-#' For the documentation please see `openalexR::oa_request()`
 #' If query_url is a list, the function is called for each element of the list in parallel
 #' using a maximum of `workers` parallel R sessions. The results from the individual URLs
 #' in the list are returned in a folder named after the names of the list elements in the
@@ -19,8 +17,7 @@
 #'   beyond 100000 due to server load and to use the snapshot instead. If `NULL`,
 #'   all pages will be downloaded. Default: 100000.
 #' @param output directory where the JSON files are saved. Default is a
-#'   temporary directory. If `NULL`, the return value from call to
-#'   `openalexR::oa_request()` with all the arguments is returned
+#'   temporary directory. Needs to be specified.
 #' @param overwrite Logical. If `TRUE`, `output` will be deleted if it already
 #'   exists.
 #' @param mailto The email address of the user.
@@ -28,12 +25,13 @@
 #' @param workers Number of parallel workers to use if `query_url` is a list. Defaults to 1.
 #' @param verbose Logical indicating whether to show verbose messages.
 #' @param progress Logical indicating whether to show a progress bar. Default `TRUE`.
-#' @param count_only return count only as a named numeric vector or list.
+#' @param count_only return count only as a data.frame.
 #' @param error_log location of error log of API calls. (default: `NULL` (none)).
 #'
 #' @return If `count_only` is `FALSE` (the default) the complete path to the expanded and
-#'   normalized `output`. If `count_only` is `TRUE`, a named numeric vector with the count
-#'   of the works from the specified query_url(s).
+#'   normalized `output`. If `count_only` is `TRUE`, a data.frame with metadata about
+#'   the query (count, db_response_time_ms, page, per_page, error). When `query_url` is
+#'   a list, an additional `query` column identifies each query.
 #'
 #' @md
 #'
@@ -88,12 +86,18 @@ pro_request <- function(
         },
         future.seed = TRUE
       )
-      out <- unlist(result, use.names = FALSE)
-      names(out) <- if (is.null(names(query_url))) {
+
+      # Create names for each query
+      query_names <- if (is.null(names(query_url))) {
         paste0("query_", seq_along(query_url))
       } else {
         names(query_url)
       }
+
+      # Combine results into a single data.frame with query names
+      out <- do.call(rbind, result)
+      out$query <- query_names
+
       return(out)
     }
 

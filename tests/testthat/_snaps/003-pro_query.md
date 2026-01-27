@@ -14,3 +14,17 @@
       "value": ["doi", "title", "display_name", "relevance_score", "publication_year", "publication_date", "ids", "language", "primary_location", "sources", "type", "type_crossref", "indexed_in", "open_access", "authorships", "institution_assertions", "institutions", "countries_distinct_count", "institutions_distinct_count", "corresponding_author_ids", "corresponding_institution_ids", "apc_list", "apc_paid", "fwci", "is_authors_truncated", "has_fulltext", "fulltext_origin", "cited_by_count", "citation_normalized_percentile", "cited_by_percentile_year", "biblio", "is_retracted", "is_paratext", "is_xpac", "primary_topic", "topics", "keywords", "concepts", "mesh", "locations_count", "locations", "best_oa_location", "sustainable_development_goals", "grants", "awards", "funders", "datasets", "versions", "has_content", "referenced_works_count", "referenced_works", "related_works", "abstract_inverted_index", "cited_by_api_url", "counts_by_year", "updated_date", "created_date."]
     }
 
+# pro_query and legacy query return identical URLs (search + filters)
+
+    Code
+      url_pro
+    Output
+      [1] "https://api.openalex.org/works?filter=from_publication_date%3A2020-01-01%2Clanguage%3Aen%7Cde%2Ctype%3Aarticle&search=biodiversity&select=ids%2Ctitle%2Cpublication_year&per_page=5&sort=cited_by_count%3Adesc"
+
+# pro_query and legacy query return identical URLs (single id)
+
+    Code
+      url_pro
+    Output
+      [1] "https://api.openalex.org/works/W1775749144?select=ids%2Ctitle"
+

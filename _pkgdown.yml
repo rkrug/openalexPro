@@ -1,3 +1,14 @@
 url: https://rkrug.github.io/openalexPro/
 template:
   bootstrap: 5
+
+articles:
+  - title: Guides
+    navbar: ~
+    contents:
+      - Quick_Start
+      - Workflow
+      - pro_query
+      - pro_request
+      - starts_with("")
+      

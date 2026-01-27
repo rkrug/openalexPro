@@ -1,5 +1,4 @@
 library(testthat)
-suppressPackageStartupMessages(library(openalexR))
 # library(httptest)
 
 # Normal Search `biodiversity AND finance`-------------------------------------
@@ -34,7 +33,7 @@ test_that("pro_request search count `biodiversity AND fiance`", {
 })
 
 
-test_that("pro_request search count and openalexR::oa_fetch() return same results", {
+test_that("pro_request search count", {
   vcr::local_cassette("pro_request_search_biodiversity_AND_fiance_count")
   # Define the API request
   count <- pro_query(
@@ -48,24 +47,90 @@ test_that("pro_request search count and openalexR::oa_fetch() return same result
       verbose = FALSE,
       count_only = TRUE
     )
-  # Get search results from openalexR::oa_fetch(output = "tibble") for
-  # comparison
 
   vcr::local_cassette("oa_fetch_biodiversity_AND_finance")
-  count_oa <- openalexR::oa_fetch(
-    title_and_abstract.search = "biodiversity AND finance",
-    to_publication_date = "2010-01-01",
-    output = "tibble",
+
+  # Check that the output file contains the expected data structure
+  expect_snapshot({
+    count
+  })
+})
+
+# Test count_only with list of queries -----------------------------------------
+
+test_that("pro_request count_only with list of queries returns data.frame", {
+  vcr::local_cassette("pro_request_list_count")
+
+  # Create a list of queries
+  queries <- list(
+    biodiversity = pro_query(
+      entity = "works",
+      title_and_abstract.search = "biodiversity",
+      to_publication_date = "2010-01-01"
+    ),
+    finance = pro_query(
+      entity = "works",
+      title_and_abstract.search = "finance",
+      to_publication_date = "2010-01-01"
+    )
+  )
+
+  # Get counts for the list of queries
+  count <- pro_request(
+    query_url = queries,
+    output = output_json,
+    mailto = "test@example.com",
     verbose = FALSE,
     count_only = TRUE
   )
 
-  # Check that the output file contains the expected data structure
-  expect_snapshot({
-    count_oa
-    count
-    identical(count_oa$count, count[["count"]])
-  })
+  # Check that the result is a data.frame
+  expect_s3_class(count, "data.frame")
+
+  # Check that it has the expected columns
+  expect_named(count, c("count", "db_response_time_ms", "page", "per_page", "error", "query"))
+
+  # Check that the query column has the correct names
+  expect_equal(count$query, c("biodiversity", "finance"))
+
+  # Check that count values are numeric
+  expect_type(count$count, "integer")
+
+  expect_snapshot(count)
+})
+
+
+test_that("pro_request count_only with unnamed list of queries", {
+  vcr::local_cassette("pro_request_list_count")
+
+  # Create an unnamed list of queries
+  queries <- list(
+    pro_query(
+      entity = "works",
+      title_and_abstract.search = "biodiversity",
+      to_publication_date = "2010-01-01"
+    ),
+    pro_query(
+      entity = "works",
+      title_and_abstract.search = "finance",
+      to_publication_date = "2010-01-01"
+    )
+  )
+
+  # Get counts for the list of queries
+  count <- pro_request(
+    query_url = queries,
+    output = output_json,
+    mailto = "test@example.com",
+    verbose = FALSE,
+    count_only = TRUE
+  )
+
+  # Check that the result is a data.frame
+  expect_s3_class(count, "data.frame")
+
+  # Check that the query column has auto-generated names
+  expect_equal(count$query, c("query_1", "query_2"))
 })
 
 unlink(output_json, recursive = TRUE, force = TRUE)
