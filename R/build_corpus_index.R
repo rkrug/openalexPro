@@ -4,7 +4,7 @@
 #' to their physical location in the parquet corpus. This enables fast random
 #' access to specific records without scanning entire partitions.
 #'
-#' @param corpus_dir Path to the parquet corpus directory (partitioned by id_block).
+#' @param corpus_dir Path to the parquet corpus directory.
 #' @param index_file Output path for the Feather index file.
 #' @param memory_limit DuckDB memory limit (e.g., "20GB"). Default is `NULL`.
 #' @param threads Number of DuckDB threads. Default is `NULL` (use all cores).
@@ -16,7 +16,6 @@
 #' \describe{
 #'   \item{id}{OpenAlex work ID (e.g., "https://openalex.org/W2741809807")}
 #'   \item{doi}{DOI (nullable, for secondary lookup)}
-#'   \item{id_block}{Partition key (numeric ID // 10000)}
 #'   \item{parquet_file}{Path to the parquet file}
 #'   \item{file_row_number}{Row number within the file (0-indexed)}
 #' }
@@ -31,7 +30,7 @@
 #' \dontrun{
 #' # Build index for works corpus
 #' build_corpus_index(
-#'   corpus_dir = "/Volumes/openalex/arrow/works_id_block",
+#'   corpus_dir = "/Volumes/openalex/arrow/works",
 #'   index_file = "/Volumes/openalex/arrow/works_index.feather",
 #'   memory_limit = "20GB"
 #' )
@@ -85,7 +84,6 @@ build_corpus_index <- function(
     "SELECT ",
     "  id, ",
     "  doi, ",
-    "  SUBSTR(id, 23)::bigint // 10000 AS id_block, ",
     "  filename AS parquet_file, ",
     "  file_row_number ",
     "FROM read_parquet('",

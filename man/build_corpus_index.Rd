@@ -7,7 +7,7 @@
 build_corpus_index(corpus_dir, index_file, memory_limit = NULL, threads = NULL)
 }
 \arguments{
-\item{corpus_dir}{Path to the parquet corpus directory (partitioned by id_block).}
+\item{corpus_dir}{Path to the parquet corpus directory.}
 
 \item{index_file}{Output path for the Feather index file.}
 
@@ -28,7 +28,6 @@ The index contains the following columns:
 \describe{
 \item{id}{OpenAlex work ID (e.g., "https://openalex.org/W2741809807")}
 \item{doi}{DOI (nullable, for secondary lookup)}
-\item{id_block}{Partition key (numeric ID // 10000)}
 \item{parquet_file}{Path to the parquet file}
 \item{file_row_number}{Row number within the file (0-indexed)}
 }
@@ -39,7 +38,7 @@ The index is stored in Feather (Arrow IPC) format for fast memory-mapped access.
 \dontrun{
 # Build index for works corpus
 build_corpus_index(
-  corpus_dir = "/Volumes/openalex/arrow/works_id_block",
+  corpus_dir = "/Volumes/openalex/arrow/works",
   index_file = "/Volumes/openalex/arrow/works_index.feather",
   memory_limit = "20GB"
 )

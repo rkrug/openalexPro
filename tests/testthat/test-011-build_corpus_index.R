@@ -43,12 +43,11 @@ testthat::test_that("build_corpus_index creates correct Feather index", {
   expect_true(file.exists(index_file))
 
   # Read and verify the index
- index <- arrow::read_feather(index_file)
+  index <- arrow::read_feather(index_file)
 
   # Check columns exist
   expect_true("id" %in% names(index))
   expect_true("doi" %in% names(index))
-  expect_true("id_block" %in% names(index))
   expect_true("parquet_file" %in% names(index))
   expect_true("file_row_number" %in% names(index))
 
@@ -57,12 +56,6 @@ testthat::test_that("build_corpus_index creates correct Feather index", {
 
   # Check IDs are all present
   expect_setequal(index$id, test_data$id)
-
-  # Check id_block calculation is correct
-  # W1000000001 -> 1000000001 // 10000 = 100000
-  # W2000000001 -> 2000000001 // 10000 = 200000
-  expect_true(100000 %in% index$id_block)
-  expect_true(200000 %in% index$id_block)
 
   # Check file_row_number is 0-indexed
   expect_true(all(index$file_row_number >= 0))
@@ -77,7 +70,9 @@ testthat::test_that("build_corpus_index creates correct Feather index", {
   expect_equal(sum(is.na(index$doi)), 2)
 
   # Check DOI lookup works - find record by DOI
-  doi_lookup <- index[index$doi == "https://doi.org/10.1000/test1" & !is.na(index$doi), ]
+  doi_lookup <- index[
+    index$doi == "https://doi.org/10.1000/test1" & !is.na(index$doi),
+  ]
   expect_equal(nrow(doi_lookup), 1)
   expect_equal(doi_lookup$id, "https://openalex.org/W1000000001")
 
