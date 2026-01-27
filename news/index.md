@@ -1,5 +1,20 @@
 # Changelog
 
+## openalexPro v0.4.2
+
+### Breaking Changes
+
+- removal of `load_sql_file()` function as not needed anymore
+
+### Documentation
+
+- Update from vignettes and adding of new ones
+- Update of README.md
+
+### Tests
+
+- Remove need in tests for openalexR
+
 ## openalexPro 0.4.1
 
 - Standardised progressbar handling

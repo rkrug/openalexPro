@@ -1,8 +1,12 @@
 # Articles
 
-### All vignettes
+### Guides
 
-- [Building OpenAlex API Queries with
-  \`pro_query()\`](https://rkrug.github.io/openalexPro/articles/pro_query.md):
-- [Workflow using
-  \`openalexPro2\`](https://rkrug.github.io/openalexPro/articles/Workflow.md):
+- [Quick Start
+  Guide](https://rkrug.github.io/openalexPro/articles/Quick_Start.md):
+- [Workflow
+  Guide](https://rkrug.github.io/openalexPro/articles/Workflow.md):
+- [\`pro_query()\` - Background and Technical
+  Documentation](https://rkrug.github.io/openalexPro/articles/pro_query.md):
+- [\`pro_request()\` - Background and Technical
+  Documentation](https://rkrug.github.io/openalexPro/articles/pro_request.md):

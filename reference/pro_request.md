@@ -1,10 +1,8 @@
-# `openalexR::oa_request()` with additional argument
+# Fetch works from OpenAlex
 
-This function adds one argument to
-[`openalexR::oa_request()`](https://docs.ropensci.org/openalexR/reference/oa_request.html),
-namely `output`. When specified, all return values from OpenAlex will be
-saved as json files in that directory and the return value is the
-directory of the json files.
+All returned values from OpenAlex will be saved as json files in the
+`output` directory and the return value is the directory of the json
+files.
 
 ## Usage
 
@@ -41,9 +39,7 @@ pro_request(
 - output:
 
   directory where the JSON files are saved. Default is a temporary
-  directory. If `NULL`, the return value from call to
-  [`openalexR::oa_request()`](https://docs.ropensci.org/openalexR/reference/oa_request.html)
-  with all the arguments is returned
+  directory. Needs to be specified.
 
 - overwrite:
 
@@ -87,8 +83,6 @@ query_url(s).
 
 ## Details
 
-For the documentation please see
-[`openalexR::oa_request()`](https://docs.ropensci.org/openalexR/reference/oa_request.html)
 If query_url is a list, the function is called for each element of the
 list in parallel using a maximum of `workers` parallel R sessions. The
 results from the individual URLs in the list are returned in a folder
