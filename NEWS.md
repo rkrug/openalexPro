@@ -1,3 +1,41 @@
+# openalexPro 0.5.0
+
+## New Features
+
+### Snapshot Handling
+* Added `prepare_snapshot()` function for setting up a directory with Makefile and documentation
+  for managing OpenAlex snapshots.
+* Added `Makefile.snapshot` in `inst/` for automating snapshot download, conversion, and indexing.
+  Includes targets for `snapshot`, `arrow`, `arrow_index`, and automatic renaming of existing
+  data with release dates.
+* Added `snapshot_to_parquet()` function for converting OpenAlex snapshot NDJSON files to Parquet format
+  using DuckDB. Supports memory management via `memory_limit` and `threads` parameters.
+* Added `build_corpus_index()` function for creating memory-efficient Parquet indexes for fast ID lookups.
+  Handles 300M+ records by streaming directly to file without loading into R memory.
+  For OpenAlex IDs, creates hive-partitioned index by `id_block` for O(1) lookups.
+* Added `lookup_by_id()` function for fast record retrieval from a parquet corpus using pre-built indexes.
+  Supports both OpenAlex ID (partitioned, O(1) lookup) and DOI lookups with automatic ID normalization.
+* Added `snapshot_filter_ids()` function for filtering snapshot data by ID lists.
+* Added `id_block()` helper function for computing ID block partitions.
+
+## Documentation
+
+* Added `snapshot.qmd` vignette with comprehensive guide on downloading, converting, and querying
+  OpenAlex snapshots locally.
+
+## Changes
+
+* Removed `overwrite` parameter from `snapshot_to_parquet()`. Existing datasets are now skipped
+  with a warning message indicating manual removal is required for re-conversion.
+
+## Bug Fixes
+
+* Fixed vignette parse errors in `pro_query.qmd` (malformed code block closings).
+
+## Tests
+
+* Added comprehensive tests for `snapshot_to_parquet()`, `build_corpus_index()`, and `lookup_by_id()`.
+
 # openalexPro v0.4.2
 
 ## Breaking Changes

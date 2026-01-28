@@ -1,0 +1,38 @@
+SNAPSHOTDIR=./openalex-snapshot
+ARROWDIR=./arrow
+RELEASE_DATE:=$(shell grep -m1 '^RELEASE ' $(SNAPSHOTDIR)/RELEASE_NOTES.txt 2>/dev/null | awk '{print $$2}')
+
+help: ## Show this help message
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-15s %s\n", $$1, $$2}'
+
+all: clean snapshot arrow ## Clean, download snapshot, and convert to parquet
+
+snapshot_info: ## Show S3 bucket size and file count
+	aws s3 ls --summarize --human-readable --no-sign-request --recursive "s3://openalex/"
+
+snapshot: ## Download/sync OpenAlex snapshot from S3
+	@if [ -d "${SNAPSHOTDIR}" ] && [ -n "${RELEASE_DATE}" ]; then \
+		echo "Renaming existing snapshot to ${SNAPSHOTDIR}-${RELEASE_DATE}"; \
+		mv "${SNAPSHOTDIR}" "${SNAPSHOTDIR}-${RELEASE_DATE}"; \
+	fi
+	aws s3 sync --delete "s3://openalex" "${SNAPSHOTDIR}" --no-sign-request
+
+arrow: ## Convert snapshot to parquet format
+	@if [ -d "${ARROWDIR}" ] && [ -n "${RELEASE_DATE}" ]; then \
+		echo "Renaming existing arrow to ${ARROWDIR}-${RELEASE_DATE}"; \
+		mv "${ARROWDIR}" "${ARROWDIR}-${RELEASE_DATE}"; \
+	fi
+	Rscript -e 'openalexPro::snapshot_to_parquet(snapshot_dir = "'${SNAPSHOTDIR}'", arrow_dir = "'${ARROWDIR}'", memory_limit = "15GB", threads = 3)'
+
+arrow_index: ## Build ID indexes for all datasets
+	Rscript -e 'lapply(list.dirs("'${ARROWDIR}'", recursive = FALSE), function(d) openalexPro::build_corpus_index(corpus_dir = d, index_dir = file.path("'${ARROWDIR}'", paste0(basename(d), "_id_idx")), merge_partitions = TRUE, memory_limit = "8GB", threads = 2))'
+
+clean_arrow: ## Remove parquet directory only
+	rm -rf ${ARROWDIR}
+
+clean_snapshot: ## Remove snapshot directory only
+	rm -rf ${SNAPSHOTDIR}
+
+clean: clean_arrow clean_snapshot ## Remove both snapshot and parquet directories
+
+.PHONY: help snapshot arrow arrow_index clean clean_arrow clean_snapshot

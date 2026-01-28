@@ -58,3 +58,5 @@ only_local/
 .DS_Store
 
 **/*.quarto_ipynb
+
+authors_id_idx/*

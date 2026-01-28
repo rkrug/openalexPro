@@ -305,7 +305,7 @@ pro_query(entity = "works", `institutions.country_code` = "US")
 
 ### By Concept/Topic
 
-```{r
+```{r}
 # Works about machine learning
 pro_query(entity = "works", `concepts.id` = "C119857082")
 
@@ -751,7 +751,7 @@ flowchart TD
         Entity[entity = "works"]
         ID[id = NULL or single ID]
         Search[search = "climate"]
-        Select[select = c"ids", "title"]
+        Select[select = c&#40;"ids", "title"&#41;]
         GroupBy[group_by = "year"]
         Options[options = list<br/>per_page = 200]
         Filters[... filters]
@@ -1000,8 +1000,8 @@ Constructs helpful error messages with fuzzy suggestions:
 try(pro_query(entity = "paper"))
 # Error: 'arg' should be one of "works", "authors", "venues",
 #        "institutions", "concepts", "publishers", "funders"
-``
-`
+```
+
 **Solution:** Use a valid entity name.
 
 ### Invalid Filter Name
@@ -1009,11 +1009,9 @@ try(pro_query(entity = "paper"))
 ```{r}
 try(pro_query(entity = "works", invalid_filter = "value"))
 # Error: Invalid filter name(s): invalid_filter.
-# Valid filter names are defined in `
-opt_filter_names()
-`.
-`
-``
+# Valid filter names are defined in `opt_filter_names()`.
+```
+
 **Solution:** Check `opt_filter_names()` for valid filter names.
 
 ### Invalid Select Field
@@ -1023,8 +1021,8 @@ try(pro_query(entity = "works", select = c("id", "titel")))
 # Error: Invalid select field(s): id, titel.
 # Did you mean: id → ids, titel → title?
 # Valid select fields are defined in `opt_select_fields()`.
-``
-`
+```
+
 **Solution:** Use suggested corrections or check `opt_select_fields()`.
 
 ### URL Too Long
@@ -1039,8 +1037,8 @@ very_long_url <- pro_query(
   chunk_limit = 1000 # Disabling chunking
 )
 # URL too long → API error
-`
-``
+```
+
 **Solution:** Use appropriate `chunk_limit` (default 50 works well).
 
 # Best Practices

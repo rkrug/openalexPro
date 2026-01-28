@@ -2,52 +2,66 @@
 % Please edit documentation in R/lookup_by_id.R
 \name{lookup_by_id}
 \alias{lookup_by_id}
-\title{Look up records by ID or DOI using a pre-built index}
+\title{Look up records by ID using a pre-built index}
 \usage{
-lookup_by_id(index_file, ids = NULL, dois = NULL, corpus_dir = NULL)
+lookup_by_id(index_dir, ids, id_column = "id")
 }
 \arguments{
-\item{index_file}{Path to the Feather index file, or a pre-loaded index
-data frame.}
+\item{index_dir}{Path to the index. For OpenAlex ID indexes
+(\code{id_column = "id"}), this is the partitioned index directory.
+For DOI indexes (\code{id_column = "doi"}), this is the single parquet file.}
 
-\item{ids}{Character vector of OpenAlex IDs to look up (e.g.,
-"https://openalex.org/W2741809807" or "W2741809807").}
+\item{ids}{Character vector of IDs to look up.}
 
-\item{dois}{Character vector of DOIs to look up (alternative to \code{ids}).}
-
-\item{corpus_dir}{Path to the parquet corpus. If \code{NULL}, uses the directory
-containing the parquet files referenced in the index.}
+\item{id_column}{The type of ID column that was indexed. This determines
+how IDs are normalized and how the index is queried:
+\describe{
+\item{\code{"id"}}{OpenAlex IDs - uses partitioned index with id_block for
+O(1) lookups. Adds "https://openalex.org/" prefix if missing.}
+\item{\code{"doi"}}{DOIs - uses single-file index. Adds "https://doi.org/"
+prefix if missing.}
+}
+Must match the \code{id_column} used when building the index.}
 }
 \value{
 A data frame containing the matching records from the corpus.
 }
 \description{
 This function retrieves specific records from a parquet corpus using
-a Feather index built by \code{\link[=build_corpus_index]{build_corpus_index()}}. It reads only the
+an index built by \code{\link[=build_corpus_index]{build_corpus_index()}}. It reads only the
 necessary files and rows, making it much faster than scanning the
 entire corpus.
 }
 \details{
-Either \code{ids} or \code{dois} must be provided (not both).
-
-IDs can be provided in either long form ("https://openalex.org/W2741809807")
-or short form ("W2741809807"). The function will normalize them.
-
 The function uses DuckDB to efficiently read only the specific rows needed
 from each parquet file, avoiding full file scans.
+
+For OpenAlex IDs (\code{id_column = "id"}), the lookup is O(1) because:
+\enumerate{
+\item The id_block is computed from each ID
+\item Only the relevant partition(s) are read from the index
+\item The specific rows are fetched from the corpus
+}
+
+For DOIs (\code{id_column = "doi"}), the entire index must be scanned since
+DOIs have no predictable structure for partitioning.
+
+You can provide IDs in either long form (with URL prefix) or short form.
 }
 \examples{
 \dontrun{
-# Look up by OpenAlex ID
+# Look up by OpenAlex ID (using partitioned index - fast O(1))
 records <- lookup_by_id(
-  index_file = "works_index.feather",
-  ids = c("W2741809807", "W1234567890")
+  index_dir = "works_id_index",
+  ids = c("W2741809807", "W1234567890"),
+  id_column = "id"
 )
 
-# Look up by DOI
+# Look up by DOI (using single-file index)
 records <- lookup_by_id(
-  index_file = "works_index.feather",
-  dois = c("10.1000/test1", "10.1000/test2")
+  index_dir = "works_doi_index.parquet",
+  ids = c("10.1000/test1", "10.1000/test2"),
+  id_column = "doi"
 )
 }
 

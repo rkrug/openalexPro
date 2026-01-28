@@ -1,0 +1,395 @@
+---
+title: "Working with OpenAlex Snapshots"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    embed-resources: true
+vignette: >
+  %\VignetteIndexEntry{Working with OpenAlex Snapshots}
+  %\VignetteEngine{quarto::html}
+  %\VignetteEncoding{UTF-8}
+execute:
+  cache: false
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = FALSE
+)
+```
+
+# Introduction
+
+OpenAlex provides complete data snapshots that can be downloaded and processed locally. This approach offers several advantages over API queries:
+- **No rate limits**: Process millions of records without API restrictions
+- **Reproducibility**: Work with a fixed point-in-time dataset
+- **Speed**: Local queries are significantly faster than API calls (in many cases, especially what larger result corp[ora concerns)])
+- **Offline access**: No internet connection required after download
+
+This vignette guides you through:
+
+1. Setting up your environment
+2. Downloading the OpenAlex snapshot
+3. Converting to parquet format
+4. Building indexes for fast lookups
+5. Querying your local corpus
+
+# Prerequisites
+
+## Hardware Requirements
+
+Working with the full OpenAlex snapshot requires significant resources:
+
+| Resource | Minimum | Recommended |
+|----------|---------|-------------|
+| Disk space | 2.5 TB | 3+ TB |
+| RAM | 16 GB | 32+ GB |
+| CPU | 2 cores | 4+ cores |
+
+The snapshot download is approximately 1.2 TB. The parquet conversion adds another 100-200 GB depending on compression settings.
+
+## Software Requirements
+
+- **R** (>= 4.1.2)
+- **AWS CLI**: For downloading from S3
+- **GNU Make**: For running the Makefile targets
+- **openalexPro**: This package
+
+### Installing AWS CLI
+
+```bash
+# macOS (with Homebrew)
+brew install awscli
+
+# Ubuntu/Debian
+sudo apt install awscli
+
+# Windows (with winget)
+winget install Amazon.AWSCLI
+```
+
+Verify installation:
+
+```bash
+aws --version
+```
+
+No AWS account is required - the OpenAlex bucket allows anonymous access.
+
+# Quick Start
+
+The easiest way to get started is using `prepare_snapshot()`:
+```{r}
+library(openalexPro)
+
+# Prepare a directory for your snapshot
+prepare_snapshot("/path/to/openalex-data")
+```
+
+This creates:
+
+- `Makefile`: Contains all commands for snapshot management
+- `snapshot_guide.html`: This documentation
+
+Then navigate to the directory and use Make:
+
+```bash
+cd /path/to/openalex-data
+
+# See available commands
+make help
+
+# Download snapshot (WARNING: ~350 GB, takes hours)
+make snapshot
+
+# Convert to parquet format
+make arrow
+
+# Build search indexes
+make arrow_index
+```
+
+# Step-by-Step Guide
+
+## 1. Prepare Your Directory
+
+Choose a location with sufficient disk space:
+
+```{r}
+library(openalexPro)
+
+# Create and prepare the snapshot directory
+snapshot_dir <- "/Volumes/external-drive/openalex"
+prepare_snapshot(snapshot_dir)
+```
+
+## 2. Download the Snapshot
+
+The OpenAlex snapshot is hosted on Amazon S3 and updated regularly. The download uses `aws s3 sync` which:
+
+- Downloads only new or changed files
+- Resumes interrupted downloads
+- Removes files deleted from the source
+
+```bash
+cd /Volumes/external-drive/openalex
+make snapshot
+```
+
+**Expected time**: 2-12 hours depending on your internet connection.
+
+**Tip**: You can monitor progress in another terminal:
+
+```bash
+watch -n 60 'du -sh openalex-snapshot/*'
+```
+
+### Snapshot Structure
+
+After download, you'll have:
+
+```
+openalex-snapshot/
+├── RELEASE_NOTES.txt
+├── data/
+│   ├── works/
+│   ├── authors/
+│   ├── institutions/
+│   ├── sources/
+│   ├── publishers/
+│   ├── funders/
+│   ├── topics/
+│   ├── fields/
+│   ├── subfields/
+│   └── domains/
+└── ...
+```
+
+Each entity type contains gzipped JSON files partitioned by update date.
+
+## 3. Convert to Parquet Format
+
+The JSON snapshot is not efficient for analytical queries. Converting to parquet format provides:
+
+- **Columnar storage**: Read only the columns you need
+- **Compression**: Smaller files on disk
+- **Fast filtering**: Predicate pushdown for efficient queries
+- **Type safety**: Proper data types for each field
+
+```bash
+make arrow
+```
+
+This runs `snapshot_to_parquet()` which:
+
+1. Reads all JSON files for each entity type
+2. Flattens nested structures where appropriate
+3. Writes partitioned parquet files
+
+**Expected time**: 2-8 hours depending on CPU and disk speed.
+
+### Parquet Structure
+
+After conversion:
+
+```
+arrow/
+├── works/
+│   ├── part-00000.parquet
+│   ├── part-00001.parquet
+│   └── ...
+├── authors/
+├── institutions/
+└── ...
+```
+
+## 4. Build Search Indexes
+
+For fast ID-based lookups, build indexes:
+
+```bash
+make arrow_index
+```
+
+This creates Hive-partitioned indexes that allow O(1) lookups by OpenAlex ID:
+
+```
+arrow/
+├── works/
+├── works_id_idx/
+│   ├── id_block=0/
+│   │   └── data.parquet
+│   ├── id_block=1/
+│   │   └── data.parquet
+│   └── ...
+└── ...
+```
+
+The index partitions records by ID blocks (groups of 10,000 IDs), enabling direct access to specific records without scanning the entire corpus.
+
+# Using Your Local Corpus
+
+## Looking Up Records by ID
+
+```{r}
+library(openalexPro)
+
+# Look up specific works by OpenAlex ID
+works <- lookup_by_id(
+  index_dir = "/Volumes/external-drive/openalex/arrow/works_id_idx",
+  ids = c("W2741809807", "W2100837269")
+)
+```
+
+## Looking Up by DOI
+
+First, build a DOI index:
+
+```{r}
+build_corpus_index(
+  corpus_dir = "/Volumes/external-drive/openalex/arrow/works",
+  index_dir = "/Volumes/external-drive/openalex/arrow/works_doi_idx",
+  id_column = "doi"
+)
+```
+
+Then query:
+
+```{r}
+works <- lookup_by_id(
+  index_dir = "/Volumes/external-drive/openalex/arrow/works_doi_idx",
+  ids = "https://doi.org/10.1038/nature12373",
+  id_column = "doi"
+)
+```
+
+## Direct DuckDB Queries
+
+For complex analytical queries, use DuckDB directly:
+
+```{r}
+library(duckdb)
+library(DBI)
+
+con <- dbConnect(duckdb())
+
+# Register parquet files as a view
+dbExecute(
+  con,
+  "
+  CREATE VIEW works AS
+  SELECT * FROM parquet_scan('/Volumes/external-drive/openalex/arrow/works/*.parquet')
+"
+)
+
+# Run analytical queries
+result <- dbGetQuery(
+  con,
+  "
+  SELECT publication_year, COUNT(*) as n_works
+  FROM works
+  WHERE publication_year >= 2020
+  GROUP BY publication_year
+  ORDER BY publication_year
+"
+)
+
+dbDisconnect(con)
+```
+
+# Managing Updates
+
+OpenAlex releases new snapshots regularly. The Makefile handles updates gracefully:
+
+1. **Existing data is preserved**: Before downloading a new snapshot, the old one is renamed with its release date (e.g., `openalex-snapshot-2026-01-15`)
+
+2. **Incremental sync**: `aws s3 sync` only downloads changed files
+
+3. **Re-conversion**: After downloading, run `make arrow` again to update the parquet files
+
+## Checking for Updates
+
+```bash
+make snapshot_info
+```
+
+This shows the current state of the S3 bucket including the total size and file count.
+
+## Manual Update Workflow
+
+```bash
+# Check current release date
+head -5 openalex-snapshot/RELEASE_NOTES.txt
+
+# Sync new data (old snapshot is automatically renamed)
+make snapshot
+
+# Check new release date
+head -5 openalex-snapshot/RELEASE_NOTES.txt
+
+# Re-convert to parquet (old arrow directory is automatically renamed)
+make arrow
+
+# Rebuild indexes
+make arrow_index
+```
+
+# Troubleshooting
+
+## Download Issues
+
+**Interrupted download**: Simply run `make snapshot` again. The sync will resume where it left off.
+
+**Slow download**: OpenAlex uses CloudFront CDN. Speed depends on your location and internet connection. Consider running overnight.
+
+**Disk space errors**: Ensure you have at least 400 GB free before starting.
+
+## Conversion Issues
+
+**Out of memory**: Reduce memory usage in the Makefile:
+
+```makefile
+arrow:
+	Rscript \
+	-e 'openalexPro::snapshot_to_parquet(..., memory_limit = "4GB", threads = 1)'
+```
+
+**DuckDB errors**: Ensure you have the latest version of the `duckdb` R package.
+
+## Index Issues
+
+**Slow lookups**: Ensure `merge_partitions = TRUE` was used when building the index. This creates single files per partition for faster reads.
+
+# Makefile Reference
+
+| Target | Description |
+|--------|-------------|
+| `help` | Show available targets |
+| `snapshot_info` | Display S3 bucket information |
+| `snapshot` | Download/sync snapshot from S3 |
+| `arrow` | Convert snapshot to parquet |
+| `arrow_index` | Build ID indexes |
+| `clean_arrow` | Remove parquet directory |
+| `clean_snapshot` | Remove snapshot directory |
+| `clean` | Remove both directories |
+
+## Customizing the Makefile
+
+Edit the variables at the top of the Makefile:
+
+```makefile
+SNAPSHOTDIR=./openalex-snapshot   # Where to download JSON
+ARROWDIR=./arrow                   # Where to write parquet
+```
+
+You can also adjust memory and thread settings in the `arrow` and `arrow_index` targets.
+
+# Additional Resources
+
+- [OpenAlex Documentation](https://docs.openalex.org/)
+- [OpenAlex Snapshot Documentation](https://docs.openalex.org/download-all-data/openalex-snapshot)
+- [DuckDB Documentation](https://duckdb.org/docs/)
+- [Apache Parquet Format](https://parquet.apache.org/)
