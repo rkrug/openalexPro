@@ -6,7 +6,7 @@ testthat::test_that("snapshot_to_parquet converts JSON to Parquet", {
 
   # Create temporary snapshot directory structure
   snapshot_dir <- file.path(tempdir(), "test_snapshot")
-  arrow_dir <- file.path(tempdir(), "test_arrow")
+  parquet_dir <- file.path(tempdir(), "test_arrow")
 
   # Create expected directory structure: data/<dataset>/part_000/*.gz
   authors_dir <- file.path(snapshot_dir, "data", "authors", "part_000")
@@ -25,17 +25,17 @@ testthat::test_that("snapshot_to_parquet converts JSON to Parquet", {
   close(gz_con)
 
   # Ensure clean output directory
-  unlink(arrow_dir, recursive = TRUE)
+  unlink(parquet_dir, recursive = TRUE)
 
   # Run conversion
   snapshot_to_parquet(
     snapshot_dir = snapshot_dir,
-    arrow_dir = arrow_dir,
+    parquet_dir = parquet_dir,
     data_sets = "authors"
   )
 
   # Verify output exists
-  output_dir <- file.path(arrow_dir, "authors")
+  output_dir <- file.path(parquet_dir, "authors")
   expect_true(dir.exists(output_dir))
 
   # Read and verify the parquet data
@@ -54,7 +54,7 @@ testthat::test_that("snapshot_to_parquet converts JSON to Parquet", {
   # Clean up
 
   unlink(snapshot_dir, recursive = TRUE)
-  unlink(arrow_dir, recursive = TRUE)
+  unlink(parquet_dir, recursive = TRUE)
 })
 
 testthat::test_that("snapshot_to_parquet skips existing data sets", {
@@ -63,7 +63,7 @@ testthat::test_that("snapshot_to_parquet skips existing data sets", {
 
   # Create temporary directories
   snapshot_dir <- file.path(tempdir(), "test_snapshot_skip")
-  arrow_dir <- file.path(tempdir(), "test_arrow_skip")
+  parquet_dir <- file.path(tempdir(), "test_arrow_skip")
 
   # Create snapshot structure
   sources_dir <- file.path(snapshot_dir, "data", "sources", "part_000")
@@ -76,14 +76,14 @@ testthat::test_that("snapshot_to_parquet skips existing data sets", {
   close(gz_con)
 
   # Create existing output directory
-  output_dir <- file.path(arrow_dir, "sources")
+  output_dir <- file.path(parquet_dir, "sources")
   dir.create(output_dir, recursive = TRUE, showWarnings = FALSE)
 
   # Run conversion - should warn about existing directory
   expect_warning(
     snapshot_to_parquet(
       snapshot_dir = snapshot_dir,
-      arrow_dir = arrow_dir,
+      parquet_dir = parquet_dir,
       data_sets = "sources"
     ),
     "Skipping"
@@ -91,7 +91,7 @@ testthat::test_that("snapshot_to_parquet skips existing data sets", {
 
   # Clean up
   unlink(snapshot_dir, recursive = TRUE)
-  unlink(arrow_dir, recursive = TRUE)
+  unlink(parquet_dir, recursive = TRUE)
 })
 
 testthat::test_that("snapshot_to_parquet handles works with large JSON", {
@@ -100,7 +100,7 @@ testthat::test_that("snapshot_to_parquet handles works with large JSON", {
 
   # Create temporary directories
   snapshot_dir <- file.path(tempdir(), "test_snapshot_works")
-  arrow_dir <- file.path(tempdir(), "test_arrow_works")
+  parquet_dir <- file.path(tempdir(), "test_arrow_works")
 
   # Create works directory structure
   works_dir <- file.path(snapshot_dir, "data", "works", "part_000")
@@ -118,20 +118,20 @@ testthat::test_that("snapshot_to_parquet handles works with large JSON", {
   close(gz_con)
 
   # Ensure clean output directory
-  unlink(arrow_dir, recursive = TRUE)
+  unlink(parquet_dir, recursive = TRUE)
 
   # Run conversion for works (should use maximum_object_size)
   expect_message(
     snapshot_to_parquet(
       snapshot_dir = snapshot_dir,
-      arrow_dir = arrow_dir,
+      parquet_dir = parquet_dir,
       data_sets = "works"
     ),
     "Processing works"
   )
 
   # Verify output
-  output_dir <- file.path(arrow_dir, "works")
+  output_dir <- file.path(parquet_dir, "works")
   expect_true(dir.exists(output_dir))
 
   parquet_files <- list.files(output_dir, pattern = "\\.parquet$", full.names = TRUE)
@@ -144,5 +144,5 @@ testthat::test_that("snapshot_to_parquet handles works with large JSON", {
 
   # Clean up
   unlink(snapshot_dir, recursive = TRUE)
-  unlink(arrow_dir, recursive = TRUE)
+  unlink(parquet_dir, recursive = TRUE)
 })

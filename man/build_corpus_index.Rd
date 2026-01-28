@@ -66,16 +66,16 @@ DOIs have no predictable structure for partitioning.
 \dontrun{
 # Build partitioned index for OpenAlex IDs (fast O(1) lookup)
 build_corpus_index(
-  corpus_dir = "/Volumes/openalex/arrow/works",
-  index_dir = "/Volumes/openalex/arrow/works_id_index",
+  corpus_dir = "/Volumes/openalex/parquet/works",
+  index_dir = "/Volumes/openalex/parquet/works_id_index",
   id_column = "id",
   memory_limit = "20GB"
 )
 
 # Build single-file index for DOIs
 build_corpus_index(
-  corpus_dir = "/Volumes/openalex/arrow/works",
-  index_dir = "/Volumes/openalex/arrow/works_doi_index.parquet",
+  corpus_dir = "/Volumes/openalex/parquet/works",
+  index_dir = "/Volumes/openalex/parquet/works_doi_index.parquet",
   id_column = "doi",
   memory_limit = "20GB"
 )

@@ -20,8 +20,8 @@
 #' \describe{
 #'   \item{help}{Show available make targets}
 #'   \item{snapshot}{Download/sync OpenAlex snapshot from S3}
-#'   \item{arrow}{Convert snapshot to parquet format}
-#'   \item{arrow_index}{Build ID indexes for fast lookups}
+#'   \item{parquet}{Convert snapshot to parquet format}
+#'   \item{parquet_index}{Build ID indexes for fast lookups}
 #'   \item{clean}{Remove generated directories}
 #' }
 #'
@@ -80,8 +80,8 @@ makefile_dst <- file.path(path, "Makefile")
     "Navigate to the directory: {.code cd {normalizePath(path)}}",
     "View available commands: {.code make help}",
     "Download the snapshot (~350GB): {.code make snapshot}",
-    "Convert to parquet format: {.code make arrow}",
-    "Build search indexes: {.code make arrow_index}"
+    "Convert to parquet format: {.code make parquet}",
+    "Build search indexes: {.code make parquet_index}"
   ))
   cli::cli_text("")
   cli::cli_h2("Requirements")

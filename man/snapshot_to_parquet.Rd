@@ -2,11 +2,11 @@
 % Please edit documentation in R/snapshot_to_parquet.R
 \name{snapshot_to_parquet}
 \alias{snapshot_to_parquet}
-\title{Convert OA snapshot to Arrow format}
+\title{Convert OA snapshot to Parquet format}
 \usage{
 snapshot_to_parquet(
   snapshot_dir = file.path("", "Volumes", "openalex", "openalex-snapshot"),
-  arrow_dir = file.path("", "Volumes", "openalex", "arrow"),
+  parquet_dir = file.path("", "Volumes", "openalex", "parquet"),
   data_sets = NULL,
   temp_directory = NULL,
   memory_limit = NULL,
@@ -16,7 +16,7 @@ snapshot_to_parquet(
 \arguments{
 \item{snapshot_dir}{The directory path of the OA snapshot data. Default is "Volumes/openalex/openalex-snapshot".}
 
-\item{arrow_dir}{The directory path where the Arrow files will be saved. Default is "Volumes/openalex/arrow".}
+\item{parquet_dir}{The directory path where the Parquet files will be saved. Default is "Volumes/openalex/parquet".}
 
 \item{data_sets}{A character vector specifying the data sets to process. Default is NULL, which processes all data sets.}
 
@@ -30,7 +30,7 @@ system RAM for optimal performance. Default is \code{NULL}, use DuckDB default.}
 usage but slow down processing. Default is \code{NULL}, use all available cores.}
 }
 \description{
-This function converts the OA (openalex) snapshot data to Arrow format.
+This function converts the OA (openalex) snapshot data to Parquet format.
 Existing datasets are skipped with a warning. On macOS, a \code{.metadata_never_index}
 file is created in the output directory to prevent Spotlight from indexing
 the parquet files.

@@ -106,10 +106,10 @@ make help
 make snapshot
 
 # Convert to parquet format
-make arrow
+make parquet
 
 # Build search indexes
-make arrow_index
+make parquet_index
 ```
 
 # Step-by-Step Guide
@@ -180,7 +180,7 @@ The JSON snapshot is not efficient for analytical queries. Converting to parquet
 - **Type safety**: Proper data types for each field
 
 ```bash
-make arrow
+make parquet
 ```
 
 This runs `snapshot_to_parquet()` which:
@@ -196,7 +196,7 @@ This runs `snapshot_to_parquet()` which:
 After conversion:
 
 ```
-arrow/
+parquet/
 ├── works/
 │   ├── part-00000.parquet
 │   ├── part-00001.parquet
@@ -211,13 +211,13 @@ arrow/
 For fast ID-based lookups, build indexes:
 
 ```bash
-make arrow_index
+make parquet_index
 ```
 
 This creates Hive-partitioned indexes that allow O(1) lookups by OpenAlex ID:
 
 ```
-arrow/
+parquet/
 ├── works/
 ├── works_id_idx/
 │   ├── id_block=0/
@@ -239,7 +239,7 @@ library(openalexPro)
 
 # Look up specific works by OpenAlex ID
 works <- lookup_by_id(
-  index_dir = "/Volumes/external-drive/openalex/arrow/works_id_idx",
+  index_dir = "/Volumes/external-drive/openalex/parquet/works_id_idx",
   ids = c("W2741809807", "W2100837269")
 )
 ```
@@ -250,8 +250,8 @@ First, build a DOI index:
 
 ```{r}
 build_corpus_index(
-  corpus_dir = "/Volumes/external-drive/openalex/arrow/works",
-  index_dir = "/Volumes/external-drive/openalex/arrow/works_doi_idx",
+  corpus_dir = "/Volumes/external-drive/openalex/parquet/works",
+  index_dir = "/Volumes/external-drive/openalex/parquet/works_doi_idx",
   id_column = "doi"
 )
 ```
@@ -260,7 +260,7 @@ Then query:
 
 ```{r}
 works <- lookup_by_id(
-  index_dir = "/Volumes/external-drive/openalex/arrow/works_doi_idx",
+  index_dir = "/Volumes/external-drive/openalex/parquet/works_doi_idx",
   ids = "https://doi.org/10.1038/nature12373",
   id_column = "doi"
 )
@@ -281,7 +281,7 @@ dbExecute(
   con,
   "
   CREATE VIEW works AS
-  SELECT * FROM parquet_scan('/Volumes/external-drive/openalex/arrow/works/*.parquet')
+  SELECT * FROM parquet_scan('/Volumes/external-drive/openalex/parquet/works/*.parquet')
 "
 )
 
@@ -308,7 +308,7 @@ OpenAlex releases new snapshots regularly. The Makefile handles updates graceful
 
 2. **Incremental sync**: `aws s3 sync` only downloads changed files
 
-3. **Re-conversion**: After downloading, run `make arrow` again to update the parquet files
+3. **Re-conversion**: After downloading, run `make parquet` again to update the parquet files
 
 ## Checking for Updates
 
@@ -330,11 +330,11 @@ make snapshot
 # Check new release date
 head -5 openalex-snapshot/RELEASE_NOTES.txt
 
-# Re-convert to parquet (old arrow directory is automatically renamed)
-make arrow
+# Re-convert to parquet (old parquet directory is automatically renamed)
+make parquet
 
 # Rebuild indexes
-make arrow_index
+make parquet_index
 ```
 
 # Troubleshooting
@@ -352,7 +352,7 @@ make arrow_index
 **Out of memory**: Reduce memory usage in the Makefile:
 
 ```makefile
-arrow:
+parquet:
 	Rscript \
 	-e 'openalexPro::snapshot_to_parquet(..., memory_limit = "4GB", threads = 1)'
 ```
@@ -370,9 +370,9 @@ arrow:
 | `help` | Show available targets |
 | `snapshot_info` | Display S3 bucket information |
 | `snapshot` | Download/sync snapshot from S3 |
-| `arrow` | Convert snapshot to parquet |
-| `arrow_index` | Build ID indexes |
-| `clean_arrow` | Remove parquet directory |
+| `parquet` | Convert snapshot to parquet |
+| `parquet_index` | Build ID indexes |
+| `clean_parquet` | Remove parquet directory |
 | `clean_snapshot` | Remove snapshot directory |
 | `clean` | Remove both directories |
 
@@ -382,10 +382,10 @@ Edit the variables at the top of the Makefile:
 
 ```makefile
 SNAPSHOTDIR=./openalex-snapshot   # Where to download JSON
-ARROWDIR=./arrow                   # Where to write parquet
+PARQUETDIR=./parquet                   # Where to write parquet
 ```
 
-You can also adjust memory and thread settings in the `arrow` and `arrow_index` targets.
+You can also adjust memory and thread settings in the `parquet` and `parquet_index` targets.
 
 # Additional Resources
 

@@ -1,12 +1,12 @@
-#' Convert OA snapshot to Arrow format
+#' Convert OA snapshot to Parquet format
 #'
-#' This function converts the OA (openalex) snapshot data to Arrow format.
+#' This function converts the OA (openalex) snapshot data to Parquet format.
 #' Existing datasets are skipped with a warning. On macOS, a `.metadata_never_index`
 #' file is created in the output directory to prevent Spotlight from indexing
 #' the parquet files.
 #'
 #' @param snapshot_dir The directory path of the OA snapshot data. Default is "Volumes/openalex/openalex-snapshot".
-#' @param arrow_dir The directory path where the Arrow files will be saved. Default is "Volumes/openalex/arrow".
+#' @param parquet_dir The directory path where the Parquet files will be saved. Default is "Volumes/openalex/parquet".
 #' @param data_sets A character vector specifying the data sets to process. Default is NULL, which processes all data sets.
 #' @param temp_directory location of the temporaty directory for duckdb. Initial runs indicate
 #'   that 2TB should be safe. Default is `NULL`, use the system temporary directory.
@@ -31,7 +31,7 @@
 #' @md
 snapshot_to_parquet <- function(
   snapshot_dir = file.path("", "Volumes", "openalex", "openalex-snapshot"),
-  arrow_dir = file.path("", "Volumes", "openalex", "arrow"),
+  parquet_dir = file.path("", "Volumes", "openalex", "parquet"),
   data_sets = NULL,
   temp_directory = NULL,
   memory_limit = NULL,
@@ -47,10 +47,10 @@ snapshot_to_parquet <- function(
     data_sets <- data_sets[data_sets != "merged_ids"]
   }
 
-  dir.create(arrow_dir, recursive = TRUE, showWarnings = FALSE)
+  dir.create(parquet_dir, recursive = TRUE, showWarnings = FALSE)
 
   ## Prevent macOS Spotlight from indexing parquet files
-  file.create(file.path(arrow_dir, ".metadata_never_index"))
+  file.create(file.path(parquet_dir, ".metadata_never_index"))
 
   con <- DBI::dbConnect(duckdb::duckdb(), read_only = FALSE)
 
@@ -83,10 +83,10 @@ snapshot_to_parquet <- function(
   }
 
   for (data_set in data_sets) {
-    arrow_ds <- file.path(arrow_dir, data_set)
-    if (file.exists(arrow_ds)) {
+    parquet_ds <- file.path(parquet_dir, data_set)
+    if (file.exists(parquet_ds)) {
       warning(
-        "Skipping '", data_set, "' - directory already exists at '", arrow_ds, "'. ",
+        "Skipping '", data_set, "' - directory already exists at '", parquet_ds, "'. ",
         "Remove it manually to re-convert.",
         call. = FALSE
       )
@@ -118,7 +118,7 @@ snapshot_to_parquet <- function(
       ndjson_options,
       ")",
       ") TO '",
-      arrow_ds,
+      parquet_ds,
       "' ",
       "(FORMAT PARQUET, COMPRESSION SNAPPY, PER_THREAD_OUTPUT, ",
       "ROW_GROUP_SIZE 100_000, ROW_GROUPS_PER_FILE 20)"

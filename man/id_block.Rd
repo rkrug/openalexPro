@@ -7,24 +7,31 @@
 id_block(ids)
 }
 \arguments{
-\item{ids}{Character vector of OpenAlex IDs (e.g., "W2741809807" or
-"https://openalex.org/W2741809807").}
+\item{ids}{Character vector of OpenAlex IDs in any format:
+\itemize{
+\item Short form: \code{"W2741809807"}
+\item Long form: \code{"https://openalex.org/W2741809807"}
+\item Path-based: \code{"https://openalex.org/domains/2"}
+}}
 }
 \value{
 Integer vector of ID blocks.
 }
 \description{
 This function computes the ID block partition key from OpenAlex IDs.
-The ID block is calculated as the numeric portion of the ID divided by 10,000.
+The ID block is calculated as the trailing numeric portion of the ID
+divided by 10,000.
 }
 \details{
-OpenAlex IDs have the format \verb{https://openalex.org/\{type\}\{number\}} where
-\code{{type}} is a single letter (W for works, A for authors, etc.) and
-\code{{number}} is a numeric identifier.
+OpenAlex IDs come in several formats:
+\itemize{
+\item Standard: \verb{https://openalex.org/\{type\}\{number\}} (e.g., \code{W1234567890})
+\item Path-based: \verb{https://openalex.org/\{entity_type\}/\{number\}} (e.g., \code{domains/2}, \code{subfields/2208})
+}
 
-The ID block is computed as \code{floor(number / 10000)}, which groups
-approximately 10,000 IDs into each block. This is useful for partitioning
-large datasets.
+The ID block is computed as \code{floor(number / 10000)}, where \code{number} is
+the trailing numeric portion of the ID. This groups approximately 10,000
+IDs into each block, useful for partitioning large datasets.
 }
 \examples{
 # Short form IDs
@@ -34,6 +41,10 @@ id_block(c("W2741809807", "W2741809808", "W1234567890"))
 # Long form IDs
 id_block("https://openalex.org/W2741809807")
 # Returns: 274180
+
+# Path-based IDs
+id_block("https://openalex.org/domains/2")
+# Returns: 0
 
 # Works with any entity type
 id_block(c("A123456789", "I987654321"))

@@ -30,8 +30,8 @@ The Makefile provides the following targets:
 \describe{
   \item{help}{Show available make targets}
   \item{snapshot}{Download/sync OpenAlex snapshot from S3}
-  \item{arrow}{Convert snapshot to parquet format}
-  \item{arrow_index}{Build ID indexes for fast lookups}
+  \item{parquet}{Convert snapshot to parquet format}
+  \item{parquet_index}{Build ID indexes for fast lookups}
   \item{clean}{Remove generated directories}
 }
 }

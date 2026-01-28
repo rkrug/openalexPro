@@ -6,7 +6,7 @@
 * Added `prepare_snapshot()` function for setting up a directory with Makefile and documentation
   for managing OpenAlex snapshots.
 * Added `Makefile.snapshot` in `inst/` for automating snapshot download, conversion, and indexing.
-  Includes targets for `snapshot`, `arrow`, `arrow_index`, and automatic renaming of existing
+  Includes targets for `snapshot`, `parquet`, `parquet_index`, and automatic renaming of existing
   data with release dates.
 * Added `snapshot_to_parquet()` function for converting OpenAlex snapshot NDJSON files to Parquet format
   using DuckDB. Supports memory management via `memory_limit` and `threads` parameters.

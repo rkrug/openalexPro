@@ -48,16 +48,16 @@
 #' \dontrun{
 #' # Build partitioned index for OpenAlex IDs (fast O(1) lookup)
 #' build_corpus_index(
-#'   corpus_dir = "/Volumes/openalex/arrow/works",
-#'   index_dir = "/Volumes/openalex/arrow/works_id_index",
+#'   corpus_dir = "/Volumes/openalex/parquet/works",
+#'   index_dir = "/Volumes/openalex/parquet/works_id_index",
 #'   id_column = "id",
 #'   memory_limit = "20GB"
 #' )
 #'
 #' # Build single-file index for DOIs
 #' build_corpus_index(
-#'   corpus_dir = "/Volumes/openalex/arrow/works",
-#'   index_dir = "/Volumes/openalex/arrow/works_doi_index.parquet",
+#'   corpus_dir = "/Volumes/openalex/parquet/works",
+#'   index_dir = "/Volumes/openalex/parquet/works_doi_index.parquet",
 #'   id_column = "doi",
 #'   memory_limit = "20GB"
 #' )
@@ -78,9 +78,9 @@ build_corpus_index <- function(
   }
 
   if (dir.exists(index_dir)) {
-    warning(
-      "index_dir exists - creeation skipped - delete manually to re-create: ",
-      corpus_dir
+    message(
+      "index_dir exists - creation skipped - delete manually to re-create: ",
+      index_dir
     )
     return(invisible(NULL))
   }
@@ -132,18 +132,19 @@ build_corpus_index <- function(
   if (id_column == "id") {
     ## For OpenAlex IDs: partition by id_block for O(1) lookups
     ## id_block = floor(numeric_part / 10000)
-    message("Creating partitioned index by id_block...")
+    message("    Creating partitioned index by id_block...")
 
-    ## OpenAlex ID format: https://openalex.org/W1234567890
-    ## - Prefix 'https://openalex.org/' is 21 chars
-    ## - Position 22 is the entity type letter (W, A, I, etc.)
-    ## - Position 23+ is the numeric ID
+    ## OpenAlex ID formats:
+    ##   https://openalex.org/W1234567890  (standard: letter + digits)
+    ##   https://openalex.org/domains/2    (path-based: entity_type/digits)
+    ##   https://openalex.org/subfields/2208
+    ## Use regexp_extract to get the trailing numeric part from any format
     ## id_block = floor(numeric_id / 10000)
     copy_query <- paste0(
       "COPY (",
       "SELECT ",
       "  id, ",
-      "  CAST(FLOOR(CAST(SUBSTR(id, 23) AS BIGINT) / 10000) AS INTEGER) ",
+      "  CAST(FLOOR(CAST(regexp_extract(id, '(\\d+)$', 1) AS BIGINT) / 10000) AS INTEGER) ",
       "    AS id_block, ",
       "  filename AS parquet_file, ",
       "  file_row_number ",
