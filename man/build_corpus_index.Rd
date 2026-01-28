@@ -44,7 +44,9 @@ access to specific records without scanning entire partitions.
 \details{
 The function is memory-efficient and can handle 300M+ records by using
 DuckDB's COPY TO command to write directly to the output without
-loading data into R memory.
+loading data into R memory. On macOS, a \code{.metadata_never_index}
+file is created in the output directory to prevent Spotlight from indexing
+the parquet files.
 
 The index contains the following columns:
 \describe{

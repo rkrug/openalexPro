@@ -1,7 +1,9 @@
 #' Convert OA snapshot to Arrow format
 #'
 #' This function converts the OA (openalex) snapshot data to Arrow format.
-#' Existing datasets are skipped with a warning.
+#' Existing datasets are skipped with a warning. On macOS, a `.metadata_never_index`
+#' file is created in the output directory to prevent Spotlight from indexing
+#' the parquet files.
 #'
 #' @param snapshot_dir The directory path of the OA snapshot data. Default is "Volumes/openalex/openalex-snapshot".
 #' @param arrow_dir The directory path where the Arrow files will be saved. Default is "Volumes/openalex/arrow".
@@ -46,6 +48,9 @@ snapshot_to_parquet <- function(
   }
 
   dir.create(arrow_dir, recursive = TRUE, showWarnings = FALSE)
+
+  ## Prevent macOS Spotlight from indexing parquet files
+  file.create(file.path(arrow_dir, ".metadata_never_index"))
 
   con <- DBI::dbConnect(duckdb::duckdb(), read_only = FALSE)
 

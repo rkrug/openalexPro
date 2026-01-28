@@ -31,7 +31,9 @@ usage but slow down processing. Default is \code{NULL}, use all available cores.
 }
 \description{
 This function converts the OA (openalex) snapshot data to Arrow format.
-Existing datasets are skipped with a warning.
+Existing datasets are skipped with a warning. On macOS, a \code{.metadata_never_index}
+file is created in the output directory to prevent Spotlight from indexing
+the parquet files.
 }
 \examples{
 \dontrun{

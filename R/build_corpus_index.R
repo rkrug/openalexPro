@@ -6,7 +6,9 @@
 #'
 #' The function is memory-efficient and can handle 300M+ records by using
 #' DuckDB's COPY TO command to write directly to the output without
-#' loading data into R memory.
+#' loading data into R memory. On macOS, a `.metadata_never_index`
+#' file is created in the output directory to prevent Spotlight from indexing
+#' the parquet files.
 #'
 #' @param corpus_dir Path to the parquet corpus directory.
 #' @param index_dir Output path for the index. For OpenAlex ID indexes
@@ -93,6 +95,9 @@ build_corpus_index <- function(
   if (!dir.exists(parent_dir)) {
     dir.create(parent_dir, recursive = TRUE)
   }
+
+  ## Prevent macOS Spotlight from indexing parquet files
+  file.create(file.path(parent_dir, ".metadata_never_index"))
 
   con <- DBI::dbConnect(duckdb::duckdb(), read_only = FALSE)
 
