@@ -5,181 +5,212 @@
 #' necessary files and rows, making it much faster than scanning the
 #' entire corpus.
 #'
-#' @param index_dir Path to the index. For OpenAlex ID indexes
-#'   (`id_column = "id"`), this is the partitioned index directory.
-#'   For DOI indexes (`id_column = "doi"`), this is the single parquet file.
-#' @param ids Character vector of IDs to look up.
-#' @param id_column The type of ID column that was indexed. This determines
-#'   how IDs are normalized and how the index is queried:
-#'   \describe{
-#'     \item{`"id"`}{OpenAlex IDs - uses partitioned index with id_block for
-#'       O(1) lookups. Adds "https://openalex.org/" prefix if missing.}
-#'     \item{`"doi"`}{DOIs - uses single-file index. Adds "https://doi.org/"
-#'       prefix if missing.}
-#'   }
-#'   Must match the `id_column` used when building the index.
+#' @param index_file Path to the partitioned index file created by
+#'   [build_corpus_index()].
+#' @param ids Character vector of OpenAlex IDs to look up. Can be in long form
+#'   (e.g., `"https://openalex.org/W2741809807"`) or short form
+#'   (e.g., `"W2741809807"`).
+#' @param workers Number of parallel workers for reading corpus files.
+#'   Default is `NULL` (sequential). If `> 1`, uses
+#'   [future.apply::future_lapply()] with [future::multisession].
+#' @param output Path to an output directory for writing results as parquet
+#'   files. If `NULL` (default), results are returned as a data frame.
+#'   If set, filtered records are written directly to parquet (one file per
+#'   source corpus file) without loading them into R memory. The directory
+#'   must not already exist.
 #'
-#' @return A data frame containing the matching records from the corpus.
+#' @return If `output` is `NULL`, a data frame containing the matching records.
+#'   If `output` is set, the output directory path is returned invisibly.
 #'
 #' @details
 #' The function uses DuckDB to efficiently read only the specific rows needed
 #' from each parquet file, avoiding full file scans.
 #'
-#' For OpenAlex IDs (`id_column = "id"`), the lookup is O(1) because:
+#' The lookup is O(1) because:
 #' 1. The id_block is computed from each ID
 #' 2. Only the relevant partition(s) are read from the index
 #' 3. The specific rows are fetched from the corpus
 #'
-#' For DOIs (`id_column = "doi"`), the entire index must be scanned since
-#' DOIs have no predictable structure for partitioning.
+#' When `output` is set, DuckDB writes the filtered rows directly to parquet
+#' files using `COPY ... TO`, so the data never enters R memory. This is
+#' essential for lookups involving millions of IDs.
 #'
-#' You can provide IDs in either long form (with URL prefix) or short form.
-#'
-#' @importFrom DBI dbConnect dbDisconnect dbGetQuery
+#' @importFrom DBI dbConnect dbDisconnect dbGetQuery dbExecute
 #' @importFrom duckdb duckdb
-#' @importFrom arrow read_parquet
+#' @importFrom future plan multisession
+#' @importFrom future.apply future_lapply
 #'
 #' @examples
 #' \dontrun{
-#' # Look up by OpenAlex ID (using partitioned index - fast O(1))
+#' # Return results as data frame
 #' records <- lookup_by_id(
-#'   index_dir = "works_id_index",
-#'   ids = c("W2741809807", "W1234567890"),
-#'   id_column = "id"
+#'   index_file = "works_id_index.parquet",
+#'   ids = c("W2741809807", "W1234567890")
 #' )
 #'
-#' # Look up by DOI (using single-file index)
-#' records <- lookup_by_id(
-#'   index_dir = "works_doi_index.parquet",
-#'   ids = c("10.1000/test1", "10.1000/test2"),
-#'   id_column = "doi"
+#' # Write results to parquet (for millions of IDs)
+#' lookup_by_id(
+#'   index_file = "works_id_index.parquet",
+#'   ids = large_id_vector,
+#'   output = "filtered_works",
+#'   workers = 3
 #' )
 #' }
 #'
 #' @export
 #' @md
 lookup_by_id <- function(
-  index_dir,
+  index_file,
   ids,
-  id_column = "id"
+  workers = NULL,
+  output = NULL
 ) {
   ## Validate inputs
   if (missing(ids) || length(ids) == 0) {
     stop("'ids' must be provided")
   }
 
-  if (!id_column %in% c("id", "doi")) {
-    stop("id_column must be 'id' or 'doi'")
-  }
-
   ## Check index exists
-  if (id_column == "id") {
-    if (!dir.exists(index_dir)) {
-      stop("Index directory not found: ", index_dir)
-    }
-  } else {
-    if (!file.exists(index_dir)) {
-      stop("Index file not found: ", index_dir)
-    }
+  if (!file.exists(index_file)) {
+    stop("Index file not found: ", index_file)
   }
 
-  ## Normalize IDs based on id_column type
-  if (id_column == "id") {
-    ids <- ifelse(
-      grepl("^https://openalex.org/", ids),
-      ids,
-      paste0("https://openalex.org/", ids)
-    )
-  } else {
-    ids <- ifelse(
-      grepl("^https://doi.org/", ids),
-      ids,
-      paste0("https://doi.org/", ids)
-    )
+  ## Validate output directory
+  if (!is.null(output)) {
+    if (dir.exists(output)) {
+      stop("Output directory already exists: ", output)
+    }
+    dir.create(output, recursive = TRUE, showWarnings = FALSE)
   }
 
-  ## Connect to DuckDB
+  ## Normalize IDs - add prefix if missing
+  ids <- ifelse(
+    grepl("^https://openalex.org/", ids),
+    ids,
+    paste0("https://openalex.org/", ids)
+  )
+
+  ## Connect to DuckDB for index queries
   con <- DBI::dbConnect(duckdb::duckdb(), read_only = TRUE)
   on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
 
-  ## Query index based on id_column type
-  if (id_column == "id") {
-    ## For OpenAlex IDs: use partitioned index with id_block filtering
-    ## Compute id_blocks for the requested IDs
-    id_blocks <- id_block(ids)
-    unique_blocks <- unique(id_blocks)
+  ## Compute id_blocks and group IDs by block
+  blocks <- id_block(ids)
+  id_chunks <- split(ids, blocks)
 
-    message(
-      "Looking up ", length(ids), " IDs across ",
-      length(unique_blocks), " partition(s)..."
-    )
+  message(
+    "Looking up ",
+    length(ids),
+    " IDs across ",
+    length(id_chunks),
+    " partition(s)..."
+  )
 
-    ## Build query that filters by id_block (partition pruning)
-    ## DuckDB will only read the relevant partitions
-    ids_escaped <- gsub("'", "''", ids)
-    ids_sql <- paste0("'", ids_escaped, "'", collapse = ", ")
+  ## Query each id_block partition separately
+  matches <- do.call(
+    rbind,
+    lapply(names(id_chunks), function(block) {
+      chunk_ids <- id_chunks[[block]]
+      ids_escaped <- gsub("'", "''", chunk_ids)
+      ids_sql <- paste0("'", ids_escaped, "'", collapse = ", ")
 
-    index_query <- paste0(
-      "SELECT id, parquet_file, file_row_number ",
-      "FROM read_parquet('", index_dir, "/**/*.parquet', ",
-      "hive_partitioning = true) ",
-      "WHERE id_block IN (", paste(unique_blocks, collapse = ", "), ") ",
-      "AND id IN (", ids_sql, ")"
-    )
+      index_query <- paste0(
+        "SELECT id, parquet_file, file_row_number ",
+        "FROM read_parquet('",
+        index_file,
+        "') ",
+        "WHERE id_block = ",
+        block,
+        " ",
+        "AND id IN (",
+        ids_sql,
+        ")"
+      )
 
-    matches <- DBI::dbGetQuery(con, index_query)
-  } else {
-    ## For DOIs: query single file index
-    message("Looking up ", length(ids), " DOIs in index...")
+      DBI::dbGetQuery(con, index_query)
+    })
+  )
 
-    ids_escaped <- gsub("'", "''", ids)
-    ids_sql <- paste0("'", ids_escaped, "'", collapse = ", ")
-
-    index_query <- paste0(
-      "SELECT id, parquet_file, file_row_number ",
-      "FROM read_parquet('", index_dir, "') ",
-      "WHERE id IN (", ids_sql, ")"
-    )
-
-    matches <- DBI::dbGetQuery(con, index_query)
-  }
-
-  if (nrow(matches) == 0) {
+  if (is.null(matches) || nrow(matches) == 0) {
     message("No matching records found in index")
+    if (!is.null(output)) {
+      return(invisible(output))
+    }
     return(data.frame())
   }
 
   message("Found ", nrow(matches), " matching records in index")
 
-  ## Group by parquet file
-  files <- unique(matches$parquet_file)
+  ## Set up parallel plan if workers > 1
+  if (!is.null(workers) && workers > 1) {
+    old_plan <- future::plan(future::multisession, workers = workers)
+    on.exit(future::plan(old_plan), add = TRUE)
+  }
 
-  ## Read records from each corpus file
-  results <- lapply(files, function(pq_file) {
-    file_matches <- matches[matches$parquet_file == pq_file, ]
-    row_numbers <- file_matches$file_row_number
+  ## Split matches by corpus file
+  file_chunks <- split(matches$file_row_number, matches$parquet_file)
 
-    ## Build query to read specific rows
-    ## DuckDB's file_row_number is 0-indexed
-    query <- paste0(
-      "SELECT * FROM read_parquet('",
-      pq_file,
-      "', file_row_number = true) ",
-      "WHERE file_row_number IN (",
-      paste(row_numbers, collapse = ", "),
-      ")"
-    )
+  ## Read/write records from each corpus file (parallel if workers > 1)
+  results <- future.apply::future_lapply(names(file_chunks), function(pq_file) {
+    row_numbers <- file_chunks[[pq_file]]
 
-    tryCatch(
-      DBI::dbGetQuery(con, query),
-      error = function(e) {
-        warning("Failed to read from ", pq_file, ": ", e$message)
-        data.frame()
-      }
-    )
+    ## Each worker gets its own DuckDB connection
+    worker_con <- DBI::dbConnect(duckdb::duckdb(), read_only = TRUE)
+    on.exit(DBI::dbDisconnect(worker_con, shutdown = TRUE))
+
+    row_filter <- paste(row_numbers, collapse = ", ")
+
+    if (!is.null(output)) {
+      ## Write directly to parquet — never loads into R memory
+      out_file <- file.path(output, paste0("part_", basename(pq_file)))
+      copy_query <- paste0(
+        "COPY (SELECT * FROM read_parquet('",
+        pq_file,
+        "', file_row_number = true) ",
+        "WHERE file_row_number IN (",
+        row_filter,
+        ")) ",
+        "TO '",
+        out_file,
+        "' (FORMAT PARQUET, COMPRESSION SNAPPY)"
+      )
+      tryCatch(
+        {
+          DBI::dbExecute(worker_con, copy_query)
+          length(row_numbers)
+        },
+        error = function(e) {
+          warning("Failed to write from ", pq_file, ": ", e$message)
+          0L
+        }
+      )
+    } else {
+      ## Return data frame (in-memory mode)
+      query <- paste0(
+        "SELECT * FROM read_parquet('",
+        pq_file,
+        "', file_row_number = true) ",
+        "WHERE file_row_number IN (",
+        row_filter,
+        ")"
+      )
+      tryCatch(
+        DBI::dbGetQuery(worker_con, query),
+        error = function(e) {
+          warning("Failed to read from ", pq_file, ": ", e$message)
+          data.frame()
+        }
+      )
+    }
   })
 
-  ## Combine results
+  if (!is.null(output)) {
+    total <- sum(unlist(results))
+    message("Written ", total, " records to ", output)
+    return(invisible(output))
+  }
+
+  ## Combine results (in-memory mode)
   result <- do.call(rbind, results)
 
   ## Remove the file_row_number column we added for filtering

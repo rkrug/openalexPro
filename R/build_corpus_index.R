@@ -1,64 +1,51 @@
 #' Build a Parquet index for fast ID lookups in a parquet corpus
 #'
-#' This function creates a Parquet index that maps a specified ID column
-#' to its physical location in the parquet corpus. This enables fast random
+#' This function creates a Parquet index that maps OpenAlex IDs
+#' to their physical location in the parquet corpus. This enables fast random
 #' access to specific records without scanning entire partitions.
 #'
 #' The function is memory-efficient and can handle 300M+ records by using
-#' DuckDB's COPY TO command to write directly to the output without
-#' loading data into R memory. On macOS, a `.metadata_never_index`
+#' a two-stage approach: first indexing each parquet file individually
+#' (bounded memory per file), then redistributing into hive-partitioned
+#' output by `id_block`. This avoids loading the entire dataset at once.
+#' Stage 1 is parallelized using [future.apply::future_lapply()] and
+#' supports resuming if interrupted. On macOS, a `.metadata_never_index`
 #' file is created in the output directory to prevent Spotlight from indexing
 #' the parquet files.
 #'
 #' @param corpus_dir Path to the parquet corpus directory.
-#' @param index_dir Output path for the index. For OpenAlex ID indexes
-#'   (`id_column = "id"`), this is a directory with hive-partitioned parquet
-#'   files by `id_block`. For DOI indexes (`id_column = "doi"`), this is a
-#'   single parquet file path.
-#' @param id_column Name of the column to index. Default is `"id"` for OpenAlex
-#'   IDs. Use `"doi"` to create a DOI index.
-#' @param merge_partitions Logical. For partitioned indexes (`id_column = "id"`),
-#'   whether to merge multiple files per partition into a single file. Default
-#'   is `TRUE` for cleaner output. Set to `FALSE` for faster index building
-#'   (lookup still works correctly with multiple files per partition).
+#' @param index_file Output path for the index parquet file.
+#'   parquet files by `id_block`.
 #' @param memory_limit DuckDB memory limit (e.g., "20GB"). Default is `NULL`.
-#' @param threads Number of DuckDB threads. Default is `NULL` (use all cores).
+#' @param workers Number of parallel workers for Stage 1 indexing and DuckDB
+#'   threads for Stage 2. Default is `NULL` (use all cores).
 #'
 #' @return Invisibly returns the path to the created index.
 #'
 #' @details
 #' The index contains the following columns:
 #' \describe{
-#'   \item{id}{The indexed column (renamed to "id" regardless of source column)}
+#'   \item{id}{The OpenAlex ID}
 #'   \item{parquet_file}{Path to the parquet file in the corpus}
 #'   \item{file_row_number}{Row number within the file (0-indexed)}
 #' }
 #'
-#' For OpenAlex ID indexes (`id_column = "id"`), the index is partitioned by
-#' `id_block` (computed as `floor(numeric_id / 10000)`). This enables O(1)
-#' lookups by first computing the ID block, then reading only that partition.
-#'
-#' For DOI indexes (`id_column = "doi"`), the index is a single file since
-#' DOIs have no predictable structure for partitioning.
+#' The index is partitioned by `id_block` (computed as
+#' `floor(numeric_id / 10000)`). This enables O(1) lookups by first
+#' computing the ID block, then reading only that partition.
 #'
 #' @importFrom DBI dbConnect dbDisconnect dbExecute dbGetQuery
 #' @importFrom duckdb duckdb
+#' @importFrom future plan multisession sequential
+#' @importFrom future.apply future_lapply
+#' @importFrom progressr with_progress progressor
 #'
 #' @examples
 #' \dontrun{
 #' # Build partitioned index for OpenAlex IDs (fast O(1) lookup)
 #' build_corpus_index(
 #'   corpus_dir = "/Volumes/openalex/parquet/works",
-#'   index_dir = "/Volumes/openalex/parquet/works_id_index",
-#'   id_column = "id",
-#'   memory_limit = "20GB"
-#' )
-#'
-#' # Build single-file index for DOIs
-#' build_corpus_index(
-#'   corpus_dir = "/Volumes/openalex/parquet/works",
-#'   index_dir = "/Volumes/openalex/parquet/works_doi_index.parquet",
-#'   id_column = "doi",
+#'   index_file = "/Volumes/openalex/parquet/works_id_index.parquet",
 #'   memory_limit = "20GB"
 #' )
 #' }
@@ -67,38 +54,23 @@
 #' @md
 build_corpus_index <- function(
   corpus_dir,
-  index_dir,
-  id_column = "id",
-  merge_partitions = TRUE,
+  index_file,
   memory_limit = NULL,
-  threads = NULL
+  workers = NULL
 ) {
   if (!dir.exists(corpus_dir)) {
     stop("corpus_dir does not exist: ", corpus_dir)
   }
 
-  if (dir.exists(index_dir)) {
+  if (file.exists(index_file)) {
     message(
-      "index_dir exists - creation skipped - delete manually to re-create: ",
-      index_dir
+      "index_file exists - creation skipped - delete manually to re-create: ",
+      index_file
     )
     return(invisible(NULL))
   }
 
-  ## For partitioned output (id), create parent directory
-  ## For single file output (doi), create parent directory
-  parent_dir <- if (id_column == "id") {
-    index_dir
-  } else {
-    dirname(index_dir)
-  }
-  if (!dir.exists(parent_dir)) {
-    dir.create(parent_dir, recursive = TRUE)
-  }
-
-  ## Prevent macOS Spotlight from indexing parquet files
-  file.create(file.path(parent_dir, ".metadata_never_index"))
-
+  index_file <- sub("/+$", "", index_file)
   con <- DBI::dbConnect(duckdb::duckdb(), read_only = FALSE)
 
   on.exit(
@@ -113,150 +85,179 @@ build_corpus_index <- function(
       paste0("SET memory_limit = '", memory_limit, "'")
     )
   }
-  if (!is.null(threads)) {
+  if (!is.null(workers)) {
     DBI::dbExecute(
       conn = con,
-      paste0("SET threads = ", threads)
+      paste0("SET threads = ", workers)
     )
   }
 
   message("Building index from: ", corpus_dir)
-  message("    Indexing column: ", id_column)
-  message("    Writing to: ", index_dir)
+  message("    Writing to: ", index_file)
 
   total_start <- Sys.time()
 
-  ## Use COPY TO to write directly to parquet - avoids loading into R memory
-  ## This is critical for 300M+ records which would require ~60GB RAM otherwise
+  ## Two-stage approach:
+  ##   Stage 1: Index each parquet file individually (bounded memory, parallel)
+  ##   Stage 2: Redistribute into hive-partitioned output by id_block
 
-  if (id_column == "id") {
-    ## For OpenAlex IDs: partition by id_block for O(1) lookups
-    ## id_block = floor(numeric_part / 10000)
-    message("    Creating partitioned index by id_block...")
+  ## OpenAlex ID formats:
+  ##   https://openalex.org/W1234567890  (standard: letter + digits)
+  ##   https://openalex.org/domains/2    (path-based: entity_type/digits)
+  ##   https://openalex.org/subfields/2208
+  ## Use regexp_extract to get the trailing numeric part from any format
+  ## id_block = floor(numeric_id / 10000)
 
-    ## OpenAlex ID formats:
-    ##   https://openalex.org/W1234567890  (standard: letter + digits)
-    ##   https://openalex.org/domains/2    (path-based: entity_type/digits)
-    ##   https://openalex.org/subfields/2208
-    ## Use regexp_extract to get the trailing numeric part from any format
-    ## id_block = floor(numeric_id / 10000)
-    copy_query <- paste0(
-      "COPY (",
-      "SELECT ",
-      "  id, ",
-      "  CAST(FLOOR(CAST(regexp_extract(id, '(\\d+)$', 1) AS BIGINT) / 10000) AS INTEGER) ",
-      "    AS id_block, ",
-      "  filename AS parquet_file, ",
-      "  file_row_number ",
-      "FROM read_parquet('",
-      corpus_dir,
-      "/**/*.parquet', filename = true, file_row_number = true)",
-      ") TO '",
-      index_dir,
-      "' (FORMAT PARQUET, PARTITION_BY (id_block), COMPRESSION ZSTD, ",
-      "OVERWRITE_OR_IGNORE)"
-    )
-  } else {
-    ## For DOIs: single file (no predictable partitioning structure)
-    message("    Creating single-file index...")
+  temp_dir <- paste0(index_file, "_tmp")
+  dir.create(temp_dir, recursive = TRUE, showWarnings = FALSE)
+  file.create(file.path(temp_dir, ".metadata_never_index"))
 
-    copy_query <- paste0(
-      "COPY (",
-      "SELECT ",
-      "  ",
-      id_column,
-      " AS id, ",
-      "  filename AS parquet_file, ",
-      "  file_row_number ",
-      "FROM read_parquet('",
-      corpus_dir,
-      "/**/*.parquet', filename = true, file_row_number = true)",
-      ") TO '",
-      index_dir,
-      "' (FORMAT PARQUET, COMPRESSION ZSTD)"
-    )
+  parquet_files <- list.files(
+    corpus_dir,
+    pattern = "\\.parquet$",
+    recursive = TRUE,
+    full.names = TRUE
+  )
+
+  ## Stage 1: Index each file individually (parallel)
+  message(
+    "Stage 1: Indexing ",
+    length(parquet_files),
+    " parquet files",
+    if (!is.null(workers) && workers > 1) {
+      paste0(" with ", workers, " workers...")
+    } else {
+      " sequentially..."
+    }
+  )
+
+  ## Set up parallel plan if workers > 1
+  if (!is.null(workers) && workers > 1) {
+    old_plan <- future::plan(future::multisession, workers = workers)
+    on.exit(future::plan(old_plan), add = TRUE)
   }
 
-  message("    Executing index query (streaming to file)...")
-  DBI::dbExecute(conn = con, copy_query)
-
-  ## For partitioned output, optionally merge multiple files per partition
-  if (id_column == "id" && merge_partitions) {
-    message("Merging partition files...")
-
-    ## Find all partition directories
-    partition_dirs <- list.dirs(index_dir, recursive = FALSE, full.names = TRUE)
-
-    for (part_dir in partition_dirs) {
-      part_files <- list.files(
-        part_dir,
-        pattern = "\\.parquet$",
-        full.names = TRUE
+  progressr::with_progress({
+    p <- progressr::progressor(along = parquet_files)
+    future.apply::future_lapply(seq_along(parquet_files), function(i) {
+      pf <- parquet_files[i]
+      out_file <- file.path(
+        temp_dir,
+        paste0("idx_", sprintf("%05d", i), ".parquet")
       )
 
-      if (length(part_files) > 1) {
-        ## Multiple files - merge them
-        merged_file <- file.path(part_dir, "data.parquet")
-        temp_file <- file.path(part_dir, "merged_temp.parquet")
-
-        merge_query <- paste0(
-          "COPY (SELECT * FROM read_parquet('",
-          part_dir,
-          "/*.parquet')) TO '",
-          temp_file,
-          "' (FORMAT PARQUET, COMPRESSION ZSTD)"
-        )
-        DBI::dbExecute(conn = con, merge_query)
-
-        ## Remove original files and rename temp
-        file.remove(part_files)
-        file.rename(temp_file, merged_file)
+      ## Resume support: skip already indexed files
+      if (file.exists(out_file)) {
+        p()
+        return(invisible(NULL))
       }
-    }
 
-    message("Partition merge complete")
-  }
+      ## Each worker gets its own DuckDB connection
+      worker_con <- DBI::dbConnect(duckdb::duckdb(), read_only = FALSE)
+      on.exit(DBI::dbDisconnect(worker_con, shutdown = TRUE))
+      DBI::dbExecute(conn = worker_con, "SET threads = 1")
+      DBI::dbExecute(
+        conn = worker_con,
+        "SET preserve_insertion_order = false"
+      )
+      if (!is.null(memory_limit)) {
+        DBI::dbExecute(
+          conn = worker_con,
+          paste0("SET memory_limit = '", memory_limit, "'")
+        )
+      }
 
-  ## Get row count for reporting
-  count_query <- paste0(
-    "SELECT COUNT(*) as n FROM read_parquet('",
-    index_dir,
-    if (id_column == "id") "/**/*.parquet')" else "')"
-  )
-  row_count <- DBI::dbGetQuery(conn = con, count_query)$n
+      stage1_query <- paste0(
+        "COPY (",
+        "SELECT ",
+        "  id, ",
+        "  CAST(FLOOR(CAST(regexp_extract(id, '(\\d+)$', 1) AS BIGINT) / 10000) AS INTEGER) ",
+        "    AS id_block, ",
+        "  filename AS parquet_file, ",
+        "  file_row_number ",
+        "FROM read_parquet('",
+        pf,
+        "', filename = true, file_row_number = true)",
+        ") TO '",
+        out_file,
+        "' (FORMAT PARQUET, COMPRESSION SNAPPY)"
+      )
+      DBI::dbExecute(conn = worker_con, stage1_query)
+      p()
+      invisible(NULL)
+    })
+  })
 
-  message(
-    "Index built: ",
-    format(row_count, big.mark = ","),
-    " rows"
-  )
+  message("    Stage 1 complete.")
+
+  message("Stage 2: Combining into single index file ", index_file)
+
+  arrow::open_dataset(temp_dir) |>
+    arrow::write_parquet(index_file, compression = "snappy")
+
+  unlink(temp_dir, recursive = TRUE)
+
+  ## Stage 2: Write hive-partitioned index by id_block
+  # message("Stage 2: Writing hive-partitioned index by id_block...")
+  # dir.create(index_dir, recursive = TRUE, showWarnings = FALSE)
+  # file.create(file.path(index_dir, ".metadata_never_index"))
+
+  # copy_query <- paste0(
+  #   "COPY (",
+  #   "SELECT * FROM read_parquet('",
+  #   temp_dir,
+  #   "/idx_*.parquet')",
+  #   ") TO '",
+  #   index_dir,
+  #   "' (FORMAT PARQUET, PARTITION_BY (id_block), COMPRESSION SNAPPY, ",
+  #   "OVERWRITE_OR_IGNORE)"
+  # )
+
+  # message("    Executing index query (streaming to file)...")
+  # DBI::dbExecute(conn = con, copy_query)
+
+  # ## Clean up temp directory
+  # if (dir.exists(paste0(index_dir, "_tmp"))) {
+  #   message("    Cleaning up temp directory...")
+  #   unlink(paste0(index_dir, "_tmp"), recursive = TRUE)
+  # }
+
+  # ## Get row count for reporting
+  # count_query <- paste0(
+  #   "SELECT COUNT(*) as n FROM read_parquet('",
+  #   index_dir,
+  #   "/**/*.parquet')"
+  # )
+  # row_count <- DBI::dbGetQuery(conn = con, count_query)$n
+
+  # message(
+  #   "Index built: ",
+  #   format(row_count, big.mark = ","),
+  #   " rows"
+  # )
 
   ## Report size
-  if (id_column == "id") {
-    ## Sum sizes of all partition files
-    index_files <- list.files(
-      index_dir,
-      pattern = "\\.parquet$",
-      recursive = TRUE,
-      full.names = TRUE
-    )
-    total_size <- sum(file.info(index_files)$size)
-    file_size_gb <- round(total_size / 1024^3, 2)
-    message(
-      "Done! Index size: ",
-      file_size_gb,
-      " GB across ",
-      length(index_files),
-      " partition files"
-    )
-  } else {
-    file_size_gb <- round(file.info(index_dir)$size / 1024^3, 2)
-    message(
-      "Done! Index file size: ",
-      file_size_gb,
-      " GB"
-    )
-  }
+  # index_files <- list.files(
+  #   index_dir,
+  #   pattern = "\\.parquet$",
+  #   recursive = TRUE,
+  #   full.names = TRUE
+  # )
+  index_files <- index_file
+  total_size <- sum(file.info(index_files)$size)
+  file_size_gb <- round(total_size / 1024^3, 2)
+  # message(
+  #   "Done! Index size: ",
+  #   file_size_gb,
+  #   " GB across ",
+  #   length(index_files),
+  #   " partition files"
+  # )
+  message(
+    "Done! Index size: ",
+    file_size_gb,
+    " GB in one partition files"
+  )
 
   message(
     "Total time: ",
@@ -264,5 +265,5 @@ build_corpus_index <- function(
     " minutes"
   )
 
-  invisible(index_dir)
+  invisible(index_file)
 }

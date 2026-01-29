@@ -180,7 +180,7 @@ The JSON snapshot is not efficient for analytical queries. Converting to parquet
 - **Type safety**: Proper data types for each field
 
 ```bash
-make parquet
+make parquet MEMORY_LIMIT=20GB WORKERS=4
 ```
 
 This runs `snapshot_to_parquet()` which:
@@ -188,6 +188,8 @@ This runs `snapshot_to_parquet()` which:
 1. Reads all JSON files for each entity type
 2. Flattens nested structures where appropriate
 3. Writes partitioned parquet files
+ 
+**NB: set MEMORY_LIMIT and WORKERS (the number of parallel threads) to values working with yor system - this is initiallty a trial and error, but can be re-used again.**
 
 **Expected time**: 2-8 hours depending on CPU and disk speed.
 
@@ -214,21 +216,18 @@ For fast ID-based lookups, build indexes:
 make parquet_index
 ```
 
-This creates Hive-partitioned indexes that allow O(1) lookups by OpenAlex ID:
+This creates an index parquet file which allows O(1) lookups by OpenAlex ID:
 
 ```
 parquet/
 ├── works/
-├── works_id_idx/
-│   ├── id_block=0/
-│   │   └── data.parquet
-│   ├── id_block=1/
-│   │   └── data.parquet
-│   └── ...
+├── works_id_idx.parquet
 └── ...
 ```
 
 The index partitions records by ID blocks (groups of 10,000 IDs), enabling direct access to specific records without scanning the entire corpus.
+
+**NB: set MEMORY_LIMIT and WORKERS (the number of parallel threads) to values working with yor system. From experience, only WORKERS need to be set and can be rather large.**
 
 # Using Your Local Corpus
 
@@ -237,32 +236,18 @@ The index partitions records by ID blocks (groups of 10,000 IDs), enabling direc
 ```{r}
 library(openalexPro)
 
-# Look up specific works by OpenAlex ID
+# Look up specific works by OpenAlex ID (returns data frame)
 works <- lookup_by_id(
-  index_dir = "/Volumes/external-drive/openalex/parquet/works_id_idx",
+  index_file = "/Volumes/external-drive/openalex/parquet/works_id_idx.parquet",
   ids = c("W2741809807", "W2100837269")
 )
-```
 
-## Looking Up by DOI
-
-First, build a DOI index:
-
-```{r}
-build_corpus_index(
-  corpus_dir = "/Volumes/external-drive/openalex/parquet/works",
-  index_dir = "/Volumes/external-drive/openalex/parquet/works_doi_idx",
-  id_column = "doi"
-)
-```
-
-Then query:
-
-```{r}
-works <- lookup_by_id(
-  index_dir = "/Volumes/external-drive/openalex/parquet/works_doi_idx",
-  ids = "https://doi.org/10.1038/nature12373",
-  id_column = "doi"
+# For millions of IDs, write directly to parquet instead of loading into memory
+lookup_by_id(
+  index_file = "/Volumes/external-drive/openalex/parquet/works_id_idx.parquet",
+  ids = large_id_vector,
+  output = "filtered_works",
+  workers = 3
 )
 ```
 
@@ -308,7 +293,7 @@ OpenAlex releases new snapshots regularly. The Makefile handles updates graceful
 
 2. **Incremental sync**: `aws s3 sync` only downloads changed files
 
-3. **Re-conversion**: After downloading, run `make parquet` again to update the parquet files
+3. **Re-conversion**: After downloading, run `make parquet` and `parquet_index` again to update the parquet files and the indices.
 
 ## Checking for Updates
 
@@ -354,14 +339,14 @@ make parquet_index
 ```makefile
 parquet:
 	Rscript \
-	-e 'openalexPro::snapshot_to_parquet(..., memory_limit = "4GB", threads = 1)'
+	-e 'openalexPro::snapshot_to_parquet(..., memory_limit = "4GB", workers = 1)'
 ```
 
 **DuckDB errors**: Ensure you have the latest version of the `duckdb` R package.
 
-## Index Issues
+<!-- ## Index Issues
 
-**Slow lookups**: Ensure `merge_partitions = TRUE` was used when building the index. This creates single files per partition for faster reads.
+**Slow lookups**: Rebuild the index with fewer workers to reduce the number of files per partition. -->
 
 # Makefile Reference
 

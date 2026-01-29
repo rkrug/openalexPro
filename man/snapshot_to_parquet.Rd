@@ -10,7 +10,7 @@ snapshot_to_parquet(
   data_sets = NULL,
   temp_directory = NULL,
   memory_limit = NULL,
-  threads = NULL
+  workers = NULL
 )
 }
 \arguments{
@@ -26,7 +26,7 @@ that 2TB should be safe. Default is \code{NULL}, use the system temporary direct
 \item{memory_limit}{DuckDB memory limit (e.g., "64GB"). Set to 50-60\% of
 system RAM for optimal performance. Default is \code{NULL}, use DuckDB default.}
 
-\item{threads}{Number of threads for DuckDB to use. Lower values reduce memory
+\item{workers}{Number of DuckDB threads to use. Lower values reduce memory
 usage but slow down processing. Default is \code{NULL}, use all available cores.}
 }
 \description{

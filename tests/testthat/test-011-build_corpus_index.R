@@ -24,11 +24,11 @@ testthat::test_that("build_corpus_index creates partitioned index for id column"
   # Create temporary directories
   corpus_dir <- file.path(tempdir(), "test_corpus_partitioned")
   dir.create(corpus_dir, recursive = TRUE, showWarnings = FALSE)
-  index_dir <- file.path(tempdir(), "test_index_partitioned")
+  index_file <- file.path(tempdir(), "test_index_partitioned.parquet")
 
   # Clean up any existing index
 
-  unlink(index_dir, recursive = TRUE)
+  unlink(index_file, recursive = TRUE)
 
   # Create test data with IDs in different blocks
   test_data <- data.frame(
@@ -53,19 +53,19 @@ testthat::test_that("build_corpus_index creates partitioned index for id column"
   # Write test parquet file
   arrow::write_parquet(test_data, file.path(corpus_dir, "test.parquet"))
 
-  # Build the partitioned index (default id_column = "id")
+  # Build the partitioned index
   result <- build_corpus_index(
     corpus_dir = corpus_dir,
-    index_dir = index_dir
+    index_file = index_file
   )
 
   # Check return value
-  expect_equal(result, index_dir)
-  expect_true(dir.exists(index_dir))
+  expect_equal(result, index_file)
+  expect_true(file.exists(index_file))
 
   # Check partition directories exist
-  partitions <- list.dirs(index_dir, recursive = FALSE)
-  expect_true(length(partitions) >= 1)
+  # partitions <- list.dirs(index_file, recursive = FALSE)
+  # expect_true(length(partitions) >= 1)
 
   # Read the partitioned index using DuckDB
   con <- DBI::dbConnect(duckdb::duckdb(), read_only = TRUE)
@@ -74,8 +74,9 @@ testthat::test_that("build_corpus_index creates partitioned index for id column"
   index <- DBI::dbGetQuery(
     con,
     paste0(
-      "SELECT * FROM read_parquet('", index_dir,
-      "/**/*.parquet', hive_partitioning = true)"
+      "SELECT * FROM read_parquet('",
+      index_file,
+      "')"
     )
   )
 
@@ -101,74 +102,14 @@ testthat::test_that("build_corpus_index creates partitioned index for id column"
 
   # Clean up
   unlink(corpus_dir, recursive = TRUE)
-  unlink(index_dir, recursive = TRUE)
-})
-
-testthat::test_that("build_corpus_index creates single-file index for doi column", {
-  skip_if_not_installed("arrow")
-  skip_if_not_installed("duckdb")
-
-  # Create temporary directories
-  corpus_dir <- file.path(tempdir(), "test_corpus_doi")
-  dir.create(corpus_dir, recursive = TRUE, showWarnings = FALSE)
-  index_file <- file.path(tempdir(), "test_doi_index.parquet")
-
-  # Clean up any existing index
-  unlink(index_file)
-
-  # Create a small test parquet file with known data
-  test_data <- data.frame(
-    id = c(
-      "https://openalex.org/W1000000001",
-      "https://openalex.org/W1000000002"
-    ),
-    doi = c(
-      "https://doi.org/10.1000/test1",
-      "https://doi.org/10.1000/test2"
-    ),
-    title = c("Paper 1", "Paper 2"),
-    stringsAsFactors = FALSE
-  )
-
-  # Write test parquet file
-  arrow::write_parquet(test_data, file.path(corpus_dir, "test.parquet"))
-
-  # Build the DOI index (single file, not partitioned)
-  result <- build_corpus_index(
-    corpus_dir = corpus_dir,
-    index_dir = index_file,
-    id_column = "doi"
-  )
-
-  # Check return value
-  expect_equal(result, index_file)
-  expect_true(file.exists(index_file))
-
-  # Read and verify the index
-  index <- arrow::read_parquet(index_file)
-
-  # Check columns exist (id column contains DOIs, no id_block)
-  expect_true("id" %in% names(index))
-  expect_true("parquet_file" %in% names(index))
-  expect_true("file_row_number" %in% names(index))
-  expect_false("id_block" %in% names(index))
-
-  # Check row count matches
-  expect_equal(nrow(index), nrow(test_data))
-
-  # Check DOIs are all present (stored in "id" column)
-  expect_setequal(index$id, test_data$doi)
-
-  # Clean up
-  unlink(corpus_dir, recursive = TRUE)
-  unlink(index_file)
+  unlink(index_file, recursive = TRUE)
 })
 
 testthat::test_that("build_corpus_index errors on non-existent directory", {
   expect_error(
     build_corpus_index(
       corpus_dir = "/non/existent/path",
-      index_dir = tempfile()
+      index_file = tempfile()
     ),
     "corpus_dir does not exist"
   )

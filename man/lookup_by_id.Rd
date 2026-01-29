@@ -4,27 +4,29 @@
 \alias{lookup_by_id}
 \title{Look up records by ID using a pre-built index}
 \usage{
-lookup_by_id(index_dir, ids, id_column = "id")
+lookup_by_id(index_file, ids, workers = NULL, output = NULL)
 }
 \arguments{
-\item{index_dir}{Path to the index. For OpenAlex ID indexes
-(\code{id_column = "id"}), this is the partitioned index directory.
-For DOI indexes (\code{id_column = "doi"}), this is the single parquet file.}
+\item{index_file}{Path to the partitioned index file created by
+\code{\link[=build_corpus_index]{build_corpus_index()}}.}
 
-\item{ids}{Character vector of IDs to look up.}
+\item{ids}{Character vector of OpenAlex IDs to look up. Can be in long form
+(e.g., \code{"https://openalex.org/W2741809807"}) or short form
+(e.g., \code{"W2741809807"}).}
 
-\item{id_column}{The type of ID column that was indexed. This determines
-how IDs are normalized and how the index is queried:
-\describe{
-\item{\code{"id"}}{OpenAlex IDs - uses partitioned index with id_block for
-O(1) lookups. Adds "https://openalex.org/" prefix if missing.}
-\item{\code{"doi"}}{DOIs - uses single-file index. Adds "https://doi.org/"
-prefix if missing.}
-}
-Must match the \code{id_column} used when building the index.}
+\item{workers}{Number of parallel workers for reading corpus files.
+Default is \code{NULL} (sequential). If \verb{> 1}, uses
+\code{\link[future.apply:future_lapply]{future.apply::future_lapply()}} with \link[future:multisession]{future::multisession}.}
+
+\item{output}{Path to an output directory for writing results as parquet
+files. If \code{NULL} (default), results are returned as a data frame.
+If set, filtered records are written directly to parquet (one file per
+source corpus file) without loading them into R memory. The directory
+must not already exist.}
 }
 \value{
-A data frame containing the matching records from the corpus.
+If \code{output} is \code{NULL}, a data frame containing the matching records.
+If \code{output} is set, the output directory path is returned invisibly.
 }
 \description{
 This function retrieves specific records from a parquet corpus using
@@ -36,32 +38,31 @@ entire corpus.
 The function uses DuckDB to efficiently read only the specific rows needed
 from each parquet file, avoiding full file scans.
 
-For OpenAlex IDs (\code{id_column = "id"}), the lookup is O(1) because:
+The lookup is O(1) because:
 \enumerate{
 \item The id_block is computed from each ID
 \item Only the relevant partition(s) are read from the index
 \item The specific rows are fetched from the corpus
 }
 
-For DOIs (\code{id_column = "doi"}), the entire index must be scanned since
-DOIs have no predictable structure for partitioning.
-
-You can provide IDs in either long form (with URL prefix) or short form.
+When \code{output} is set, DuckDB writes the filtered rows directly to parquet
+files using \verb{COPY ... TO}, so the data never enters R memory. This is
+essential for lookups involving millions of IDs.
 }
 \examples{
 \dontrun{
-# Look up by OpenAlex ID (using partitioned index - fast O(1))
+# Return results as data frame
 records <- lookup_by_id(
-  index_dir = "works_id_index",
-  ids = c("W2741809807", "W1234567890"),
-  id_column = "id"
+  index_file = "works_id_index.parquet",
+  ids = c("W2741809807", "W1234567890")
 )
 
-# Look up by DOI (using single-file index)
-records <- lookup_by_id(
-  index_dir = "works_doi_index.parquet",
-  ids = c("10.1000/test1", "10.1000/test2"),
-  id_column = "doi"
+# Write results to parquet (for millions of IDs)
+lookup_by_id(
+  index_file = "works_id_index.parquet",
+  ids = large_id_vector,
+  output = "filtered_works",
+  workers = 3
 )
 }
 

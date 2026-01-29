@@ -12,7 +12,7 @@
 #'   that 2TB should be safe. Default is `NULL`, use the system temporary directory.
 #' @param memory_limit DuckDB memory limit (e.g., "64GB"). Set to 50-60% of
 #'   system RAM for optimal performance. Default is `NULL`, use DuckDB default.
-#' @param threads Number of threads for DuckDB to use. Lower values reduce memory
+#' @param workers Number of DuckDB threads to use. Lower values reduce memory
 #'   usage but slow down processing. Default is `NULL`, use all available cores.
 #'
 #' @importFrom DBI dbConnect dbDisconnect dbExecute
@@ -35,7 +35,7 @@ snapshot_to_parquet <- function(
   data_sets = NULL,
   temp_directory = NULL,
   memory_limit = NULL,
-  threads = NULL
+  workers = NULL
 ) {
   if (is.null(data_sets)) {
     data_sets <- list.dirs(
@@ -75,10 +75,10 @@ snapshot_to_parquet <- function(
       paste0("SET memory_limit = '", memory_limit, "'")
     )
   }
-  if (!is.null(threads)) {
+  if (!is.null(workers)) {
     DBI::dbExecute(
       conn = con,
-      paste0("SET threads = ", threads)
+      paste0("SET threads = ", workers)
     )
   }
 

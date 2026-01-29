@@ -1,7 +1,7 @@
 SNAPSHOTDIR=./openalex-snapshot
 PARQUETDIR=./parquet
 MEMORY_LIMIT=15GB
-THREADS=3
+WORKERS=3
 RELEASE_DATE:=$(shell grep -m1 '^RELEASE ' $(SNAPSHOTDIR)/RELEASE_NOTES.txt 2>/dev/null | awk '{print $$2}')
 
 help: ## Show this help message
@@ -9,12 +9,14 @@ help: ## Show this help message
 	@echo "  SNAPSHOTDIR    = ${SNAPSHOTDIR}"
 	@echo "  PARQUETDIR     = ${PARQUETDIR}"
 	@echo "  MEMORY_LIMIT   = ${MEMORY_LIMIT}"
-	@echo "  THREADS        = ${THREADS}"
+	@echo "  WORKERS        = ${WORKERS}"
 	@echo ""
 	@echo "Targets:"
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-15s %s\n", $$1, $$2}'
 	@echo ""
-	@echo "Override variables on command line: make parquet MEMORY_LIMIT=20GB THREADS=4"
+	@echo "Override variables on command line: make parquet MEMORY_LIMIT=20GB WORKERS=4"
+	@echo "The conversion from snapshot to parquet is more memory intensive and needs lower WORKERS"
+	@echo "The indexing is less memory intensive and profits from higher number of workers WORKERS"
 
 all: clean snapshot parquet ## Clean, download snapshot, and convert to parquet
 
@@ -33,10 +35,10 @@ parquet: ## Convert snapshot to parquet format
 		echo "Renaming existing parquet to ${PARQUETDIR}-${RELEASE_DATE}"; \
 		mv "${PARQUETDIR}" "${PARQUETDIR}-${RELEASE_DATE}"; \
 	fi
-	Rscript -e 'openalexPro::snapshot_to_parquet(snapshot_dir = "'${SNAPSHOTDIR}'", parquet_dir = "'${PARQUETDIR}'", memory_limit = "'${MEMORY_LIMIT}'", threads = '${THREADS}')' 2>&1
+	Rscript -e 'openalexPro::snapshot_to_parquet(snapshot_dir = "'${SNAPSHOTDIR}'", parquet_dir = "'${PARQUETDIR}'", memory_limit = "'${MEMORY_LIMIT}'", workers = '${WORKERS}')' 2>&1
 
 parquet_index: ## Build ID indexes for all datasets
-	Rscript -e 'invisible(lapply(grepv("_idx$$", list.dirs("'${PARQUETDIR}'", recursive = FALSE), invert = TRUE), function(d) openalexPro::build_corpus_index(corpus_dir = d, index_dir = file.path("'${PARQUETDIR}'", paste0(basename(d), "_id_idx")), merge_partitions = TRUE, memory_limit = "'${MEMORY_LIMIT}'", threads = '${THREADS}')))' 2>&1
+	Rscript -e 'invisible(lapply(grepv("_idx.parquet$$", list.dirs("'${PARQUETDIR}'", recursive = FALSE), invert = TRUE), function(d) openalexPro::build_corpus_index(corpus_dir = d, index_file = file.path("'${PARQUETDIR}'", paste0(basename(d), "_id_idx.parquet")), memory_limit = "'${MEMORY_LIMIT}'", workers = '${WORKERS}')))' 2>&1
 
 clean_parquet: ## Remove parquet directory only
 	rm -rf ${PARQUETDIR}

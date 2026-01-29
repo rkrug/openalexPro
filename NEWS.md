@@ -9,12 +9,13 @@
   Includes targets for `snapshot`, `parquet`, `parquet_index`, and automatic renaming of existing
   data with release dates.
 * Added `snapshot_to_parquet()` function for converting OpenAlex snapshot NDJSON files to Parquet format
-  using DuckDB. Supports memory management via `memory_limit` and `threads` parameters.
+  using DuckDB. Supports memory management via `memory_limit` and `workers` parameters.
 * Added `build_corpus_index()` function for creating memory-efficient Parquet indexes for fast ID lookups.
-  Handles 300M+ records by streaming directly to file without loading into R memory.
-  For OpenAlex IDs, creates hive-partitioned index by `id_block` for O(1) lookups.
+  Handles 300M+ records by processing parquet files individually, with optional parallelization via
+  `workers` and progress reporting via `progressr`. Creates hive-partitioned index by `id_block` for O(1) lookups.
 * Added `lookup_by_id()` function for fast record retrieval from a parquet corpus using pre-built indexes.
-  Supports both OpenAlex ID (partitioned, O(1) lookup) and DOI lookups with automatic ID normalization.
+  Uses partitioned index for O(1) lookups with automatic ID normalization. Supports parallel reads
+  via `workers` and streaming to parquet via `output` for millions of IDs without loading into memory.
 * Added `snapshot_filter_ids()` function for filtering snapshot data by ID lists.
 * Added `id_block()` helper function for computing ID block partitions.
 

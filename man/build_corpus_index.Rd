@@ -4,79 +4,54 @@
 \alias{build_corpus_index}
 \title{Build a Parquet index for fast ID lookups in a parquet corpus}
 \usage{
-build_corpus_index(
-  corpus_dir,
-  index_dir,
-  id_column = "id",
-  merge_partitions = TRUE,
-  memory_limit = NULL,
-  threads = NULL
-)
+build_corpus_index(corpus_dir, index_file, memory_limit = NULL, workers = NULL)
 }
 \arguments{
 \item{corpus_dir}{Path to the parquet corpus directory.}
 
-\item{index_dir}{Output path for the index. For OpenAlex ID indexes
-(\code{id_column = "id"}), this is a directory with hive-partitioned parquet
-files by \code{id_block}. For DOI indexes (\code{id_column = "doi"}), this is a
-single parquet file path.}
-
-\item{id_column}{Name of the column to index. Default is \code{"id"} for OpenAlex
-IDs. Use \code{"doi"} to create a DOI index.}
-
-\item{merge_partitions}{Logical. For partitioned indexes (\code{id_column = "id"}),
-whether to merge multiple files per partition into a single file. Default
-is \code{TRUE} for cleaner output. Set to \code{FALSE} for faster index building
-(lookup still works correctly with multiple files per partition).}
+\item{index_file}{Output path for the index parquet file.
+parquet files by \code{id_block}.}
 
 \item{memory_limit}{DuckDB memory limit (e.g., "20GB"). Default is \code{NULL}.}
 
-\item{threads}{Number of DuckDB threads. Default is \code{NULL} (use all cores).}
+\item{workers}{Number of parallel workers for Stage 1 indexing and DuckDB
+threads for Stage 2. Default is \code{NULL} (use all cores).}
 }
 \value{
 Invisibly returns the path to the created index.
 }
 \description{
-This function creates a Parquet index that maps a specified ID column
-to its physical location in the parquet corpus. This enables fast random
+This function creates a Parquet index that maps OpenAlex IDs
+to their physical location in the parquet corpus. This enables fast random
 access to specific records without scanning entire partitions.
 }
 \details{
 The function is memory-efficient and can handle 300M+ records by using
-DuckDB's COPY TO command to write directly to the output without
-loading data into R memory. On macOS, a \code{.metadata_never_index}
+a two-stage approach: first indexing each parquet file individually
+(bounded memory per file), then redistributing into hive-partitioned
+output by \code{id_block}. This avoids loading the entire dataset at once.
+Stage 1 is parallelized using \code{\link[future.apply:future_lapply]{future.apply::future_lapply()}} and
+supports resuming if interrupted. On macOS, a \code{.metadata_never_index}
 file is created in the output directory to prevent Spotlight from indexing
 the parquet files.
 
 The index contains the following columns:
 \describe{
-\item{id}{The indexed column (renamed to "id" regardless of source column)}
+\item{id}{The OpenAlex ID}
 \item{parquet_file}{Path to the parquet file in the corpus}
 \item{file_row_number}{Row number within the file (0-indexed)}
 }
 
-For OpenAlex ID indexes (\code{id_column = "id"}), the index is partitioned by
-\code{id_block} (computed as \code{floor(numeric_id / 10000)}). This enables O(1)
-lookups by first computing the ID block, then reading only that partition.
-
-For DOI indexes (\code{id_column = "doi"}), the index is a single file since
-DOIs have no predictable structure for partitioning.
+The index is partitioned by \code{id_block} (computed as
+\code{floor(numeric_id / 10000)}). This enables O(1) lookups by first
+computing the ID block, then reading only that partition.
 }
 \examples{
 \dontrun{
 # Build partitioned index for OpenAlex IDs (fast O(1) lookup)
 build_corpus_index(
   corpus_dir = "/Volumes/openalex/parquet/works",
-  index_dir = "/Volumes/openalex/parquet/works_id_index",
-  id_column = "id",
-  memory_limit = "20GB"
-)
-
-# Build single-file index for DOIs
-build_corpus_index(
-  corpus_dir = "/Volumes/openalex/parquet/works",
-  index_dir = "/Volumes/openalex/parquet/works_doi_index.parquet",
-  id_column = "doi",
+  index_file = "/Volumes/openalex/parquet/works_id_index.parquet",
   memory_limit = "20GB"
 )
 }
