@@ -4,13 +4,10 @@
 \alias{build_corpus_index}
 \title{Build a Parquet index for fast ID lookups in a parquet corpus}
 \usage{
-build_corpus_index(corpus_dir, index_file, memory_limit = NULL, workers = NULL)
+build_corpus_index(corpus_dir, memory_limit = NULL, workers = NULL)
 }
 \arguments{
 \item{corpus_dir}{Path to the parquet corpus directory.}
-
-\item{index_file}{Output path for the index parquet file.
-parquet files by \code{id_block}.}
 
 \item{memory_limit}{DuckDB memory limit (e.g., "20GB"). Default is \code{NULL}.}
 
@@ -26,32 +23,32 @@ to their physical location in the parquet corpus. This enables fast random
 access to specific records without scanning entire partitions.
 }
 \details{
+The index file will be created in the same directory as the \code{corpus_dir} and
+has to stay there for the lookup to function. Together with the \code{corpus_dir},
+the index file can be moved to any location.
+
 The function is memory-efficient and can handle 300M+ records by using
 a two-stage approach: first indexing each parquet file individually
-(bounded memory per file), then redistributing into hive-partitioned
-output by \code{id_block}. This avoids loading the entire dataset at once.
+(bounded memory per file), then combining into a single parquet index
+file. This avoids loading the entire dataset at once.
 Stage 1 is parallelized using \code{\link[future.apply:future_lapply]{future.apply::future_lapply()}} and
 supports resuming if interrupted. On macOS, a \code{.metadata_never_index}
-file is created in the output directory to prevent Spotlight from indexing
-the parquet files.
+file is created in the temporary directory to prevent Spotlight from
+indexing the parquet files during building.
 
 The index contains the following columns:
 \describe{
 \item{id}{The OpenAlex ID}
-\item{parquet_file}{Path to the parquet file in the corpus}
+\item{id_block}{Block number computed as \code{floor(numeric_id / 10000)}}
+\item{parquet_file}{Relative path to the parquet file in the corpus}
 \item{file_row_number}{Row number within the file (0-indexed)}
 }
-
-The index is partitioned by \code{id_block} (computed as
-\code{floor(numeric_id / 10000)}). This enables O(1) lookups by first
-computing the ID block, then reading only that partition.
 }
 \examples{
 \dontrun{
 # Build partitioned index for OpenAlex IDs (fast O(1) lookup)
 build_corpus_index(
   corpus_dir = "/Volumes/openalex/parquet/works",
-  index_file = "/Volumes/openalex/parquet/works_id_index.parquet",
   memory_limit = "20GB"
 )
 }

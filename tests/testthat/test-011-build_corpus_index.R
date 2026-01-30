@@ -24,7 +24,8 @@ testthat::test_that("build_corpus_index creates partitioned index for id column"
   # Create temporary directories
   corpus_dir <- file.path(tempdir(), "test_corpus_partitioned")
   dir.create(corpus_dir, recursive = TRUE, showWarnings = FALSE)
-  index_file <- file.path(tempdir(), "test_index_partitioned.parquet")
+  corpus_dir_norm <- normalizePath(corpus_dir)
+  index_file <- file.path(dirname(corpus_dir_norm), "test_corpus_partitioned_id_idx.parquet")
 
   # Clean up any existing index
 
@@ -55,8 +56,7 @@ testthat::test_that("build_corpus_index creates partitioned index for id column"
 
   # Build the partitioned index
   result <- build_corpus_index(
-    corpus_dir = corpus_dir,
-    index_file = index_file
+    corpus_dir = corpus_dir
   )
 
   # Check return value
@@ -108,8 +108,7 @@ testthat::test_that("build_corpus_index creates partitioned index for id column"
 testthat::test_that("build_corpus_index errors on non-existent directory", {
   expect_error(
     build_corpus_index(
-      corpus_dir = "/non/existent/path",
-      index_file = tempfile()
+      corpus_dir = "/non/existent/path"
     ),
     "corpus_dir does not exist"
   )

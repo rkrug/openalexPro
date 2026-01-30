@@ -35,10 +35,10 @@ parquet: ## Convert snapshot to parquet format
 		echo "Renaming existing parquet to ${PARQUETDIR}-${RELEASE_DATE}"; \
 		mv "${PARQUETDIR}" "${PARQUETDIR}-${RELEASE_DATE}"; \
 	fi
-	Rscript -e 'openalexPro::snapshot_to_parquet(snapshot_dir = "'${SNAPSHOTDIR}'", parquet_dir = "'${PARQUETDIR}'", memory_limit = "'${MEMORY_LIMIT}'", workers = '${WORKERS}')' 2>&1
+	Rscript -e 'options(cli.progress_show_after = 0); openalexPro::snapshot_to_parquet(snapshot_dir = "'${SNAPSHOTDIR}'", parquet_dir = "'${PARQUETDIR}'", memory_limit = "'${MEMORY_LIMIT}'", workers = '${WORKERS}')' 2>&1
 
 parquet_index: ## Build ID indexes for all datasets
-	Rscript -e 'invisible(lapply(grepv("_idx.parquet$$", list.dirs("'${PARQUETDIR}'", recursive = FALSE), invert = TRUE), function(d) openalexPro::build_corpus_index(corpus_dir = d, index_file = file.path("'${PARQUETDIR}'", paste0(basename(d), "_id_idx.parquet")), memory_limit = "'${MEMORY_LIMIT}'", workers = '${WORKERS}')))' 2>&1
+	Rscript -e 'options(cli.progress_show_after = 0); invisible(lapply(grepv("_idx.parquet$$", list.dirs("'${PARQUETDIR}'", recursive = FALSE, full.names = TRUE), invert = TRUE), function(d) openalexPro::build_corpus_index(corpus_dir = d, memory_limit = "'${MEMORY_LIMIT}'", workers = '${WORKERS}')))' 2>&1
 
 clean_parquet: ## Remove parquet directory only
 	rm -rf ${PARQUETDIR}

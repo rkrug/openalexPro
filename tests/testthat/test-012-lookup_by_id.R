@@ -7,7 +7,8 @@ testthat::test_that("lookup_by_id retrieves correct records by OpenAlex ID using
   # Create temporary directories
   corpus_dir <- file.path(tempdir(), "test_corpus_lookup")
   dir.create(corpus_dir, recursive = TRUE, showWarnings = FALSE)
-  index_file <- file.path(tempdir(), "test_index_lookup.parquet")
+  corpus_dir_norm <- normalizePath(corpus_dir)
+  index_file <- file.path(dirname(corpus_dir_norm), "test_corpus_lookup_id_idx.parquet")
 
   # Clean up any existing
   unlink(index_file, recursive = TRUE)
@@ -34,10 +35,9 @@ testthat::test_that("lookup_by_id retrieves correct records by OpenAlex ID using
   # Write test parquet
   arrow::write_parquet(test_data, file.path(corpus_dir, "test.parquet"))
 
-  # Build partitioned index for OpenAlex IDs
+  # Build index for OpenAlex IDs
   build_corpus_index(
-    corpus_dir = corpus_dir,
-    index_file = index_file
+    corpus_dir = corpus_dir
   )
 
   # Test lookup by ID (long form)
@@ -84,7 +84,8 @@ testthat::test_that("lookup_by_id writes to output directory when output is set"
   # Create temporary directories
   corpus_dir <- file.path(tempdir(), "test_corpus_output")
   dir.create(corpus_dir, recursive = TRUE, showWarnings = FALSE)
-  index_file <- file.path(tempdir(), "test_index_output.parquet")
+  corpus_dir_norm <- normalizePath(corpus_dir)
+  index_file <- file.path(dirname(corpus_dir_norm), "test_corpus_output_id_idx.parquet")
   output_dir <- file.path(tempdir(), "test_output_lookup")
 
   # Clean up any existing
@@ -103,7 +104,7 @@ testthat::test_that("lookup_by_id writes to output directory when output is set"
   )
 
   arrow::write_parquet(test_data, file.path(corpus_dir, "test.parquet"))
-  build_corpus_index(corpus_dir = corpus_dir, index_file = index_file)
+  build_corpus_index(corpus_dir = corpus_dir)
 
   # Test output mode
   result <- lookup_by_id(

@@ -216,7 +216,7 @@ For fast ID-based lookups, build indexes:
 make parquet_index
 ```
 
-This creates an index parquet file which allows O(1) lookups by OpenAlex ID:
+This creates a single index parquet file for each entity type, enabling fast lookups by OpenAlex ID:
 
 ```
 parquet/
@@ -225,7 +225,7 @@ parquet/
 └── ...
 ```
 
-The index partitions records by ID blocks (groups of 10,000 IDs), enabling direct access to specific records without scanning the entire corpus.
+The index maps each ID to its physical location (file and row number) in the corpus, so `lookup_by_id()` can retrieve specific records without scanning the entire corpus.
 
 **NB: set MEMORY_LIMIT and WORKERS (the number of parallel threads) to values working with yor system. From experience, only WORKERS need to be set and can be rather large.**
 

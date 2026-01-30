@@ -12,9 +12,10 @@
   using DuckDB. Supports memory management via `memory_limit` and `workers` parameters.
 * Added `build_corpus_index()` function for creating memory-efficient Parquet indexes for fast ID lookups.
   Handles 300M+ records by processing parquet files individually, with optional parallelization via
-  `workers` and progress reporting via `progressr`. Creates hive-partitioned index by `id_block` for O(1) lookups.
+  `workers` and progress reporting via `progressr`. The index file is auto-named and placed alongside
+  the corpus directory.
 * Added `lookup_by_id()` function for fast record retrieval from a parquet corpus using pre-built indexes.
-  Uses partitioned index for O(1) lookups with automatic ID normalization. Supports parallel reads
+  Uses Arrow for index filtering with automatic ID normalization. Supports parallel reads
   via `workers` and streaming to parquet via `output` for millions of IDs without loading into memory.
 * Added `snapshot_filter_ids()` function for filtering snapshot data by ID lists.
 * Added `id_block()` helper function for computing ID block partitions.

@@ -4,15 +4,25 @@
 \alias{lookup_by_id}
 \title{Look up records by ID using a pre-built index}
 \usage{
-lookup_by_id(index_file, ids, workers = NULL, output = NULL)
+lookup_by_id(
+  index_file,
+  ids,
+  selected = NULL,
+  workers = NULL,
+  output = NULL,
+  verbose = TRUE
+)
 }
 \arguments{
-\item{index_file}{Path to the partitioned index file created by
+\item{index_file}{Path to the index parquet file created by
 \code{\link[=build_corpus_index]{build_corpus_index()}}.}
 
 \item{ids}{Character vector of OpenAlex IDs to look up. Can be in long form
 (e.g., \code{"https://openalex.org/W2741809807"}) or short form
 (e.g., \code{"W2741809807"}).}
+
+\item{selected}{Path to the parquet dataset containing the selected indices,
+partitioned by \code{parquet_file} of the work. If \code{NULL}, not saved.}
 
 \item{workers}{Number of parallel workers for reading corpus files.
 Default is \code{NULL} (sequential). If \verb{> 1}, uses
@@ -23,6 +33,8 @@ files. If \code{NULL} (default), results are returned as a data frame.
 If set, filtered records are written directly to parquet (one file per
 source corpus file) without loading them into R memory. The directory
 must not already exist.}
+
+\item{verbose}{If \code{TRUE}, print progress messages. Default: \code{TRUE}}
 }
 \value{
 If \code{output} is \code{NULL}, a data frame containing the matching records.
@@ -35,15 +47,10 @@ necessary files and rows, making it much faster than scanning the
 entire corpus.
 }
 \details{
-The function uses DuckDB to efficiently read only the specific rows needed
-from each parquet file, avoiding full file scans.
-
-The lookup is O(1) because:
-\enumerate{
-\item The id_block is computed from each ID
-\item Only the relevant partition(s) are read from the index
-\item The specific rows are fetched from the corpus
-}
+The function first filters the index (a single parquet file) using
+\code{\link[arrow:open_dataset]{arrow::open_dataset()}} and \code{\link[dplyr:filter]{dplyr::filter()}} to find matching IDs.
+It then uses DuckDB to efficiently read only the specific rows needed
+from each corpus parquet file, avoiding full file scans.
 
 When \code{output} is set, DuckDB writes the filtered rows directly to parquet
 files using \verb{COPY ... TO}, so the data never enters R memory. This is
