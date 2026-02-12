@@ -43,13 +43,13 @@ snapshot_to_parquet <- function(
       recursive = FALSE,
       full.names = FALSE
     )
-    ## Remove merged_dirs
+    # Remove merged_dirs ----
     data_sets <- data_sets[data_sets != "merged_ids"]
   }
 
   dir.create(parquet_dir, recursive = TRUE, showWarnings = FALSE)
 
-  ## Prevent macOS Spotlight from indexing parquet files
+  # Prevent macOS Spotlight from indexing parquet files ----
   file.create(file.path(parquet_dir, ".metadata_never_index"))
 
   con <- DBI::dbConnect(duckdb::duckdb(), read_only = FALSE)
@@ -86,7 +86,11 @@ snapshot_to_parquet <- function(
     parquet_ds <- file.path(parquet_dir, data_set)
     if (file.exists(parquet_ds)) {
       warning(
-        "Skipping '", data_set, "' - directory already exists at '", parquet_ds, "'. ",
+        "Skipping '",
+        data_set,
+        "' - directory already exists at '",
+        parquet_ds,
+        "'. ",
         "Remove it manually to re-convert.",
         call. = FALSE
       )
@@ -102,7 +106,7 @@ snapshot_to_parquet <- function(
     ds_start <- Sys.time()
     json_dir <- file.path(snapshot_dir, "data", data_set)
 
-    ## works needs maximum_object_size for large JSON records
+    # works needs maximum_object_size for large JSON records ----
     ndjson_options <- if (data_set == "works") {
       ", maximum_object_size=1000000000"
     } else {
