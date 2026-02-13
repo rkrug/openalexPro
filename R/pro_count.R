@@ -6,8 +6,6 @@
 #'
 #' @param query_url Character string containing the fully constructed OpenAlex
 #'   PRO endpoint URL.
-#' @param mailto Character string used for the API `mailto` query parameter and
-#'   the request `User-Agent`. Defaults to the configured `Sys.getenv("openalexPro.email")`.
 #' @param api_key Either a character string API key or a function returning one.
 #'   Defaults to `Sys.getenv("openalexPro.apikey")`, and gracefully handles `NULL` or lazy evaluation.
 #' @param error_log location of error log of API calls. (default: `NULL` (none)).
@@ -26,32 +24,30 @@
 #' }
 pro_count <- function(
   query_url,
-  mailto = Sys.getenv("openalexPro.email"),
   api_key = Sys.getenv("openalexPro.apikey"),
   error_log = NULL
 ) {
-  # if (is.function(api_key)) {
-  #   api_key <- api_key()
-  # }
-  # if (is.null(api_key)) {
-  #   api_key <- ""
-  # }
+  if (!nzchar(api_key)) {
+    stop(
+      "An OpenAlex API key is required. ",
+      "Set it with:\n",
+      "  Sys.setenv(openalexPro.apikey = \"your-key\")\n",
+      "or add to your .Renviron file:\n",
+      "  openalexPro.apikey=your-key",
+      call. = FALSE
+    )
+  }
 
   req <- httr2::request(query_url) |>
     httr2::req_url_query(
       per_page = 1,
       select = "ids",
       page = 1,
-      mailto = mailto,
       api_key = api_key
     ) |>
-    httr2::req_user_agent(paste(
-      "openalexPro v",
-      packageVersion("openalexPro"),
-      " (mailto:",
-      mailto,
-      ")"
-    ))
+    httr2::req_user_agent(
+      paste0("openalexPro/", packageVersion("openalexPro"))
+    )
 
   meta <- data.frame(
     count = NA_integer_,

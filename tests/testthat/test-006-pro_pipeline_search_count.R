@@ -21,7 +21,7 @@ test_that("pro_request search count `biodiversity AND fiance`", {
   ) |>
     pro_request(
       output = output_json,
-      mailto = "test@example.com",
+
       verbose = FALSE,
       count_only = TRUE
     )
@@ -43,7 +43,7 @@ test_that("pro_request search count", {
   ) |>
     pro_request(
       output = output_json,
-      mailto = "test@example.com",
+
       verbose = FALSE,
       count_only = TRUE
     )
@@ -79,7 +79,6 @@ test_that("pro_request count_only with list of queries returns data.frame", {
   count <- pro_request(
     query_url = queries,
     output = output_json,
-    mailto = "test@example.com",
     verbose = FALSE,
     count_only = TRUE
   )
@@ -121,7 +120,6 @@ test_that("pro_request count_only with unnamed list of queries", {
   count <- pro_request(
     query_url = queries,
     output = output_json,
-    mailto = "test@example.com",
     verbose = FALSE,
     count_only = TRUE
   )

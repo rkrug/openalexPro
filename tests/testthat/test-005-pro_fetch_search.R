@@ -20,7 +20,6 @@ test_that("pro_fetch search `biodiversity AND fiance`", {
     pro_fetch(
       pages = 1,
       project_folder = output_dir,
-      mailto = "test@example.com",
       verbose = FALSE,
       progress = TRUE
     )

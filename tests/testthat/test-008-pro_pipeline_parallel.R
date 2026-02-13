@@ -42,7 +42,6 @@ test_that("pro_request with url list  and parallel", {
   output_json <- pro_request(
     query_url = req,
     output = output_json,
-    mailto = "test@example.com",
     verbose = FALSE,
     progress = TRUE
   )

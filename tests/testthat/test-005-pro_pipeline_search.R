@@ -22,7 +22,6 @@ test_that("pro_request search `biodiversity AND fiance`", {
     pro_request(
       pages = 1,
       output = output_json,
-      mailto = "test@example.com",
       verbose = FALSE,
       progress = TRUE
     )

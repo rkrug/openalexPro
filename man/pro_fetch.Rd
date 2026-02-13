@@ -9,7 +9,6 @@ pro_fetch(
   pages = 10000,
   project_folder = NULL,
   overwrite = FALSE,
-  mailto = Sys.getenv("openalexPro.email"),
   api_key = Sys.getenv("openalexPro.apikey"),
   workers = 1,
   verbose = FALSE,
@@ -33,8 +32,6 @@ directory is created.}
 
 \item{overwrite}{Logical. If \code{TRUE}, \code{output} will be deleted if it already
 exists.}
-
-\item{mailto}{The email address of the user.}
 
 \item{api_key}{The API key of the user.}
 

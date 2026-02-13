@@ -1,3 +1,16 @@
+# openalexPro (dev)
+
+## Breaking Changes
+
+* Removed `mailto` parameter from all API functions (`pro_request()`, `pro_fetch()`,
+  `pro_count()`, `pro_validate_credentials()`). OpenAlex no longer uses email addresses
+  for polite-pool access.
+* `api_key` is now required. All API functions (`pro_request()`, `pro_fetch()`,
+  `pro_count()`) will error with a clear message if `openalexPro.apikey` is not set.
+  Set it via `Sys.setenv(openalexPro.apikey = "your-key")` or in `.Renviron`.
+* Simplified User-Agent string from `openalexPro v[VERSION] (mailto:[EMAIL])` to
+  `openalexPro/[VERSION]`.
+
 # openalexPro 0.5.0
 
 ## New Features

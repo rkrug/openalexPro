@@ -21,7 +21,6 @@ test_that("pro_request single identifier", {
     pro_request(
       pages = 1,
       output = output_json,
-      mailto = "test@example.com",
       verbose = FALSE,
       progress = TRUE
     )

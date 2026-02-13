@@ -6,7 +6,6 @@
 \usage{
 pro_count(
   query_url,
-  mailto = Sys.getenv("openalexPro.email"),
   api_key = Sys.getenv("openalexPro.apikey"),
   error_log = NULL
 )
@@ -14,9 +13,6 @@ pro_count(
 \arguments{
 \item{query_url}{Character string containing the fully constructed OpenAlex
 PRO endpoint URL.}
-
-\item{mailto}{Character string used for the API `mailto` query parameter and
-the request `User-Agent`. Defaults to the configured `Sys.getenv("openalexPro.email")`.}
 
 \item{api_key}{Either a character string API key or a function returning one.
 Defaults to `Sys.getenv("openalexPro.apikey")`, and gracefully handles `NULL` or lazy evaluation.}

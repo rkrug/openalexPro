@@ -1243,7 +1243,6 @@ OpenAlex offers limited API access without credentials. Free API keys with subst
 
 ```{r}
 # Set credentials (typically in your .Renviron file)
-Sys.setenv(openalexPro.email = "your.email@example.org")
 Sys.setenv(openalexPro.apikey = "your-api-key-here")
 
 # Validate your credentials

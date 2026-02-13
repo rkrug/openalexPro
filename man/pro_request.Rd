@@ -9,7 +9,6 @@ pro_request(
   pages = 1e+05,
   output = NULL,
   overwrite = FALSE,
-  mailto = Sys.getenv("openalexPro.email"),
   api_key = Sys.getenv("openalexPro.apikey"),
   workers = 1,
   verbose = FALSE,
@@ -31,8 +30,6 @@ temporary directory. Needs to be specified.}
 
 \item{overwrite}{Logical. If \code{TRUE}, \code{output} will be deleted if it already
 exists.}
-
-\item{mailto}{The email address of the user.}
 
 \item{api_key}{The API key of the user.}
 

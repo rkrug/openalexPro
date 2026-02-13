@@ -192,8 +192,7 @@
 #'   from_publication_date = "2020-01-01",
 #'   language = c("en","de"),
 #'   select = c("id","title","publication_year"),
-#'   options = list(per_page = 5),
-#'   mailto = "you@example.org"
+#'   options = list(per_page = 5)
 #' )
 #' # resp <- api_call(req)
 #' # httr2::resp_body_json(resp)

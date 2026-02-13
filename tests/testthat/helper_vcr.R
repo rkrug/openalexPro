@@ -67,6 +67,11 @@ invisible(vcr::vcr_configure(
   filter_query_parameters = list(api_key = "<api-key>")
 ))
 
+# Ensure a dummy API key is set so validation passes during VCR-recorded tests
+if (!nzchar(Sys.getenv("openalexPro.apikey"))) {
+  Sys.setenv(openalexPro.apikey = "test-api-key")
+}
+
 # try(
 #   {
 #     Sys.setenv(openalexPro.apikey = keyring::key_get("API_openalex"))

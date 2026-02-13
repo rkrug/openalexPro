@@ -74,11 +74,9 @@ OpenAlex provides free API keys with higher rate limits. Get yours at [openalex.
 # Add to your .Renviron file (recommended)
 # Run: usethis::edit_r_environ()
 # Then add these lines:
-#   openalexPro.email=your.email@example.org
 #   openalexPro.apikey=your-api-key
 
 # Or set temporarily in your session:
-Sys.setenv(openalexPro.email = "your.email@example.org")
 Sys.setenv(openalexPro.apikey = "your-api-key")
 
 # Verify credentials work

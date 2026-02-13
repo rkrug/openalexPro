@@ -20,7 +20,6 @@
 #'   temporary directory. Needs to be specified.
 #' @param overwrite Logical. If `TRUE`, `output` will be deleted if it already
 #'   exists.
-#' @param mailto The email address of the user.
 #' @param api_key The API key of the user.
 #' @param workers Number of parallel workers to use if `query_url` is a list. Defaults to 1.
 #' @param verbose Logical indicating whether to show verbose messages.
@@ -48,7 +47,6 @@ pro_request <- function(
   pages = 100000,
   output = NULL,
   overwrite = FALSE,
-  mailto = Sys.getenv("openalexPro.email"),
   api_key = Sys.getenv("openalexPro.apikey"),
   workers = 1,
   verbose = FALSE,
@@ -56,6 +54,17 @@ pro_request <- function(
   count_only = FALSE,
   error_log = NULL
 ) {
+  if (!nzchar(api_key)) {
+    stop(
+      "An OpenAlex API key is required. ",
+      "Set it with:\n",
+      "  Sys.setenv(openalexPro.apikey = \"your-key\")\n",
+      "or add to your .Renviron file:\n",
+      "  openalexPro.apikey=your-key",
+      call. = FALSE
+    )
+  }
+
   if (!is.null(error_log)) {
     message("error log file: ", error_log)
   }
@@ -80,7 +89,6 @@ pro_request <- function(
         function(i) {
           pro_count(
             query_url = query_url[[i]],
-            mailto = mailto,
             api_key = api_key
           )
         },
@@ -107,7 +115,7 @@ pro_request <- function(
       counts <- vapply(
         query_url,
         function(url) {
-          pro_count(url, mailto = mailto, api_key = api_key)$count
+          pro_count(url, api_key = api_key)$count
         },
         numeric(1)
       )
@@ -147,7 +155,6 @@ pro_request <- function(
               pages = pages,
               output = query_output,
               overwrite = FALSE,
-              mailto = mailto,
               api_key = api_key,
               verbose = verbose,
               error_log = error_log,
@@ -169,7 +176,6 @@ pro_request <- function(
   if (count_only) {
     out <- pro_count(
       query_url = query_url,
-      mailto = mailto,
       api_key = api_key
     )
     return(out)
@@ -181,7 +187,6 @@ pro_request <- function(
     pages = pages,
     output = output,
     overwrite = overwrite,
-    mailto = mailto,
     api_key = api_key,
     verbose = verbose,
     error_log = error_log,
@@ -197,7 +202,6 @@ pro_request <- function(
 #' @param pages Max pages to download
 #' @param output Output directory
 #' @param overwrite Whether to overwrite existing output
-#' @param mailto Email for API
 #' @param api_key API key
 #' @param verbose Show verbose messages
 #' @param error_log Error log file path
@@ -212,7 +216,6 @@ fetch_query_pages <- function(
   pages,
   output,
   overwrite,
-  mailto,
   api_key,
   verbose,
   error_log,
@@ -272,13 +275,9 @@ fetch_query_pages <- function(
       cursor = "*",
       api_key = api_key
     ) |>
-    httr2::req_user_agent(paste(
-      "openalexPro v",
-      packageVersion("openalexPro"),
-      " (mailto:",
-      mailto,
-      ")"
-    ))
+    httr2::req_user_agent(
+      paste0("openalexPro/", packageVersion("openalexPro"))
+    )
 
   # Initialize page counter
   page <- 1L
