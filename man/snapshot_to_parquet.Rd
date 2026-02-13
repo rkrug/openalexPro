@@ -8,40 +8,68 @@ snapshot_to_parquet(
   snapshot_dir = file.path("", "Volumes", "openalex", "openalex-snapshot"),
   parquet_dir = file.path("", "Volumes", "openalex", "parquet"),
   data_sets = NULL,
+  sample_size = 20,
   temp_directory = NULL,
   memory_limit = NULL,
   workers = NULL
 )
 }
 \arguments{
-\item{snapshot_dir}{The directory path of the OA snapshot data. Default is "Volumes/openalex/openalex-snapshot".}
+\item{snapshot_dir}{The directory path of the OA snapshot data.
+Default is \code{"Volumes/openalex/openalex-snapshot"}.}
 
-\item{parquet_dir}{The directory path where the Parquet files will be saved. Default is "Volumes/openalex/parquet".}
+\item{parquet_dir}{The directory path where the Parquet files will be saved.
+Default is \code{"Volumes/openalex/parquet"}.}
 
-\item{data_sets}{A character vector specifying the data sets to process. Default is NULL, which processes all data sets.}
+\item{data_sets}{A character vector specifying the data sets to process.
+Default is \code{NULL}, which processes all data sets.}
 
-\item{temp_directory}{location of the temporaty directory for duckdb. Initial runs indicate
-that 2TB should be safe. Default is \code{NULL}, use the system temporary directory.}
+\item{sample_size}{Number of \code{.gz} files to sample for unified schema
+inference. Higher values give more accurate schemas but take longer.
+Default is \code{20}. Use \code{NULL} or \code{0} to use all files.}
 
-\item{memory_limit}{DuckDB memory limit (e.g., "64GB"). Set to 50-60\% of
-system RAM for optimal performance. Default is \code{NULL}, use DuckDB default.}
+\item{temp_directory}{Location of the temporary directory for DuckDB.
+Passed to each worker's DuckDB connection. Default is \code{NULL} (system default).}
 
-\item{workers}{Number of DuckDB threads to use. Lower values reduce memory
-usage but slow down processing. Default is \code{NULL}, use all available cores.}
+\item{memory_limit}{DuckDB memory limit per worker (e.g., \code{"8GB"}).
+Default is \code{NULL} (DuckDB default).}
+
+\item{workers}{Number of parallel workers for file conversion via
+\code{\link[future.apply:future_lapply]{future.apply::future_lapply()}}. Default is \code{NULL} (sequential processing).}
 }
 \description{
-This function converts the OA (openalex) snapshot data to Parquet format.
-Existing datasets are skipped with a warning. On macOS, a \code{.metadata_never_index}
+This function converts the OA (OpenAlex) snapshot data to Parquet format,
+processing each \code{.gz} file individually. Existing output files are skipped,
+allowing interrupted conversions to resume. On macOS, a \code{.metadata_never_index}
 file is created in the output directory to prevent Spotlight from indexing
 the parquet files.
+}
+\details{
+The conversion proceeds in two stages for each data set:
+\enumerate{
+\item \strong{Schema inference}: A sample of \code{.gz} files is read using DuckDB's
+\code{read_json_auto()} with \code{union_by_name = true} to infer a unified schema.
+This ensures all output parquet files have consistent column types.
+\item \strong{Per-file conversion}: Each \code{.gz} file is converted individually to a
+\code{.parquet} file. When \code{workers > 1}, files are processed in parallel using
+\link[future:multisession]{future::multisession}, with each worker creating its own DuckDB connection.
+}
+
+Already-converted files (those with a matching \code{.parquet} output) are
+automatically skipped, so the function can resume after interruption.
 }
 \examples{
 \dontrun{
 # Convert all data sets in the default snapshot directory
 snapshot_to_parquet()
 
-# Convert specific data sets in a custom snapshot directory
-snapshot_to_parquet(snapshot_dir = "/path/to/snapshot", data_sets = c("data_set1", "data_set2"))
+# Convert specific data sets with parallel processing
+snapshot_to_parquet(
+  snapshot_dir = "/path/to/snapshot",
+  data_sets = c("authors", "works"),
+  workers = 4,
+  memory_limit = "8GB"
+)
 }
 
 }

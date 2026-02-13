@@ -60,8 +60,7 @@ test_that("pro_request_jsonl_parquet `biodiversity` and group by type", {
   output_parquet <- output_jsonl |>
     pro_request_jsonl_parquet(
       output = output_parquet,
-      verbose = FALSE,
-      progress = TRUE
+      verbose = FALSE
     )
 
   # Check that the output file exists

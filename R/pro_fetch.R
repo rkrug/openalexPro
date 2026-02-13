@@ -92,7 +92,6 @@ pro_fetch <- function(
       output = file.path(project_folder, "parquet"),
       overwrite = overwrite,
       verbose = verbose,
-      progress = progress,
       delete_input = FALSE
     )
 }

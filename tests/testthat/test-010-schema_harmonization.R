@@ -30,7 +30,6 @@ test_that("schema harmonization prevents read errors from type conflicts", {
     output = output_parquet,
     overwrite = TRUE,
     verbose = FALSE,
-    progress = FALSE
   )
 
   expect_true(dir.exists(output_parquet))
@@ -88,7 +87,6 @@ test_that("schema harmonization handles struct with different fields across file
     output = output_parquet,
     overwrite = TRUE,
     verbose = FALSE,
-    progress = FALSE
   )
 
   # Reading should not error - unified schema should include all fields
@@ -138,7 +136,6 @@ test_that("schema harmonization handles null vs struct conflicts", {
     output = output_parquet,
     overwrite = TRUE,
     verbose = FALSE,
-    progress = FALSE
   )
 
   expect_no_error({
@@ -186,7 +183,6 @@ test_that("schema harmonization handles nested struct variations", {
     output = output_parquet,
     overwrite = TRUE,
     verbose = FALSE,
-    progress = FALSE
   )
 
   expect_no_error({

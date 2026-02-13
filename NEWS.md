@@ -9,7 +9,8 @@
   Includes targets for `snapshot`, `parquet`, `parquet_index`, and automatic renaming of existing
   data with release dates.
 * Added `snapshot_to_parquet()` function for converting OpenAlex snapshot NDJSON files to Parquet format
-  using DuckDB. Supports memory management via `memory_limit` and `workers` parameters.
+  using DuckDB. Processes each `.gz` file individually with per-file resume support. Supports parallel
+  processing via `workers` (using `future_lapply()`) and unified schema inference via `sample_size`.
 * Added `build_corpus_index()` function for creating memory-efficient Parquet indexes for fast ID lookups.
   Handles 300M+ records by processing parquet files individually, with optional parallelization via
   `workers` and progress reporting via `progressr`. The index file is auto-named and placed alongside
@@ -27,8 +28,15 @@
 
 ## Changes
 
-* Removed `overwrite` parameter from `snapshot_to_parquet()`. Existing datasets are now skipped
-  with a warning message indicating manual removal is required for re-conversion.
+* Refactored `snapshot_to_parquet()` to process each `.gz` file individually instead of all at once.
+  This reduces memory usage, enables per-file resume on interruption, and shows progress with ETA.
+  The `workers` parameter now controls parallel `future` workers instead of DuckDB threads.
+  Added `sample_size` parameter for schema inference.
+* Extracted `infer_json_schema()` and `convert_json_to_parquet()` internal helpers, shared by
+  both `snapshot_to_parquet()` and `pro_request_jsonl_parquet()`.
+* Refactored `pro_request_jsonl_parquet()` to per-file conversion with `future_lapply()`
+  parallelization. Removes hive partitioning by `page`; subfolder structure is preserved
+  directly. Added `workers` parameter. Removed `progress` parameter (replaced by `progressr`).
 
 ## Bug Fixes
 

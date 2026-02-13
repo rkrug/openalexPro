@@ -38,6 +38,7 @@
 #' @importFrom arrow open_dataset write_dataset
 #' @importFrom DBI dbConnect dbDisconnect dbGetQuery dbExecute
 #' @importFrom dplyr filter collect
+#' @importFrom rlang .data
 #' @importFrom duckdb duckdb
 #' @importFrom future plan multisession
 #' @importFrom future.apply future_lapply
@@ -118,7 +119,7 @@ lookup_by_id <- function(
   ## Query each id_block partition separately
   matches <- index_file |>
     arrow::open_dataset() |>
-    dplyr::filter(id %in% ids) |>
+    dplyr::filter(.data$id %in% ids) |>
     dplyr::collect()
 
   if (is.null(matches) || nrow(matches) == 0) {

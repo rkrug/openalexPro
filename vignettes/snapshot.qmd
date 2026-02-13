@@ -185,23 +185,24 @@ make parquet MEMORY_LIMIT=20GB WORKERS=4
 
 This runs `snapshot_to_parquet()` which:
 
-1. Reads all JSON files for each entity type
-2. Flattens nested structures where appropriate
-3. Writes partitioned parquet files
- 
-**NB: set MEMORY_LIMIT and WORKERS (the number of parallel threads) to values working with yor system - this is initiallty a trial and error, but can be re-used again.**
+1. Infers a unified schema by sampling `.gz` files from each entity type
+2. Converts each `.gz` file individually to a `.parquet` file using DuckDB
+3. Supports parallel processing via `WORKERS` (number of parallel `future` workers)
+4. Automatically resumes interrupted conversions by skipping already-converted files
+
+**NB: set MEMORY_LIMIT (per-worker DuckDB limit) and WORKERS (number of parallel workers) to values working with your system.**
 
 **Expected time**: 2-8 hours depending on CPU and disk speed.
 
 ### Parquet Structure
 
-After conversion:
+After conversion, each entity directory contains one `.parquet` file per input `.gz` file:
 
 ```
 parquet/
 ├── works/
-│   ├── part-00000.parquet
-│   ├── part-00001.parquet
+│   ├── part_000.parquet
+│   ├── part_001.parquet
 │   └── ...
 ├── authors/
 ├── institutions/
