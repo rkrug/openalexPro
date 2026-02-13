@@ -347,6 +347,12 @@ old release date is still available.
 make parquet MEMORY_LIMIT=4GB WORKERS=1
 ```
 
+**DuckDB temp file errors** (`IO Error: Could not read enough bytes from file ".tmp/..."`): DuckDB spills temporary data to disk. By default it writes to `.tmp/` in the current directory. If that location runs out of space or is on a slow filesystem, point it elsewhere:
+
+```bash
+make parquet TEMP_DIR=/tmp
+```
+
 **DuckDB errors**: Ensure you have the latest version of the `duckdb` R package.
 
 <!-- ## Index Issues
@@ -380,12 +386,13 @@ PARQUETDIR=./parquet             # Where to write parquet
 MEMORY_LIMIT=15GB                # DuckDB memory limit per worker
 WORKERS=3                        # Number of parallel workers
 SAMPLE_SIZE=100                  # Files sampled for schema inference
+TEMP_DIR=/tmp                    # DuckDB temporary directory (spill-to-disk)
 ```
 
 Override on the command line without editing the file:
 
 ```bash
-make parquet MEMORY_LIMIT=20GB WORKERS=4 SAMPLE_SIZE=10000
+make parquet MEMORY_LIMIT=20GB WORKERS=4 SAMPLE_SIZE=10000 TEMP_DIR=/tmp
 ```
 
 # Additional Resources

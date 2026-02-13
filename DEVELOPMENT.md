@@ -6,6 +6,36 @@ development history for the `openalexPro` package. It is aimed at future contrib
 
 ---
 
+## 2026-02-13 — DuckDB temp file IO error fix (TEMP_DIR in Makefile)
+
+**Problem:** During `snapshot_to_parquet()` for the `works` dataset (resume run after
+an OOM kill), DuckDB raised:
+
+```
+IO Error: Could not read enough bytes from file ".tmp/duckdb_temp_storage_DEFAULT-0.tmp":
+  attempted to read 262144 bytes from location 24641536
+```
+
+DuckDB spills temporary data to `.tmp/` relative to the working directory by default.
+This directory can fill up (or be on a slow/full filesystem) causing the error.
+
+**Fix:** Exposed `temp_directory` via a new `TEMP_DIR` Makefile variable (default
+`/tmp`) and passed it to `snapshot_to_parquet()` in the `parquet` target. The
+`snapshot_to_parquet()` function already accepted `temp_directory`; only the Makefile
+was missing the plumbing.
+
+**Changes:**
+- Added `TEMP_DIR=/tmp` variable to `inst/Makefile.snapshot`.
+- Added `TEMP_DIR` to `help` output and the command-line override example.
+- Passed `temp_directory = "'${TEMP_DIR}'"` to `snapshot_to_parquet()` in the `parquet`
+  target.
+- Updated `vignettes/snapshot.qmd`: added `TEMP_DIR` to the variables table and added a
+  Troubleshooting entry explaining the error and fix.
+
+**Key files:** `inst/Makefile.snapshot`, `vignettes/snapshot.qmd`
+
+---
+
 ## 2026-02-13 — Remove `mailto`, require `api_key`
 
 **Motivation:** OpenAlex retired email-based polite-pool access. API keys are now the
