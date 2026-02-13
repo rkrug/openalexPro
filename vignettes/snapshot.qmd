@@ -99,10 +99,10 @@ Then navigate to the directory and use Make:
 ```bash
 cd /path/to/openalex-data
 
-# See available commands
+# See available commands and current variable values
 make help
 
-# Download snapshot (WARNING: ~350 GB, takes hours)
+# Download snapshot (WARNING: ~1TB, takes hours)
 make snapshot
 
 # Convert to parquet format
@@ -180,17 +180,17 @@ The JSON snapshot is not efficient for analytical queries. Converting to parquet
 - **Type safety**: Proper data types for each field
 
 ```bash
-make parquet MEMORY_LIMIT=20GB WORKERS=4
+make parquet MEMORY_LIMIT=20GB WORKERS=4 SAMPLE_SIZE=10000
 ```
 
 This runs `snapshot_to_parquet()` which:
 
-1. Infers a unified schema by sampling `.gz` files from each entity type
-2. Converts each `.gz` file individually to a `.parquet` file using DuckDB
-3. Supports parallel processing via `WORKERS` (number of parallel `future` workers)
-4. Automatically resumes interrupted conversions by skipping already-converted files
+1. **Deletes** the existing parquet directory first (depends on `clean_parquet`)
+2. Infers a unified schema by sampling up to `SAMPLE_SIZE` `.gz` files from each entity type
+3. Converts each `.gz` file individually to a `.parquet` file using DuckDB
+4. Supports parallel processing via `WORKERS` (number of parallel `future` workers)
 
-**NB: set MEMORY_LIMIT (per-worker DuckDB limit) and WORKERS (number of parallel workers) to values working with your system.**
+**NB:** Set `MEMORY_LIMIT` (per-worker DuckDB limit), `WORKERS` (number of parallel workers), and `SAMPLE_SIZE` (files to sample for schema inference) to values that work with your system. Since `parquet` unconditionally deletes the existing parquet directory, use `snapshot_to_parquet()` directly in R if you want resume behaviour.
 
 **Expected time**: 2-8 hours depending on CPU and disk speed.
 
@@ -214,7 +214,7 @@ parquet/
 For fast ID-based lookups, build indexes:
 
 ```bash
-make parquet_index
+make parquet_index WORKERS=8
 ```
 
 This creates a single index parquet file for each entity type, enabling fast lookups by OpenAlex ID:
@@ -228,7 +228,7 @@ parquet/
 
 The index maps each ID to its physical location (file and row number) in the corpus, so `lookup_by_id()` can retrieve specific records without scanning the entire corpus.
 
-**NB: set MEMORY_LIMIT and WORKERS (the number of parallel threads) to values working with yor system. From experience, only WORKERS need to be set and can be rather large.**
+**NB:** Indexing is less memory-intensive than parquet conversion and profits from higher `WORKERS`. To rebuild indexes without touching the parquet files, use `make clean_index` followed by `make parquet_index`.
 
 # Using Your Local Corpus
 
@@ -288,13 +288,7 @@ dbDisconnect(con)
 
 # Managing Updates
 
-OpenAlex releases new snapshots regularly. The Makefile handles updates gracefully:
-
-1. **Existing data is preserved**: Before downloading a new snapshot, the old one is renamed with its release date (e.g., `openalex-snapshot-2026-01-15`)
-
-2. **Incremental sync**: `aws s3 sync` only downloads changed files
-
-3. **Re-conversion**: After downloading, run `make parquet` and `parquet_index` again to update the parquet files and the indices.
+OpenAlex releases new snapshots regularly. The Makefile supports update workflows via dedicated timestamp targets.
 
 ## Checking for Updates
 
@@ -304,24 +298,36 @@ make snapshot_info
 
 This shows the current state of the S3 bucket including the total size and file count.
 
-## Manual Update Workflow
+```bash
+make help
+```
+
+This shows the current values of all configuration variables, including `RELEASE_DATE` read from `RELEASE_NOTES.txt`.
+
+## Update Workflow
 
 ```bash
-# Check current release date
-head -5 openalex-snapshot/RELEASE_NOTES.txt
+# 1. Archive the current snapshot with its release date
+#    (renames openalex-snapshot → openalex-snapshot-YYYY-MM-DD)
+make snapshot_timestamp
 
-# Sync new data (old snapshot is automatically renamed)
+# 2. Download the new snapshot
 make snapshot
 
-# Check new release date
-head -5 openalex-snapshot/RELEASE_NOTES.txt
+# 3. Archive the current parquet directory with the old release date
+make parquet_timestamp
 
-# Re-convert to parquet (old parquet directory is automatically renamed)
-make parquet
+# 4. Re-convert to parquet (deletes parquet dir first, then converts)
+make parquet SAMPLE_SIZE=10000
 
-# Rebuild indexes
+# 5. Rebuild indexes
 make parquet_index
 ```
+
+**Note:** `snapshot_timestamp` and `parquet_timestamp` read the release date from
+`RELEASE_NOTES.txt` in the snapshot directory. Run `snapshot_timestamp` *before*
+downloading the new snapshot, and `parquet_timestamp` *before* re-converting, so the
+old release date is still available.
 
 # Troubleshooting
 
@@ -335,12 +341,10 @@ make parquet_index
 
 ## Conversion Issues
 
-**Out of memory**: Reduce memory usage in the Makefile:
+**Out of memory**: Reduce memory usage by overriding variables on the command line:
 
-```makefile
-parquet:
-	Rscript \
-	-e 'openalexPro::snapshot_to_parquet(..., memory_limit = "4GB", workers = 1)'
+```bash
+make parquet MEMORY_LIMIT=4GB WORKERS=1
 ```
 
 **DuckDB errors**: Ensure you have the latest version of the `duckdb` R package.
@@ -353,25 +357,36 @@ parquet:
 
 | Target | Description |
 |--------|-------------|
-| `help` | Show available targets |
-| `snapshot_info` | Display S3 bucket information |
+| `help` | Show available targets and current variable values |
+| `all` | Clean, download snapshot, and convert to parquet |
+| `snapshot_info` | Display S3 bucket size and file count |
+| `snapshot_timestamp` | Rename existing snapshot directory with its release date |
 | `snapshot` | Download/sync snapshot from S3 |
-| `parquet` | Convert snapshot to parquet |
-| `parquet_index` | Build ID indexes |
-| `clean_parquet` | Remove parquet directory |
+| `parquet_timestamp` | Rename existing parquet directory with its release date |
+| `parquet` | Delete parquet dir then convert snapshot to parquet |
+| `parquet_index` | Build ID indexes for all datasets |
+| `clean_index` | Remove index files (`*_idx.parquet`) from parquet directory |
+| `clean_parquet` | Remove parquet directory (includes index files) |
 | `clean_snapshot` | Remove snapshot directory |
-| `clean` | Remove both directories |
+| `clean` | Remove both snapshot and parquet directories |
 
 ## Customizing the Makefile
 
-Edit the variables at the top of the Makefile:
+Variables can be overridden on the command line or by editing the defaults at the top of the Makefile:
 
 ```makefile
-SNAPSHOTDIR=./openalex-snapshot   # Where to download JSON
-PARQUETDIR=./parquet                   # Where to write parquet
+SNAPSHOTDIR=./openalex-snapshot  # Where to download JSON
+PARQUETDIR=./parquet             # Where to write parquet
+MEMORY_LIMIT=15GB                # DuckDB memory limit per worker
+WORKERS=3                        # Number of parallel workers
+SAMPLE_SIZE=100                  # Files sampled for schema inference
 ```
 
-You can also adjust memory and thread settings in the `parquet` and `parquet_index` targets.
+Override on the command line without editing the file:
+
+```bash
+make parquet MEMORY_LIMIT=20GB WORKERS=4 SAMPLE_SIZE=10000
+```
 
 # Additional Resources
 
