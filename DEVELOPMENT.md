@@ -6,6 +6,95 @@ development history for the `openalexPro` package. It is aimed at future contrib
 
 ---
 
+## 2026-02-24 — Export `infer_json_schema()` and rename cache files
+
+**Export:** `infer_json_schema()` was previously internal (`@noRd`). It is now
+exported with full roxygen documentation including `@section Caching` and
+`@section Type-widening rules`. Useful standalone for any workflow that needs
+a unified DuckDB columns clause from a set of JSON/NDJSON files.
+
+**Cache file rename:** Per-file schema cache files were named
+`%06d_<basename>.schema.csv` (sequential index + raw filename). The index was
+meaningless when files were sampled randomly, and the `.gz` in the name
+made it hard to identify the source. Renamed to `<update_date>_<part_name>.csv`
+(e.g. `2024-01-15_part_001.csv`), derived from `basename(dirname(f))` with the
+`updated_date=` hive prefix stripped, and `basename(f)` with `.gz` removed.
+
+**Key file:** `R/infer_json_schema.R`
+
+---
+
+## 2026-02-23 — Preserve `abstract_inverted_index` as VARCHAR in works parquet
+
+**Problem:** OpenAlex `works` files contain `abstract_inverted_index` with JSON keys
+`"as"` and `"As"` (case-different, which is valid JSON). DuckDB folds struct field names
+to lowercase, causing a collision (`duplicate key "as"`) that crashes the conversion.
+`ignore_errors=true` silently drops entire records rather than just the problematic field,
+which is too destructive. Dropping the column entirely loses data.
+
+**Root cause:** DuckDB auto-infers JSON objects as `STRUCT` types and case-folds field
+names. Arrow R has no JSON reading capability, so it cannot be used as an alternative.
+
+**Fix:** After schema inference, override the type of `abstract_inverted_index` to
+`VARCHAR` in the `columns_clause` for the `works` dataset. When DuckDB reads the field
+with type `VARCHAR`, it captures the raw JSON text without parsing the object's keys into
+struct fields — so no case-folding, no collision. All records are preserved.
+
+The stored VARCHAR value is a JSON string (e.g. `'{"The":[0],"as":[1],"As":[2]}'`),
+parseable with `jsonlite::fromJSON()` when needed. Case-sensitive keys are preserved
+because they're stored as data, not struct field names.
+
+**Changes:**
+- `R/snapshot_to_parquet.R`: replaces the column-drop gsub with a type-override gsub
+  (`'abstract_inverted_index': 'VARCHAR'`); `ignore_errors=true` removed from
+  `ndjson_options` (no longer needed).
+- `tests/testthat/test-013-snapshot_to_parquet.R`: added test verifying the column is
+  present as character and that `"as"`/`"As"` round-trip correctly via jsonlite.
+
+**Key file:** `R/snapshot_to_parquet.R`
+
+---
+
+## 2026-02-23 — Per-file schema inference with two-level disk caching
+
+**Problem:** `infer_json_schema()` ran a single bulk DuckDB query against all sampled
+files: `DESCRIBE SELECT * FROM read_json_auto([N files], union_by_name = true, ...)`.
+For the `works` dataset (1981 files, `maximum_object_size=1000000000`), this OOMed and
+killed R (exit code -1) when `sample_size` exceeded the file count and no sampling
+occurred.
+
+**Fix:** Replaced the single bulk query with a per-file loop — one small `DESCRIBE`
+per file — followed by R-side schema merging. Added two levels of disk caching:
+
+1. **Per-file schema cache** (`<parquet_ds>/.schema_cache/<update_date>_<part_name>.csv`):
+   each file's schema saved immediately after inference, so mid-inference restarts
+   skip already-processed files.
+2. **Unified schema cache** (`<parquet_ds>/.schema_cache/unified_schema.csv`): the
+   merged result saved after all per-file schemas are merged; loaded first on any
+   subsequent run, bypassing all DuckDB queries entirely. Delete this file to force
+   re-inference.
+
+**Type-widening rules in `merge_schemas()`** (for columns that differ across files):
+1. All identical → keep as-is.
+2. STRUCT/LIST/MAP vs simpler type → complex type wins.
+3. Multiple STRUCT types → pick the one with the most fields.
+4. Numeric conflicts → widest type wins: `TINYINT < SMALLINT < INTEGER < BIGINT < HUGEINT < FLOAT < DOUBLE`.
+5. Fallback → `VARCHAR`.
+Column order is preserved (first-seen, not alphabetical) to maintain backward
+compatibility with existing parquet consumers.
+
+**Changes:**
+- `R/infer_json_schema.R`: rewrote `infer_json_schema()` to use per-file loop with
+  caching; added `schema_cache_dir` parameter; added `merge_schemas()` internal helper.
+- `R/snapshot_to_parquet.R`: passes `schema_cache_dir = file.path(parquet_ds, ".schema_cache")`.
+- `tests/testthat/test-013-snapshot_to_parquet.R`: added two new tests for cache
+  creation and unified schema reuse.
+
+**Key files:** `R/infer_json_schema.R`, `R/snapshot_to_parquet.R`,
+`tests/testthat/test-013-snapshot_to_parquet.R`
+
+---
+
 ## 2026-02-13 — DuckDB temp file IO error fix (TEMP_DIR in Makefile)
 
 **Problem:** During `snapshot_to_parquet()` for the `works` dataset (resume run after

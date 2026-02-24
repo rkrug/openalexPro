@@ -264,6 +264,167 @@ testthat::test_that("snapshot_to_parquet skips all when fully converted", {
   unlink(parquet_dir, recursive = TRUE)
 })
 
+testthat::test_that("snapshot_to_parquet creates per-file and unified schema cache", {
+  skip_if_not_installed("arrow")
+  skip_if_not_installed("duckdb")
+
+  snapshot_dir <- file.path(tempdir(), "test_snapshot_cache")
+  parquet_dir  <- file.path(tempdir(), "test_arrow_cache")
+  unlink(snapshot_dir, recursive = TRUE)
+  unlink(parquet_dir,  recursive = TRUE)
+
+  ds_dir <- file.path(snapshot_dir, "data", "authors", "part_000")
+  dir.create(ds_dir, recursive = TRUE, showWarnings = FALSE)
+
+  gz1 <- file.path(ds_dir, "file1.gz")
+  gz_con <- gzfile(gz1, "w")
+  writeLines('{"id":"A1","display_name":"Alice"}', gz_con)
+  close(gz_con)
+
+  gz2 <- file.path(ds_dir, "file2.gz")
+  gz_con <- gzfile(gz2, "w")
+  writeLines('{"id":"A2","display_name":"Bob"}', gz_con)
+  close(gz_con)
+
+  snapshot_to_parquet(
+    snapshot_dir = snapshot_dir,
+    parquet_dir  = parquet_dir,
+    data_sets    = "authors"
+  )
+
+  cache_dir <- file.path(parquet_dir, "authors", ".schema_cache")
+  expect_true(dir.exists(cache_dir))
+
+  # Per-file schema CSVs (one per gz file, named <update_date>_<part_name>.csv)
+  all_csvs      <- list.files(cache_dir, pattern = "\\.csv$")
+  per_file_csvs <- all_csvs[all_csvs != "unified_schema.csv"]
+  expect_equal(length(per_file_csvs), 2L)
+
+  # Unified schema CSV
+  expect_true(file.exists(file.path(cache_dir, "unified_schema.csv")))
+
+  unified <- read.csv(file.path(cache_dir, "unified_schema.csv"), stringsAsFactors = FALSE)
+  expect_true("col_name" %in% names(unified))
+  expect_true("col_type" %in% names(unified))
+  expect_true("id" %in% unified$col_name)
+
+  unlink(snapshot_dir, recursive = TRUE)
+  unlink(parquet_dir,  recursive = TRUE)
+})
+
+testthat::test_that("snapshot_to_parquet reuses unified schema cache on re-run", {
+  skip_if_not_installed("arrow")
+  skip_if_not_installed("duckdb")
+
+  snapshot_dir <- file.path(tempdir(), "test_snapshot_cache2")
+  parquet_dir  <- file.path(tempdir(), "test_arrow_cache2")
+  unlink(snapshot_dir, recursive = TRUE)
+  unlink(parquet_dir,  recursive = TRUE)
+
+  ds_dir <- file.path(snapshot_dir, "data", "authors", "part_000")
+  dir.create(ds_dir, recursive = TRUE, showWarnings = FALSE)
+
+  gz1 <- file.path(ds_dir, "file1.gz")
+  gz_con <- gzfile(gz1, "w")
+  writeLines('{"id":"A1","display_name":"Alice"}', gz_con)
+  close(gz_con)
+
+  # First run: creates cache
+  snapshot_to_parquet(
+    snapshot_dir = snapshot_dir,
+    parquet_dir  = parquet_dir,
+    data_sets    = "authors"
+  )
+
+  cache_dir    <- file.path(parquet_dir, "authors", ".schema_cache")
+  unified_csv  <- file.path(cache_dir, "unified_schema.csv")
+  expect_true(file.exists(unified_csv))
+
+  # Delete parquet files but keep schema cache
+  parquet_files_dir <- file.path(parquet_dir, "authors", "part_000")
+  unlink(parquet_files_dir, recursive = TRUE)
+
+  # Second run: should load schema from cache (message contains "Loaded cached")
+  expect_message(
+    snapshot_to_parquet(
+      snapshot_dir = snapshot_dir,
+      parquet_dir  = parquet_dir,
+      data_sets    = "authors"
+    ),
+    "Loaded cached unified schema"
+  )
+
+  # Parquet file should be recreated correctly
+  pq_files <- list.files(
+    file.path(parquet_dir, "authors"),
+    pattern = "\\.parquet$",
+    recursive = TRUE
+  )
+  expect_equal(length(pq_files), 1L)
+
+  unlink(snapshot_dir, recursive = TRUE)
+  unlink(parquet_dir,  recursive = TRUE)
+})
+
+testthat::test_that("snapshot_to_parquet stores works abstract_inverted_index as VARCHAR", {
+  skip_if_not_installed("arrow")
+  skip_if_not_installed("duckdb")
+  skip_if_not_installed("jsonlite")
+
+  snapshot_dir <- file.path(tempdir(), "test_snapshot_aii")
+  parquet_dir  <- file.path(tempdir(), "test_arrow_aii")
+  unlink(snapshot_dir, recursive = TRUE)
+  unlink(parquet_dir,  recursive = TRUE)
+
+  works_dir <- file.path(snapshot_dir, "data", "works", "part_000")
+  dir.create(works_dir, recursive = TRUE, showWarnings = FALSE)
+
+  # abstract_inverted_index with "as" and "As" as distinct JSON keys —
+  # DuckDB cannot store this as STRUCT (case-folds field names), so we
+  # expect it to be stored as a VARCHAR (raw JSON string) instead.
+  test_works <- c(
+    '{"id":"W1","title":"Paper 1","abstract_inverted_index":{"The":[0],"as":[1],"As":[2]}}',
+    '{"id":"W2","title":"Paper 2","abstract_inverted_index":{"test":[0]}}'
+  )
+  gz_file <- file.path(works_dir, "test.gz")
+  gz_con <- gzfile(gz_file, "w")
+  writeLines(test_works, gz_con)
+  close(gz_con)
+
+  # Conversion should succeed (no error from duplicate JSON keys)
+  expect_no_error(
+    snapshot_to_parquet(
+      snapshot_dir = snapshot_dir,
+      parquet_dir  = parquet_dir,
+      data_sets    = "works"
+    )
+  )
+
+  pq_files <- list.files(
+    file.path(parquet_dir, "works"),
+    pattern = "\\.parquet$",
+    full.names = TRUE,
+    recursive = TRUE
+  )
+  expect_equal(length(pq_files), 1L)
+
+  result <- arrow::read_parquet(pq_files[1])
+
+  # Column must be present
+  expect_true("abstract_inverted_index" %in% names(result))
+
+  # Column must be stored as character (VARCHAR)
+  expect_true(is.character(result$abstract_inverted_index))
+
+  # Round-trip: case-sensitive keys "as" and "As" must be preserved
+  parsed <- jsonlite::fromJSON(result$abstract_inverted_index[1])
+  expect_true("as" %in% names(parsed))
+  expect_true("As" %in% names(parsed))
+
+  unlink(snapshot_dir, recursive = TRUE)
+  unlink(parquet_dir,  recursive = TRUE)
+})
+
 testthat::test_that("snapshot_to_parquet preserves hive partition directory structure", {
   skip_if_not_installed("arrow")
   skip_if_not_installed("duckdb")

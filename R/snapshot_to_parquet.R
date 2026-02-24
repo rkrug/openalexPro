@@ -163,9 +163,23 @@ snapshot_to_parquet <- function(
       files = gz_files,
       sample_size = sample_size,
       extra_options = ndjson_options,
-      verbose = TRUE
+      verbose = TRUE,
+      schema_cache_dir = file.path(parquet_ds, ".schema_cache")
     )
     DBI::dbDisconnect(con, shutdown = TRUE)
+
+    # For works: abstract_inverted_index has duplicate JSON keys ("as" vs "As")
+    # that DuckDB case-folds to the same struct field name, causing a collision.
+    # Override the type to VARCHAR so DuckDB reads the raw JSON text instead of
+    # building a STRUCT, which avoids the collision entirely. ----
+    if (data_set == "works" && !is.null(columns_clause)) {
+      columns_clause <- gsub(
+        "'abstract_inverted_index':\\s*'[^']*'",
+        "'abstract_inverted_index': 'VARCHAR'",
+        columns_clause
+      )
+      message("  Storing 'abstract_inverted_index' as VARCHAR (raw JSON string)")
+    }
 
     # Stage 2: Per-file conversion ----
     progressr::with_progress(

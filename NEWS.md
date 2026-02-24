@@ -1,5 +1,17 @@
 # openalexPro (dev)
 
+## New Features
+
+* Exported `infer_json_schema()` for direct use. Infers a unified DuckDB columns
+  clause from a set of JSON/NDJSON files via per-file `DESCRIBE` queries with
+  type-widening and optional two-level disk caching (`schema_cache_dir`).
+
+## Changes
+
+* Schema cache per-file CSVs renamed from `%06d_<basename>.schema.csv` to
+  `<update_date>_<part_name>.csv` (e.g. `2024-01-15_part_001.csv`), making
+  each cache file directly traceable to its source `.gz`.
+
 ## Breaking Changes
 
 * Removed `mailto` parameter from all API functions (`pro_request()`, `pro_fetch()`,
@@ -54,10 +66,30 @@
 ## Bug Fixes
 
 * Fixed vignette parse errors in `pro_query.qmd` (malformed code block closings).
+* Fixed out-of-memory crash in `snapshot_to_parquet()` when `sample_size` exceeded the
+  number of available files (e.g. `sample_size = 10000` with 1981 works files). Schema
+  inference now processes one file at a time instead of a single bulk DuckDB query.
+* Fixed `duplicate key "as"` crash when converting the `works` dataset.
+  `abstract_inverted_index` is now stored as `VARCHAR` (raw JSON string) rather than a
+  `STRUCT`. DuckDB folds struct field names to lowercase, causing a collision between the
+  valid JSON keys `"as"` and `"As"` in this field. Storing as `VARCHAR` avoids struct
+  parsing entirely and preserves the data. Parse individual values with
+  `jsonlite::fromJSON()` when needed.
+* Fixed DuckDB temp file IO errors during `snapshot_to_parquet()` by exposing a
+  `TEMP_DIR` variable in `Makefile.snapshot` (default `/tmp`).
+
+## Changes
+
+* `snapshot_to_parquet()` schema inference now runs one DuckDB `DESCRIBE` per file
+  instead of a single query across all sampled files. Results are cached in
+  `<parquet_ds>/.schema_cache/`: per-file CSVs (`<update_date>_<part_name>.csv`) enable
+  mid-run resume; a unified `unified_schema.csv` is loaded on subsequent runs to skip
+  inference entirely. Delete `unified_schema.csv` to force re-inference.
 
 ## Tests
 
 * Added comprehensive tests for `snapshot_to_parquet()`, `build_corpus_index()`, and `lookup_by_id()`.
+* Added tests for schema caching, unified schema reuse, and works `abstract_inverted_index` VARCHAR round-trip.
 
 # openalexPro v0.4.2
 
