@@ -165,14 +165,25 @@ pro_request_jsonl_parquet <- function(
 
   DBI::dbDisconnect(con, shutdown = TRUE)
 
-  # Compute output paths, converting subfolders to hive-partition format ----
-  input_root <- normalizePath(input_jsonl)
+  # Compute output paths, converting subfolders to hive-partition format.
+  # Use path-depth counting rather than string comparison of absolute paths.
+  # On Windows, normalizePath() can return 8.3 short names (e.g. RUNNER~1)
+  # for some calls and long names (runneradmin) for others, so comparing
+  # dirname(normalizePath(f)) == normalizePath(input_jsonl) is unreliable.
+  # Counting components is immune to this because 8.3 and long names occupy
+  # the same depth in the hierarchy. ----
+  input_depth <- length(strsplit(gsub("\\\\", "/", input_jsonl), "/")[[1]])
   output_files <- vapply(jsons, function(f) {
-    f_norm <- normalizePath(f)
-    fname <- sub("\\.json$", ".parquet", basename(f))
-    if (dirname(f_norm) != input_root) {
-      # Subfolder present — convert to hive partition (query=<name>)
-      file.path(output, paste0("query=", basename(dirname(f_norm))), fname)
+    f_parts <- strsplit(gsub("\\\\", "/", f), "/")[[1]]
+    fname   <- sub("\\.json$", ".parquet", basename(f))
+    rel_dir <- if (length(f_parts) > input_depth + 1L) {
+      # File is in a subdirectory relative to input_jsonl
+      paste(f_parts[seq(input_depth + 1L, length(f_parts) - 1L)], collapse = "/")
+    } else {
+      ""
+    }
+    if (nchar(rel_dir) > 0) {
+      file.path(output, paste0("query=", rel_dir), fname)
     } else {
       file.path(output, fname)
     }

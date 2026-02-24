@@ -6,6 +6,65 @@ development history for the `openalexPro` package. It is aimed at future contrib
 
 ---
 
+## 2026-02-24 — Fix Windows path-normalization failures (CI)
+
+**Root cause:** On Windows GitHub Actions runners, `tempdir()` returns a path
+containing the 8.3 short name (`RUNNER~1`), while `normalizePath(f)` on a file
+*inside* that directory resolves to the long name (`runneradmin`). These are
+structurally different strings even though they refer to the same location. Any
+code that compared absolute paths (via `%in%`, `!=`, or regex substitution) for
+resume detection or subdir logic would silently malfunction.
+
+Additionally, `normalizePath()` uses `\` as a separator on Windows, but
+`list.files()` and DuckDB use `/`, causing `%in%` comparisons to fail even when
+the short/long-name issue is absent.
+
+**Symptoms (12 test failures on Windows CI, none on macOS/Linux):**
+
+1. `test-013` (resume detection in `snapshot_to_parquet()`): `%in%` comparing
+   `list.files()` output (`/`) vs `normalizePath()` output (`\`) always `FALSE`
+   → all files re-converted instead of skipped.
+2. `test-012` (`build_corpus_index()` + `lookup_by_id()` path doubling):
+   `build_corpus_index()` used `regexp_replace(filename, '<snapshot_dir>', '')`
+   in SQL. On Windows, `snapshot_dir` contained `\`, DuckDB `filename` uses `/`
+   → regex never matched → full absolute path stored. `lookup_by_id()` then
+   did `file.path(snapshot_path, abs_path)` doubling the path.
+3. `test-004`/`test-007` (spurious `query=` directories in
+   `pro_request_jsonl_parquet()`): `dirname(normalizePath(f)) != input_root`
+   always `TRUE` due to 8.3 vs long-name mismatch → every output file placed in
+   a `query=<dirname>` subdirectory instead of the root output directory.
+
+**Fixes:**
+
+1. **`R/snapshot_to_parquet.R`**: Apply `gsub("\\\\", "/", ...)` to both sides
+   of the `%in%` comparison used for resume detection (existing parquets vs
+   expected parquets).
+2. **`R/build_corpus_index.R`**: Compute `snapshot_depth` (number of path
+   components in `snapshot_dir`) before `future_lapply`. Inside each worker,
+   split the file path into components and extract
+   `pf_parts[seq(snapshot_depth + 1, length(pf_parts))]` as the relative path.
+   Pass this as a SQL literal string (`'<rel_path>' AS parquet_file`) — no
+   `filename = true` needed, no regex in SQL.
+3. **`R/pro_request_jsonl_parquet.R`**: Replace `normalizePath` string
+   comparison with depth-based subdir detection: compute `input_depth`, split
+   each file path, check `length(f_parts) > input_depth + 1` to detect
+   subdirectories.
+4. **`R/lookup_by_id.R`**: Normalize separators after `file.path()`:
+   `gsub("\\\\", "/", file.path(snapshot_path, names(file_chunks)))`.
+
+**Key principle:** Path-depth counting is immune to 8.3 vs long-name differences
+because `RUNNER~1` and `runneradmin` occupy the same depth in the hierarchy.
+Never compare absolute paths across `normalizePath()` and `list.files()` on
+Windows.
+
+**All 183 tests pass** on macOS after all fixes; Windows CI no longer has
+path-related failures.
+
+**Key files:** `R/snapshot_to_parquet.R`, `R/build_corpus_index.R`,
+`R/pro_request_jsonl_parquet.R`, `R/lookup_by_id.R`
+
+---
+
 ## 2026-02-24 — Export `infer_json_schema()` and rename cache files
 
 **Export:** `infer_json_schema()` was previously internal (`@noRd`). It is now

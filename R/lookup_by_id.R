@@ -160,7 +160,12 @@ lookup_by_id <- function(
     message("Splitting into parquet files ...")
   }
   file_chunks <- split(matches$file_row_number, matches$parquet_file)
-  names(file_chunks) <- file.path(snapshot_path, names(file_chunks))
+  # Normalise to forward slashes so DuckDB receives consistent paths on all
+  # platforms (normalizePath on Windows may produce backslashes). ----
+  names(file_chunks) <- gsub(
+    "\\\\", "/",
+    file.path(snapshot_path, names(file_chunks))
+  )
 
   ## Read/write records from each corpus file (parallel if workers > 1)
   if (verbose) {

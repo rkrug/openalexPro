@@ -6,6 +6,28 @@
   clause from a set of JSON/NDJSON files via per-file `DESCRIBE` queries with
   type-widening and optional two-level disk caching (`schema_cache_dir`).
 
+## Bug Fixes
+
+* Fixed Windows path-normalization failures in `snapshot_to_parquet()`,
+  `build_corpus_index()`, `lookup_by_id()`, and `pro_request_jsonl_parquet()`.
+  On Windows, `normalizePath()` can return 8.3 short names (e.g. `RUNNER~1`)
+  for `tempdir()`-derived paths while `list.files()` and DuckDB resolve to long
+  names (`runneradmin`). Resume detection in `snapshot_to_parquet()` used
+  `%in%` on paths with mixed separators (`\` vs `/`), causing already-converted
+  files to be reconverted. `build_corpus_index()` embedded `snapshot_dir` (with
+  `\`) inside a DuckDB `regexp_replace` pattern, which never matched — so the
+  full absolute path was stored in the index and later doubled by
+  `lookup_by_id()`. `pro_request_jsonl_parquet()` used `normalizePath` string
+  comparison to detect subdirectories, which always failed, placing every output
+  file in a spurious `query=<dirname>` subdirectory.
+
+  Fixes: (1) normalize separators to `/` with `gsub("\\\\", "/", ...)` on both
+  sides of `%in%` comparisons; (2) compute relative paths in R using path-depth
+  counting (`strsplit(path, "/")` then indexed extraction) rather than
+  string-matching absolute paths — immune to 8.3 vs long-name differences;
+  (3) pass the relative path as a SQL literal in `build_corpus_index()` instead
+  of computing it inside DuckDB with a regex.
+
 ## Changes
 
 * Schema cache per-file CSVs renamed from `%06d_<basename>.schema.csv` to

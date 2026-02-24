@@ -125,6 +125,14 @@ build_corpus_index <- function(
     full.names = TRUE
   )
 
+  ## Depth of snapshot_dir in path hierarchy — used to extract relative paths
+  ## inside future_lapply without string-matching absolute paths.
+  ## normalizePath() on Windows can return 8.3 short names (e.g. RUNNER~1)
+  ## for some calls and long names (runneradmin) for others, making string
+  ## comparison unreliable. Counting components is immune to this. ----
+  snapshot_dir_fwd <- gsub("\\\\", "/", snapshot_dir)
+  snapshot_depth   <- length(strsplit(snapshot_dir_fwd, "/")[[1]])
+
   ## Stage 1: Index each file individually (parallel)
   message(
     "Stage 1: Indexing ",
@@ -173,20 +181,27 @@ build_corpus_index <- function(
         )
       }
 
+      ## Compute relative path from snapshot_dir using component depth.
+      ## This avoids embedding snapshot_dir in a SQL regex (backslashes on
+      ## Windows break regex) and avoids string-matching absolute paths
+      ## (8.3 short-name vs long-name mismatch). ----
+      pf_parts <- strsplit(gsub("\\\\", "/", pf), "/")[[1]]
+      rel_path <- paste(
+        pf_parts[seq(snapshot_depth + 1L, length(pf_parts))],
+        collapse = "/"
+      )
+
       stage1_query <- paste0(
         "COPY (",
         "SELECT ",
         "  id, ",
         "  CAST(FLOOR(CAST(regexp_extract(id, '(\\d+)$', 1) AS BIGINT) / 10000) AS INTEGER) ",
         "    AS id_block, ",
-        "  regexp_replace(filename, '^",
-        snapshot_dir,
-        "/?', '') AS parquet_file,",
-        # "  filename AS parquet_file, ",
+        "  '", rel_path, "' AS parquet_file,",
         "  file_row_number ",
         "FROM read_parquet('",
         pf,
-        "', filename = true, file_row_number = true)",
+        "', file_row_number = true)",
         ") TO '",
         out_file,
         "' (FORMAT PARQUET, COMPRESSION SNAPPY)"

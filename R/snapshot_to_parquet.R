@@ -113,20 +113,22 @@ snapshot_to_parquet <- function(
       next
     }
 
-    # Compute relative paths from json_dir ----
+    # Compute relative paths from json_dir.
+    # normalizePath() uses \ on Windows; gsub ensures / on all platforms so
+    # the %in% comparison with list.files() output is consistent. ----
     json_dir_norm <- normalizePath(json_dir)
     rel_paths <- vapply(gz_files, function(f) {
-      substring(normalizePath(f), nchar(json_dir_norm) + 2)
+      gsub("\\\\", "/", substring(normalizePath(f), nchar(json_dir_norm) + 2))
     }, character(1), USE.NAMES = FALSE)
 
     # Resume support: skip already-converted files ----
     dir.create(parquet_ds, recursive = TRUE, showWarnings = FALSE)
-    existing_parquets <- list.files(
+    existing_parquets <- gsub("\\\\", "/", list.files(
       parquet_ds,
       pattern = "\\.parquet$",
       recursive = TRUE,
       full.names = FALSE
-    )
+    ))
     expected_parquets <- sub("\\.gz$", ".parquet", rel_paths)
     todo_mask <- !(expected_parquets %in% existing_parquets)
     skipped <- sum(!todo_mask)
