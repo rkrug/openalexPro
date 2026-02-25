@@ -6,6 +6,28 @@ development history for the `openalexPro` package. It is aimed at future contrib
 
 ---
 
+## 2026-02-25 — Deprecate filter-based search; add `search.exact` and `search.semantic`
+
+**Background:** OpenAlex deprecated the `filter=field.search:keyword` URL syntax
+in favour of a top-level `search=keyword` parameter. Two new variants were also
+introduced: `search.exact` (unstemmed) and `search.semantic` (AI-powered).
+
+**Changes:**
+- `pro_query()` already had a `search` parameter (mapped to `search=` in the URL);
+  added `search.exact` and `search.semantic` alongside it in `shared_q`.
+- `.validate_filter()` now emits a `cli::cli_warn()` when any filter name ends
+  with `.search` or `.search.no_stem`, directing users to `search =` instead.
+- Existing tests that use `title_and_abstract.search = "..."` are intentionally
+  kept as **canaries**: they will fail when OpenAlex removes the deprecated syntax,
+  signalling that migration is complete.
+- New URL-construction tests added to `test-003-pro_query.R` for the new params.
+- README example updated to use `search =`.
+- Version bumped to 0.6.0.
+
+**Key file:** `R/pro_query.R`
+
+---
+
 ## 2026-02-24 — Fix Windows path-normalization failures (CI)
 
 **Root cause:** On Windows GitHub Actions runners, `tempdir()` returns a path

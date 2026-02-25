@@ -1,10 +1,27 @@
-# openalexPro (dev)
+# openalexPro 0.6.0
 
 ## New Features
+
+* Added `search.exact` and `search.semantic` parameters to `pro_query()`,
+  matching the new OpenAlex search API:
+  - `search.exact`: searches without stemming or stop-word removal; supports
+    boolean operators, quoted phrases, proximity (`~N`), and wildcards.
+  - `search.semantic`: AI embedding-based search that matches by conceptual
+    meaning rather than keywords (max 50 results, max 1 req/sec).
+  - `search`: now documented to support the full boolean/phrase/wildcard
+    syntax in addition to its existing stemmed matching.
 
 * Exported `infer_json_schema()` for direct use. Infers a unified DuckDB columns
   clause from a set of JSON/NDJSON files via per-file `DESCRIBE` queries with
   type-widening and optional two-level disk caching (`schema_cache_dir`).
+
+## Deprecations
+
+* Filter arguments with a `.search` suffix (e.g. `title_and_abstract.search = "..."`)
+  are deprecated by the OpenAlex API. They still work but now emit a warning.
+  Use the `search` parameter of `pro_query()` instead:
+  `pro_query(entity = "works", search = "your terms")`.
+  See <https://developers.openalex.org/guides/searching> for details.
 
 ## Bug Fixes
 

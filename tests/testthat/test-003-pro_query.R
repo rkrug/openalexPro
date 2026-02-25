@@ -194,3 +194,42 @@ testthat::test_that("pro_query handles NULL id gracefully", {
   testthat::expect_true(grepl("search=test", url))
   testthat::expect_false(grepl("/works/", url))
 })
+
+# New search parameter tests ----------------------------------------------
+
+testthat::test_that("search.exact appears in URL", {
+  url <- pro_query("works", search.exact = "biodiversity")
+  testthat::expect_true(grepl("search\\.exact=biodiversity", url))
+  testthat::expect_false(grepl("filter=", url))
+})
+
+testthat::test_that("search.semantic appears in URL", {
+  url <- pro_query("works", search.semantic = "ocean acidification")
+  testthat::expect_true(grepl("search\\.semantic=ocean", url))
+  testthat::expect_false(grepl("filter=", url))
+})
+
+testthat::test_that("search.exact and search can be combined with filters", {
+  url <- pro_query(
+    "works",
+    search.exact = "CRISPR",
+    from_publication_date = "2020-01-01"
+  )
+  testthat::expect_true(grepl("search\\.exact=CRISPR", url))
+  testthat::expect_true(grepl("filter=from_publication_date", url))
+})
+
+# Deprecation warning tests -----------------------------------------------
+
+testthat::test_that("deprecated .search filter emits a warning", {
+  testthat::expect_warning(
+    pro_query("works", title_and_abstract.search = "biodiversity"),
+    regexp = "deprecated"
+  )
+})
+
+testthat::test_that("non-.search filters do not emit a deprecation warning", {
+  testthat::expect_no_warning(
+    pro_query("works", from_publication_date = "2020-01-01")
+  )
+})

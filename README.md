@@ -95,8 +95,8 @@ This defines a basic query.
 
 ```r
 query <- pro_query(
-  title_and_abstract.search = "biodiversity AND conservation AND IPBES",
-  entity = "works"
+  entity = "works",
+  search = "biodiversity AND conservation AND IPBES"
 )
 ```
 
