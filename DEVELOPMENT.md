@@ -6,6 +6,29 @@ development history for the `openalexPro` package. It is aimed at future contrib
 
 ---
 
+## 2026-02-25 — Add `pro_download_content()` for PDF and TEI XML downloads
+
+**Background:** OpenAlex added a new content endpoint (`content.openalex.org`)
+that serves full-text PDFs (~60 M files) and Grobid TEI XML (~43 M files) for
+works. Cost is $0.01 per file. The metadata API already supports
+`has_content.pdf:true` and `has_content.grobid-xml:true` filter arguments in
+`pro_query()` to discover downloadable works.
+
+**Implementation:**
+- New file `R/pro_download_content.R` with exported `pro_download_content()`.
+- Accepts a character vector of work IDs (or full OpenAlex URLs, normalised).
+- Downloads via `httr2::req_perform()`: PDF → `resp_body_raw()` + `writeBin()`;
+  grobid-xml → `resp_body_string()` + `writeLines()`.
+- Parallel via `future_lapply()` consistent with rest of package.
+- Returns a data frame (`id`, `file`, `status`, `message`) — never aborts on
+  partial failures.
+- API key passed as `?api_key=` query parameter (same as all other functions).
+- Tests use `httr2::with_mocked_responses()` — no VCR cassettes needed.
+
+**Key file:** `R/pro_download_content.R`
+
+---
+
 ## 2026-02-25 — Deprecate filter-based search; add `search.exact` and `search.semantic`
 
 **Background:** OpenAlex deprecated the `filter=field.search:keyword` URL syntax

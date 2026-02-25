@@ -33,7 +33,8 @@ Suggests:
     quarto,
     testthat (>= 3.0.0),
     vcr (> 1.7.0),
-    vdiffr
+    vdiffr,
+    withr
 Encoding: UTF-8
 RoxygenNote: 7.3.3
 VignetteBuilder: quarto

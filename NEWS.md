@@ -2,6 +2,13 @@
 
 ## New Features
 
+* Added `pro_download_content()` to download full-text PDFs
+  (`format = "pdf"`) or TEI XML (`format = "grobid-xml"`) from the OpenAlex
+  content endpoint (`content.openalex.org`). Accepts a vector of work IDs,
+  supports parallel downloads via `workers`, and returns a data frame with
+  per-file status (`"ok"` / `"not_found"` / `"error"`). Note: content
+  downloads cost \$0.01 per file.
+
 * Added `search.exact` and `search.semantic` parameters to `pro_query()`,
   matching the new OpenAlex search API:
   - `search.exact`: searches without stemming or stop-word removal; supports
