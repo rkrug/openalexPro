@@ -49,7 +49,7 @@
       p
     Output
       FileSystemDataset with 4 Parquet files
-      52 columns
+      53 columns
       id: string
       doi: string
       title: string
@@ -71,7 +71,7 @@
       corresponding_institution_ids: list<element: string>
       apc_list: struct<value: int64, currency: string, value_usd: int64>
       ...
-      32 more columns
+      33 more columns
       Use `schema()` to see entire schema
     Code
       dplyr::collect(dplyr::arrange(dplyr::distinct(dplyr::select(p, page)), page))

@@ -9,7 +9,6 @@ pro_request(
   pages = 1e+05,
   output = NULL,
   overwrite = FALSE,
-  mailto = Sys.getenv("openalexPro.email"),
   api_key = Sys.getenv("openalexPro.apikey"),
   workers = 1,
   verbose = FALSE,
@@ -32,9 +31,9 @@ temporary directory. Needs to be specified.}
 \item{overwrite}{Logical. If \code{TRUE}, \code{output} will be deleted if it already
 exists.}
 
-\item{mailto}{The email address of the user.}
-
-\item{api_key}{The API key of the user.}
+\item{api_key}{Character string API key or \code{NULL}. Defaults to
+\code{Sys.getenv("openalexPro.apikey")}. If \code{NULL} or \code{""}, requests are sent
+without an API key (subject to OpenAlex's unauthenticated limits).}
 
 \item{workers}{Number of parallel workers to use if \code{query_url} is a list. Defaults to 1.}
 
@@ -42,14 +41,15 @@ exists.}
 
 \item{progress}{Logical indicating whether to show a progress bar. Default \code{TRUE}.}
 
-\item{count_only}{return count only as a named numeric vector or list.}
+\item{count_only}{return count only as a data.frame.}
 
 \item{error_log}{location of error log of API calls. (default: \code{NULL} (none)).}
 }
 \value{
 If \code{count_only} is \code{FALSE} (the default) the complete path to the expanded and
-normalized \code{output}. If \code{count_only} is \code{TRUE}, a named numeric vector with the count
-of the works from the specified query_url(s).
+normalized \code{output}. If \code{count_only} is \code{TRUE}, a data.frame with metadata about
+the query (count, db_response_time_ms, page, per_page, error). When \code{query_url} is
+a list, an additional \code{query} column identifies each query.
 }
 \description{
 All returned values from OpenAlex will be saved as

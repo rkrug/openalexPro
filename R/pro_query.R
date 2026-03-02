@@ -133,6 +133,16 @@
     return(invisible(TRUE))
   }
 
+  # Warn about deprecated .search filter fields
+  search_filters <- grep("\\.search(\\.no_stem)?$", names(fl), value = TRUE)
+  if (length(search_filters)) {
+    cli::cli_warn(c(
+      "!" = "The filter argument{?s} {.val {search_filters}} use{?s/} the deprecated {.code field.search} syntax.",
+      "i" = "Use the {.arg search} parameter instead: {.code pro_query(..., search = \"your terms\")}.",
+      "i" = "See {.url https://developers.openalex.org/guides/searching} for details."
+    ))
+  }
+
   allowed <- opt_filter_names()
   if (.is_empty(allowed)) {
     return(invisible(TRUE))
@@ -171,7 +181,19 @@
 #' @param id Optional ID or vector of IDs (e.g., \code{"W1775749144"}). If a single ID
 #'   is provided, fetches one entity directly. If multiple IDs are provided, they are
 #'   automatically moved into the \code{ids.openalex} filter.
-#' @param search Optional full-text search string.
+#' @param search Optional full-text search string. Applies stemming and
+#'   stop-word removal. Supports boolean operators (\code{AND}, \code{OR},
+#'   \code{NOT} in uppercase), quoted phrases (\code{"exact phrase"}),
+#'   proximity (\code{"word1 word2"~N}), wildcards (\code{*}, \code{?}), and
+#'   fuzzy matching (\code{term~N}). Replaces the deprecated
+#'   \code{filter = field.search:keyword} syntax.
+#' @param search.exact Optional full-text search without stemming or stop-word
+#'   removal. Supports the same boolean/phrase/wildcard syntax as \code{search}.
+#'   Use when you need to match exact word forms (e.g. \code{"surgery"} should
+#'   not match \code{"surgical"}).
+#' @param search.semantic Optional semantic (AI-powered) search string. Uses
+#'   embeddings to match conceptual meaning rather than exact keywords. Limited
+#'   to 1 request per second and returns at most 50 results per query.
 #' @param group_by Optional field to group by (facets), e.g. \code{"type"}.
 #' @param select Optional character vector of fields to return.
 #' @param options Optional named list of additional query parameters (e.g.,
@@ -183,6 +205,28 @@
 #'
 #' @return An individual URL or a list of URLs.
 #'
+#' @section Search syntax:
+#' All three search parameters (\code{search}, \code{search.exact},
+#' \code{search.semantic}) accept a query string. For \code{search} and
+#' \code{search.exact}, the following syntax is supported:
+#' \itemize{
+#'   \item Boolean: \code{biodiversity AND finance}, \code{climate OR weather},
+#'     \code{ocean NOT pollution} (operators must be uppercase).
+#'   \item Exact phrase: \code{"biodiversity finance"} (double quotes).
+#'   \item Proximity: \code{"biodiversity finance"~5} (words within 5 positions).
+#'   \item Wildcard: \code{bio*} (zero or more characters), \code{organi?ation}.
+#'   \item Fuzzy: \code{biodiversty~1} (allows 1 character edit).
+#' }
+#' \code{search.semantic} does not use keyword syntax; pass a natural-language
+#' phrase or even a full abstract. It returns at most 50 results per call.
+#'
+#' @section Deprecated search filters:
+#' Filter arguments with a \code{.search} suffix (e.g.
+#' \code{title_and_abstract.search = "biodiversity"}) are deprecated by the
+#' OpenAlex API. They still work but emit a warning. Use the \code{search},
+#' \code{search.exact}, or \code{search.semantic} parameters instead. See
+#' \url{https://developers.openalex.org/guides/searching} for details.
+#'
 #' @examples
 #' \dontrun{
 #'
@@ -192,8 +236,7 @@
 #'   from_publication_date = "2020-01-01",
 #'   language = c("en","de"),
 #'   select = c("id","title","publication_year"),
-#'   options = list(per_page = 5),
-#'   mailto = "you@example.org"
+#'   options = list(per_page = 5)
 #' )
 #' # resp <- api_call(req)
 #' # httr2::resp_body_json(resp)
@@ -214,6 +257,8 @@ pro_query <- function(
   ),
   id = NULL,
   search = NULL,
+  search.exact = NULL,
+  search.semantic = NULL,
   group_by = NULL,
   select = NULL,
   options = NULL,
@@ -299,6 +344,8 @@ pro_query <- function(
   # assemble query components shared across batches (drop NULLs later)
   shared_q <- list(
     search = search,
+    `search.exact` = search.exact,
+    `search.semantic` = search.semantic,
     group_by = group_by,
     select = select_str
   )

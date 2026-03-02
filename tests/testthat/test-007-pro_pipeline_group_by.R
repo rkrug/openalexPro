@@ -14,16 +14,17 @@ unlink(output_parquet, recursive = TRUE, force = TRUE)
 test_that("pro_request `biodiversity` and group by `type`", {
   vcr::local_cassette("pro_request_biodiversity_and_group_by_type")
   # Define the API request
-  output_json <- pro_query(
-    entity = "works",
-    title_and_abstract.search = "biodiversity",
-    to_publication_date = "2010-01-01",
-    group_by = "type"
+  output_json <- suppressWarnings(
+    pro_query(
+      entity = "works",
+      title_and_abstract.search = "biodiversity",
+      to_publication_date = "2010-01-01",
+      group_by = "type"
+    )
   ) |>
     pro_request(
       pages = 1,
       output = output_json,
-      mailto = "test@example.com",
       verbose = FALSE,
       progress = TRUE
     )
@@ -60,16 +61,13 @@ test_that("pro_request_jsonl_parquet `biodiversity` and group by type", {
   output_parquet <- output_jsonl |>
     pro_request_jsonl_parquet(
       output = output_parquet,
-      verbose = FALSE,
-      progress = TRUE
+      verbose = FALSE
     )
 
   # Check that the output file exists
   expect_true(
     length(list.files(output_parquet, recursive = TRUE)) >= 1
   )
-
-  vcr::local_cassette("oa_fetch_group_by")
 
   results_openalexPro <- read_corpus(
     corpus = output_parquet,

@@ -5,15 +5,12 @@
 \title{Validate OpenAlex credentials}
 \usage{
 pro_validate_credentials(
-  mailto = Sys.getenv("openalexPro.email"),
   api_key = Sys.getenv("openalexPro.apikey"),
   show_credentials = FALSE
 )
 }
 \arguments{
-\item{mailto}{Email for polite pool (not validated by API)}
-
-\item{api_key}{API key to validate}
+\item{api_key}{API key to validate (character string) or `NULL`.}
 
 \item{show_credentials}{shows the api_key using `message()`. USE WITH CAUTION!}
 }

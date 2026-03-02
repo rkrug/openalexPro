@@ -9,9 +9,9 @@ pro_request_jsonl_parquet(
   output = NULL,
   overwrite = FALSE,
   verbose = TRUE,
-  progress = TRUE,
   delete_input = FALSE,
-  sample_size = 1000
+  sample_size = 1000,
+  workers = NULL
 )
 }
 \arguments{
@@ -23,10 +23,8 @@ directory.}
 
 \item{overwrite}{Logical indicating whether to overwrite \code{output}.}
 
-\item{verbose}{Logical indicating whether to show a verbose information.
+\item{verbose}{Logical indicating whether to show verbose information.
 Defaults to \code{TRUE}}
-
-\item{progress}{Logical indicating whether to show a progress bar. Default \code{TRUE}.}
 
 \item{delete_input}{Determines if the \code{input_jsonl} should be deleted
 afterwards. Defaults to \code{FALSE}.}
@@ -35,32 +33,30 @@ afterwards. Defaults to \code{FALSE}.}
 the unified schema. Higher values give more accurate schema inference but
 use more memory. Default is 1000. Set to -1 to read all records (may be slow
 for large files).}
+
+\item{workers}{Number of parallel workers for file conversion via
+\code{\link[future.apply:future_lapply]{future.apply::future_lapply()}}. Default is \code{NULL} (sequential processing).}
 }
 \value{
-The function does returns the output invisibly.
+The function returns the output path invisibly.
 }
 \description{
 The function takes a directory of JSONL files as written from a call to
-\code{pro_request_jsonl(...)} and converts it to a Apache Parquet files. Each
-jsonl is processed individually, so there is no limit of the number of records.
+\code{pro_request_jsonl(...)} and converts each file individually to a Parquet file.
+The subfolder structure from the input is preserved in the output, so files
+in \verb{Chunk_1/} will be written to \verb{Chunk_1/} in the output directory.
 }
 \details{
-The value \code{page} as created in \code{pro_request_jsonl()} is used for partitioning.
-All jsonl files are combined into a single Apache Parquet dataset, but can be
-filtered out by using the "page". As an example:
-\enumerate{
-\item the subfolder in the \code{output} folder is called \code{Chunk_1}
-\item the page othe json file represents is \code{2}
-\item The resulting values for \code{page} will be \code{Chunk_1_2}
-}
+The \code{page} column (added by \code{\link[=pro_request_jsonl]{pro_request_jsonl()}}) is preserved as a regular
+column in the Parquet data.
 
-When starting the conversion, a file \verb{00_in.progress} which is deleted upon completion.
+When starting the conversion, a file \verb{00_in.progress} is created which is
+deleted upon completion.
 
 The function uses DuckDB to read the JSON files and to create the
-Apache Parquet files. The function creates a DuckDB connection in memory
-and reads the JSON files into DuckDB when needed. Then it creates a SQL
-query to convert the JSON files to Apache Parquet files and to copy the
-result to the specified directory.
+Apache Parquet files. Each JSON file is converted individually using its own
+DuckDB connection, which enables parallel processing via
+\code{\link[future.apply:future_lapply]{future.apply::future_lapply()}}.
 
 To ensure consistent schemas across all Parquet files, the function first
 infers a unified schema by sampling records from all JSONL files. This

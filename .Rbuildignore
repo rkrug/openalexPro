@@ -30,3 +30,4 @@
 ^codecov\.yml$
 ^\.github$
 ^.claude
+^DEVELOPMENT.md$

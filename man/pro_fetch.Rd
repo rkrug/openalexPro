@@ -9,7 +9,6 @@ pro_fetch(
   pages = 10000,
   project_folder = NULL,
   overwrite = FALSE,
-  mailto = Sys.getenv("openalexPro.email"),
   api_key = Sys.getenv("openalexPro.apikey"),
   workers = 1,
   verbose = FALSE,
@@ -34,9 +33,9 @@ directory is created.}
 \item{overwrite}{Logical. If \code{TRUE}, \code{output} will be deleted if it already
 exists.}
 
-\item{mailto}{The email address of the user.}
-
-\item{api_key}{The API key of the user.}
+\item{api_key}{Character string API key or \code{NULL}. Defaults to
+\code{Sys.getenv("openalexPro.apikey")}. If \code{NULL} or \code{""}, requests are sent
+without an API key (subject to OpenAlex's unauthenticated limits).}
 
 \item{workers}{Number of parallel workers to use if \code{query_url} is a list. Defaults to 1.}
 

@@ -42,7 +42,6 @@ pro_fetch <- function(
   pages = 10000,
   project_folder = NULL,
   overwrite = FALSE,
-  mailto = Sys.getenv("openalexPro.email"),
   api_key = Sys.getenv("openalexPro.apikey"),
   workers = 1,
   verbose = FALSE,
@@ -50,6 +49,12 @@ pro_fetch <- function(
   count_only,
   error_log = NULL
 ) {
+  if (is.null(api_key) || (is.character(api_key) && length(api_key) == 1 && !nzchar(api_key))) {
+    api_key <- NULL
+  } else if (!is.character(api_key) || length(api_key) != 1) {
+    stop("`api_key` must be NULL or a length-1 character string.", call. = FALSE)
+  }
+
   if (!missing(count_only)) {
     warning("`count_only` is set but will be assumed to be `FALSE`")
     if (count_only) {
@@ -73,7 +78,6 @@ pro_fetch <- function(
     pages = pages,
     output = file.path(project_folder, "json"),
     overwrite = overwrite,
-    mailto = mailto,
     api_key = api_key,
     workers = workers,
     verbose = verbose,
@@ -92,7 +96,6 @@ pro_fetch <- function(
       output = file.path(project_folder, "parquet"),
       overwrite = overwrite,
       verbose = verbose,
-      progress = progress,
       delete_input = FALSE
     )
 }

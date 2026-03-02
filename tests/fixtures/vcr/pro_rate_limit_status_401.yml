@@ -1,0 +1,25 @@
+http_interactions:
+- request:
+    method: GET
+    uri: https://api.openalex.org/rate-limit?api_key=%3Capi-key%3E
+  response:
+    status: 401
+    headers:
+      date: Mon, 02 Mar 2026 12:58:55 GMT
+      content-type: application/json
+      content-length: '68'
+      access-control-allow-origin: '*'
+      cache-control: no-store
+      access-control-allow-headers: Accept, Accept-Language, Accept-Encoding, Authorization,
+        Content-Type
+      access-control-allow-methods: GET, HEAD, POST, OPTIONS
+      access-control-expose-headers: Cache-Control, X-RateLimit-Limit, X-RateLimit-Remaining,
+        X-RateLimit-Onetime-Remaining, X-RateLimit-Credits-Used, X-RateLimit-Credits-Required,
+        X-RateLimit-Reset, X-RateLimit-Limit-USD, X-RateLimit-Remaining-USD, X-RateLimit-Prepaid-Remaining-USD,
+        X-RateLimit-Cost-USD, X-RateLimit-Cost-Required-USD, Retry-After
+      server: cloudflare
+      cf-ray: 9d60935fdc3cc126-ZRH
+    body:
+      string: '{"error":"Invalid or missing API key","message":"API key not found"}'
+  recorded_at: 2026-03-02 12:58:55
+recorded_with: VCR-vcr/2.0.0

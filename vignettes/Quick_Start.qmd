@@ -68,22 +68,25 @@ install.packages(
 
 # Setup Credentials
 
-OpenAlex provides free API keys with higher rate limits. Get yours at [openalex.org](https://openalex.org).
+OpenAlex provides free API keys with higher rate limits. `openalexPro` can run
+without a key, but for anything beyond very small tests you should configure
+`openalexPro.apikey`. Get a key at [openalex.org](https://openalex.org).
 
 ```{r}
 # Add to your .Renviron file (recommended)
 # Run: usethis::edit_r_environ()
 # Then add these lines:
-#   openalexPro.email=your.email@example.org
 #   openalexPro.apikey=your-api-key
 
 # Or set temporarily in your session:
-Sys.setenv(openalexPro.email = "your.email@example.org")
 Sys.setenv(openalexPro.apikey = "your-api-key")
 
-# Verify credentials work
+# Verify credentials (TRUE if key works, FALSE if missing/invalid)
 library(openalexPro)
 pro_validate_credentials()
+
+# Check your current rate limit usage and remaining budget (key required)
+pro_rate_limit_status()
 ```
 
 # Quick Start: 3 Steps to Data
@@ -265,6 +268,7 @@ For detailed technical documentation, see:
 | `pro_fetch()` | **One-step download + transform + convert** |
 | `pro_count()` | Get result count without downloading |
 | `pro_validate_credentials()` | Test your API credentials |
+| `pro_rate_limit_status()` | Check current rate limit usage and remaining budget |
 | `opt_filter_names()` | List available filter names |
 | `opt_select_fields()` | List available select fields |
 

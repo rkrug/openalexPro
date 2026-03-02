@@ -3,7 +3,7 @@
     Code
       nrow(results_openalexPro)
     Output
-      [1] 16
+      [1] 18
     Code
       sort(names(results_openalexPro))
     Output
@@ -14,23 +14,25 @@
         results_openalexPro, citation = NULL, page = NULL), key))
       print(results_openalexPro)
     Output
-      # A tibble: 16 x 3
-         key                                        key_display_name  count
-         <chr>                                      <chr>             <int>
-       1 https://openalex.org/types/article         article          123965
-       2 https://openalex.org/types/book            book               3002
-       3 https://openalex.org/types/book-chapter    book-chapter       5107
-       4 https://openalex.org/types/dataset         dataset             246
-       5 https://openalex.org/types/dissertation    dissertation       1818
-       6 https://openalex.org/types/editorial       editorial           167
-       7 https://openalex.org/types/erratum         erratum              43
-       8 https://openalex.org/types/letter          letter              306
-       9 https://openalex.org/types/libguides       libguides            22
-      10 https://openalex.org/types/other           other               498
-      11 https://openalex.org/types/paratext        paratext            147
-      12 https://openalex.org/types/preprint        preprint           1367
-      13 https://openalex.org/types/reference-entry reference-entry      24
-      14 https://openalex.org/types/report          report              281
-      15 https://openalex.org/types/review          review             1882
-      16 https://openalex.org/types/standard        standard              1
+      # A tibble: 18 x 3
+         key                                                key_display_name     count
+         <chr>                                              <chr>                <int>
+       1 https://openalex.org/types/article                 article             129243
+       2 https://openalex.org/types/book                    book                  3037
+       3 https://openalex.org/types/book-chapter            book-chapter          6113
+       4 https://openalex.org/types/database                database                 1
+       5 https://openalex.org/types/dataset                 dataset                280
+       6 https://openalex.org/types/dissertation            dissertation          2017
+       7 https://openalex.org/types/editorial               editorial              170
+       8 https://openalex.org/types/erratum                 erratum                 45
+       9 https://openalex.org/types/letter                  letter                 318
+      10 https://openalex.org/types/libguides               libguides               22
+      11 https://openalex.org/types/other                   other                  563
+      12 https://openalex.org/types/paratext                paratext               184
+      13 https://openalex.org/types/preprint                preprint              1392
+      14 https://openalex.org/types/reference-entry         reference-entry         24
+      15 https://openalex.org/types/report                  report                 310
+      16 https://openalex.org/types/review                  review                1895
+      17 https://openalex.org/types/standard                standard                 1
+      18 https://openalex.org/types/supplementary-materials supplementary-mate~      1
 
