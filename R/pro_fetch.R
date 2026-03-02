@@ -49,15 +49,10 @@ pro_fetch <- function(
   count_only,
   error_log = NULL
 ) {
-  if (!nzchar(api_key)) {
-    stop(
-      "An OpenAlex API key is required. ",
-      "Set it with:\n",
-      "  Sys.setenv(openalexPro.apikey = \"your-key\")\n",
-      "or add to your .Renviron file:\n",
-      "  openalexPro.apikey=your-key",
-      call. = FALSE
-    )
+  if (is.null(api_key) || (is.character(api_key) && length(api_key) == 1 && !nzchar(api_key))) {
+    api_key <- NULL
+  } else if (!is.character(api_key) || length(api_key) != 1) {
+    stop("`api_key` must be NULL or a length-1 character string.", call. = FALSE)
   }
 
   if (!missing(count_only)) {

@@ -29,8 +29,9 @@ current working directory. Created if it does not exist.}
 (sequential). Set higher for faster batch downloads, subject to the
 content endpoint's rate limits.}
 
-\item{api_key}{OpenAlex API key. Defaults to the
-\code{openalexPro.apikey} environment variable.}
+\item{api_key}{OpenAlex API key (character string) or `NULL`. Defaults to
+the \code{openalexPro.apikey} environment variable. If `NULL` or `""`,
+requests are sent without an API key.}
 
 \item{endpoint}{Base URL of the content endpoint. Defaults to
 \code{"https://content.openalex.org"}.}

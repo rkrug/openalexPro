@@ -14,8 +14,9 @@ pro_count(
 \item{query_url}{Character string containing the fully constructed OpenAlex
 PRO endpoint URL.}
 
-\item{api_key}{Either a character string API key or a function returning one.
-Defaults to `Sys.getenv("openalexPro.apikey")`, and gracefully handles `NULL` or lazy evaluation.}
+\item{api_key}{Character string API key or `NULL`. Defaults to
+`Sys.getenv("openalexPro.apikey")`. If `NULL` or `""`, the request is sent
+without an API key (subject to OpenAlex's unauthenticated limits).}
 
 \item{error_log}{location of error log of API calls. (default: `NULL` (none)).}
 }

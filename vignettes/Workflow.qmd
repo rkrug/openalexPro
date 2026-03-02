@@ -817,7 +817,7 @@ flowchart TD
 | `pro_request()` | Download JSON | query_url, output, pages, workers |
 | `pro_request_jsonl()` | Convert to JSONL | input_json, output, workers |
 | `pro_request_jsonl_parquet()` | Convert to Parquet | input_jsonl, output, sample_size |
-| `pro_validate_credentials()` | Test credentials | api_key |
+| `pro_validate_credentials()` | Test credentials (optional helper) | api_key |
 | `pro_rate_limit_status()` | Check rate limit usage & remaining budget | api_key, verbose |
 | `pro_download_content()` | Download full-text PDFs or TEI XML | ids, output, format, workers |
 

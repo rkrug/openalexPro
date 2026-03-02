@@ -6,7 +6,7 @@
 
       The functions definitions are likely stable in the 
       release on r-universe https://rkrug.r-universe.dev/openalexPro,
-      but nothing can be assumed in the dev version on GittHub!
+      but nothing can be assumed in the dev version on GitHub!
 
       As usual, the author(s) do not take any responsibility for the 
       correct functioning of the package or any responsibility for 

@@ -10,7 +10,9 @@ pro_rate_limit_status(
 )
 }
 \arguments{
-\item{api_key}{API key. Defaults to \code{Sys.getenv("openalexPro.apikey")}.}
+\item{api_key}{API key (character string) or `NULL`. Defaults to
+\code{Sys.getenv("openalexPro.apikey")}. If `NULL` or `""`, this function
+returns \code{FALSE} with an informational message.}
 
 \item{verbose}{Logical. If \code{TRUE} (default), prints rate limit info via \code{message()}.}
 }

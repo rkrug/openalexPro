@@ -57,15 +57,28 @@ compare_json_ignore <- function(ignore_fields) {
 vcr_dir <- vcr::vcr_test_path("fixtures", "vcr")
 vcr::vcr_configure_log(file = file.path(vcr_dir, "vcr.log"))
 
-invisible(vcr::vcr_configure(
-  dir = vcr_dir,
-  # Filter the request header where the token is sent, make sure you know
-  # how authentication works in your case and read the Security chapter :-)
-  # filter_request_headers = list(Authorization = "My bearer token is safe")
-  record = "new_episodes",
-  filter_request_headers = list(api_key = "<api-key>"),
-  filter_query_parameters = list(api_key = "<api-key>")
-))
+# "all" re-records every cassette; triggered by record_cassettes.R script.
+# "new_episodes" is the normal mode: replay existing, record only missing.
+vcr_record_mode <- if (nzchar(Sys.getenv("OPENALEXPRO_RECORD_CASSETTES"))) "all" else "new_episodes"
+
+if (vcr_record_mode == "all") {
+  # During recording: no query-parameter filtering so the real API key is sent
+  # to the server (authenticated requests). record_cassettes.R post-processes
+  # the cassette files afterward to replace the real key with the placeholder.
+  invisible(vcr::vcr_configure(
+    dir = vcr_dir,
+    record = vcr_record_mode
+  ))
+} else {
+  # During playback: filter_query_parameters normalises api_key in incoming
+  # requests so they match the <api-key> placeholder stored in cassettes.
+  invisible(vcr::vcr_configure(
+    dir = vcr_dir,
+    record = vcr_record_mode,
+    filter_request_headers  = list(api_key = "<api-key>"),
+    filter_query_parameters = list(api_key = "<api-key>")
+  ))
+}
 
 # Ensure a dummy API key is set so validation passes during VCR-recorded tests
 if (!nzchar(Sys.getenv("openalexPro.apikey"))) {

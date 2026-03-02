@@ -40,14 +40,14 @@ test_that("pro_rate_limit_status emits message on 401", {
 
 test_that("pro_rate_limit_status returns a list invisibly on success", {
   vcr::local_cassette("pro_rate_limit_status_200")
-  result <- suppressMessages(pro_rate_limit_status(api_key = "good-key"))
+  result <- suppressMessages(pro_rate_limit_status(api_key = Sys.getenv("openalexPro.apikey")))
   expect_type(result, "list")
   expect_named(result, c("api_key", "rate_limit"))
 })
 
 test_that("pro_rate_limit_status result contains expected rate_limit fields", {
   vcr::local_cassette("pro_rate_limit_status_200")
-  result <- suppressMessages(pro_rate_limit_status(api_key = "good-key"))
+  result <- suppressMessages(pro_rate_limit_status(api_key = Sys.getenv("openalexPro.apikey")))
   rl <- result$rate_limit
   expect_true(all(
     c(
@@ -63,7 +63,7 @@ test_that("pro_rate_limit_status result contains expected rate_limit fields", {
 test_that("pro_rate_limit_status prints rate limit info when verbose = TRUE", {
   vcr::local_cassette("pro_rate_limit_status_200")
   expect_message(
-    pro_rate_limit_status(api_key = "good-key", verbose = TRUE),
+    pro_rate_limit_status(api_key = Sys.getenv("openalexPro.apikey"), verbose = TRUE),
     "OpenAlex Rate Limit Status"
   )
 })
@@ -71,7 +71,7 @@ test_that("pro_rate_limit_status prints rate limit info when verbose = TRUE", {
 test_that("pro_rate_limit_status is silent when verbose = FALSE", {
   vcr::local_cassette("pro_rate_limit_status_200")
   expect_no_message(
-    pro_rate_limit_status(api_key = "good-key", verbose = FALSE)
+    pro_rate_limit_status(api_key = Sys.getenv("openalexPro.apikey"), verbose = FALSE)
   )
 })
 

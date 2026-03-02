@@ -1,3 +1,31 @@
+# openalexPro (development)
+
+## Changes
+
+* Normalized `api_key` handling across API-calling functions:
+  `pro_request()`, `pro_fetch()`, `pro_count()`, and
+  `pro_download_content()` now accept `api_key = NULL` or `api_key = ""`.
+  In that case, requests are sent without an API key (subject to OpenAlex's
+  unauthenticated limits).
+
+* Added explicit `api_key` type validation in API-calling functions.
+  Accepted inputs are now limited to `NULL` or a length-1 character string.
+
+* Updated `pro_rate_limit_status()` to handle `api_key = NULL` safely
+  (informational message + `FALSE` return), and aligned documentation.
+
+## Testing and Tooling
+
+* Added opt-in live API contract tests (`tests/testthat/test-900-live_api_contracts.R`)
+  gated by `OPENALEXPRO_LIVE_TESTS=true` and a non-dummy
+  `openalexPro.apikey`.
+
+* Added `inst/scripts/record_cassettes.R` and recording safeguards to prevent
+  accidental re-recording with invalid credentials.
+
+* Reduced warning noise in test runs by cleaning up deprecated-search warning
+  handling and removing unused cassette hooks.
+
 # openalexPro 0.6.0
 
 ## New Features
@@ -83,9 +111,10 @@
 * Removed `mailto` parameter from all API functions (`pro_request()`, `pro_fetch()`,
   `pro_count()`, `pro_validate_credentials()`). OpenAlex no longer uses email addresses
   for polite-pool access.
-* `api_key` is now required. All API functions (`pro_request()`, `pro_fetch()`,
-  `pro_count()`) will error with a clear message if `openalexPro.apikey` is not set.
-  Set it via `Sys.setenv(openalexPro.apikey = "your-key")` or in `.Renviron`.
+* `api_key` handling was tightened in 0.6.0 for
+  `pro_request()`, `pro_fetch()`, and `pro_count()`.  
+  Note: this was later relaxed again in development; current development allows
+  `api_key = NULL` / `""` and runs in unauthenticated mode.
 * Simplified User-Agent string from `openalexPro v[VERSION] (mailto:[EMAIL])` to
   `openalexPro/[VERSION]`.
 

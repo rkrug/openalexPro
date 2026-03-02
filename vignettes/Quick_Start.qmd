@@ -68,7 +68,9 @@ install.packages(
 
 # Setup Credentials
 
-OpenAlex provides free API keys with higher rate limits. Get yours at [openalex.org](https://openalex.org).
+OpenAlex provides free API keys with higher rate limits. `openalexPro` can run
+without a key, but for anything beyond very small tests you should configure
+`openalexPro.apikey`. Get a key at [openalex.org](https://openalex.org).
 
 ```{r}
 # Add to your .Renviron file (recommended)
@@ -79,11 +81,11 @@ OpenAlex provides free API keys with higher rate limits. Get yours at [openalex.
 # Or set temporarily in your session:
 Sys.setenv(openalexPro.apikey = "your-api-key")
 
-# Verify credentials work
+# Verify credentials (TRUE if key works, FALSE if missing/invalid)
 library(openalexPro)
 pro_validate_credentials()
 
-# Check your current rate limit usage and remaining budget
+# Check your current rate limit usage and remaining budget (key required)
 pro_rate_limit_status()
 ```
 

@@ -41,6 +41,37 @@ Unless you need bleeding edge functionality and can deal with changing function 
 remotes::install_github("rkrug/openalexPro", ref = "dev")
 ```
 
+## Authentication (Optional, Recommended)
+
+`openalexPro` can run without an API key, but OpenAlex applies much stricter
+limits in unauthenticated mode. For real workloads, set `openalexPro.apikey`
+in `.Renviron` or your current session.
+
+```r
+# Recommended: set once in .Renviron
+# openalexPro.apikey=your-api-key
+
+# Or for the current session only:
+Sys.setenv(openalexPro.apikey = "your-api-key")
+
+# Check current key status
+pro_validate_credentials()
+
+# Inspect budget/usage (requires a valid key)
+pro_rate_limit_status()
+```
+
+## Live API Contract Tests (Optional)
+
+The default test suite is cassette-based and deterministic.  
+To run online contract checks against the live OpenAlex API:
+
+```r
+Sys.setenv(OPENALEXPRO_LIVE_TESTS = "true")
+Sys.setenv(openalexPro.apikey = "your-api-key")
+devtools::test(filter = "900-live")
+```
+
 ## Simplest Approach: `pro_fetch()`
 
 For most use cases, `pro_fetch()` handles everything in one call:

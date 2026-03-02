@@ -20,7 +20,9 @@
 #'   temporary directory. Needs to be specified.
 #' @param overwrite Logical. If `TRUE`, `output` will be deleted if it already
 #'   exists.
-#' @param api_key The API key of the user.
+#' @param api_key Character string API key or `NULL`. Defaults to
+#'   `Sys.getenv("openalexPro.apikey")`. If `NULL` or `""`, requests are sent
+#'   without an API key (subject to OpenAlex's unauthenticated limits).
 #' @param workers Number of parallel workers to use if `query_url` is a list. Defaults to 1.
 #' @param verbose Logical indicating whether to show verbose messages.
 #' @param progress Logical indicating whether to show a progress bar. Default `TRUE`.
@@ -54,15 +56,10 @@ pro_request <- function(
   count_only = FALSE,
   error_log = NULL
 ) {
-  if (!nzchar(api_key)) {
-    stop(
-      "An OpenAlex API key is required. ",
-      "Set it with:\n",
-      "  Sys.setenv(openalexPro.apikey = \"your-key\")\n",
-      "or add to your .Renviron file:\n",
-      "  openalexPro.apikey=your-key",
-      call. = FALSE
-    )
+  if (is.null(api_key) || (is.character(api_key) && length(api_key) == 1 && !nzchar(api_key))) {
+    api_key <- NULL
+  } else if (!is.character(api_key) || length(api_key) != 1) {
+    stop("`api_key` must be NULL or a length-1 character string.", call. = FALSE)
   }
 
   if (!is.null(error_log)) {
@@ -269,12 +266,16 @@ fetch_query_pages <- function(
   }
 
   # Base request with query and custom user agent
-  req <- httr2::request(query_url) |>
-    httr2::req_url_query(
-      per_page = 200,
-      cursor = "*",
-      api_key = api_key
-    ) |>
+  query <- list(
+    per_page = 200,
+    cursor = "*"
+  )
+  if (!is.null(api_key)) {
+    query$api_key <- api_key
+  }
+
+  req <- httr2::request(query_url)
+  req <- do.call(httr2::req_url_query, c(list(req), query)) |>
     httr2::req_user_agent(
       paste0("openalexPro/", packageVersion("openalexPro"))
     )

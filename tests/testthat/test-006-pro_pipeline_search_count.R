@@ -14,10 +14,12 @@ unlink(output_parquet, recursive = TRUE, force = TRUE)
 test_that("pro_request search count `biodiversity AND fiance`", {
   vcr::local_cassette("pro_request_search_biodiversity_AND_fiance_count")
   # Define the API request
-  count <- pro_query(
-    entity = "works",
-    title_and_abstract.search = "biodiversity AND finance",
-    to_publication_date = "2010-01-01"
+  count <- suppressWarnings(
+    pro_query(
+      entity = "works",
+      title_and_abstract.search = "biodiversity AND finance",
+      to_publication_date = "2010-01-01"
+    )
   ) |>
     pro_request(
       output = output_json,
@@ -36,10 +38,12 @@ test_that("pro_request search count `biodiversity AND fiance`", {
 test_that("pro_request search count", {
   vcr::local_cassette("pro_request_search_biodiversity_AND_fiance_count")
   # Define the API request
-  count <- pro_query(
-    entity = "works",
-    title_and_abstract.search = "biodiversity AND finance",
-    to_publication_date = "2010-01-01"
+  count <- suppressWarnings(
+    pro_query(
+      entity = "works",
+      title_and_abstract.search = "biodiversity AND finance",
+      to_publication_date = "2010-01-01"
+    )
   ) |>
     pro_request(
       output = output_json,
@@ -47,8 +51,6 @@ test_that("pro_request search count", {
       verbose = FALSE,
       count_only = TRUE
     )
-
-  vcr::local_cassette("oa_fetch_biodiversity_AND_finance")
 
   # Check that the output file contains the expected data structure
   expect_snapshot({
@@ -63,15 +65,19 @@ test_that("pro_request count_only with list of queries returns data.frame", {
 
   # Create a list of queries
   queries <- list(
-    biodiversity = pro_query(
-      entity = "works",
-      title_and_abstract.search = "biodiversity",
-      to_publication_date = "2010-01-01"
+    biodiversity = suppressWarnings(
+      pro_query(
+        entity = "works",
+        title_and_abstract.search = "biodiversity",
+        to_publication_date = "2010-01-01"
+      )
     ),
-    finance = pro_query(
-      entity = "works",
-      title_and_abstract.search = "finance",
-      to_publication_date = "2010-01-01"
+    finance = suppressWarnings(
+      pro_query(
+        entity = "works",
+        title_and_abstract.search = "finance",
+        to_publication_date = "2010-01-01"
+      )
     )
   )
 
@@ -104,15 +110,19 @@ test_that("pro_request count_only with unnamed list of queries", {
 
   # Create an unnamed list of queries
   queries <- list(
-    pro_query(
-      entity = "works",
-      title_and_abstract.search = "biodiversity",
-      to_publication_date = "2010-01-01"
+    suppressWarnings(
+      pro_query(
+        entity = "works",
+        title_and_abstract.search = "biodiversity",
+        to_publication_date = "2010-01-01"
+      )
     ),
-    pro_query(
-      entity = "works",
-      title_and_abstract.search = "finance",
-      to_publication_date = "2010-01-01"
+    suppressWarnings(
+      pro_query(
+        entity = "works",
+        title_and_abstract.search = "finance",
+        to_publication_date = "2010-01-01"
+      )
     )
   )
 

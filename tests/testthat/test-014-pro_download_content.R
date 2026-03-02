@@ -134,13 +134,32 @@ testthat::test_that("pro_download_content handles multiple IDs", {
   testthat::expect_equal(length(list.files(out_dir, pattern = "\\.pdf$")), 3L)
 })
 
-testthat::test_that("pro_download_content errors when api_key is missing", {
+testthat::test_that("pro_download_content works without api_key and omits api_key query param", {
+  out_dir <- withr::local_tempdir()
+  captured_url <- NULL
+  fake_pdf <- as.raw(c(0x25, 0x50, 0x44, 0x46))
+
   withr::with_envvar(c(openalexPro.apikey = ""), {
-    testthat::expect_error(
-      pro_download_content("W123", api_key = ""),
-      "API key"
+    httr2::with_mocked_responses(
+      function(req) {
+        captured_url <<- req$url
+        httr2::response(200L,
+          headers = list(`Content-Type` = "application/pdf"),
+          body = fake_pdf)
+      },
+      {
+        result <- pro_download_content(
+          ids = "W123",
+          format = "pdf",
+          output = out_dir,
+          api_key = ""
+        )
+      }
     )
   })
+
+  testthat::expect_equal(result$status, "ok")
+  testthat::expect_false(grepl("api_key=", captured_url))
 })
 
 testthat::test_that("pro_download_content URL includes api_key query param", {

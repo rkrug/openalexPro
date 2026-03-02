@@ -20,12 +20,17 @@ dois <- readRDS(
   )
 )
 
-req <- pro_query(
-  entity = "works",
-  doi = dois
-)
+build_parallel_req <- function(dois) {
+  vcr::local_cassette("opt_filter_names")
+  pro_query(
+    entity = "works",
+    doi = dois
+  )
+}
 
 test_that("pro_query with multiple ids", {
+  req <- build_parallel_req(dois)
+
   # Define the API request
   expect_snapshot(
     {
@@ -37,7 +42,9 @@ test_that("pro_query with multiple ids", {
 
 
 test_that("pro_request with url list  and parallel", {
+  req <- build_parallel_req(dois)
   vcr::local_cassette("pro_request_parallel")
+
   # Define the API request
   output_json <- pro_request(
     query_url = req,

@@ -12,10 +12,12 @@ unlink(output_dir, recursive = TRUE, force = TRUE)
 test_that("pro_fetch search `biodiversity AND fiance`", {
   vcr::local_cassette("pro_fetch_search_biodiversity_AND_finance")
   # Define the API request
-  output_json <- pro_query(
-    entity = "works",
-    title_and_abstract.search = "biodiversity AND finance",
-    to_publication_date = "2010-01-01"
+  output_json <- suppressWarnings(
+    pro_query(
+      entity = "works",
+      title_and_abstract.search = "biodiversity AND finance",
+      to_publication_date = "2010-01-01"
+    )
   ) |>
     pro_fetch(
       pages = 1,

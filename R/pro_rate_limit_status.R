@@ -3,7 +3,9 @@
 #' Queries the OpenAlex rate-limit endpoint and returns current API usage
 #' and remaining budget as a parsed list.
 #'
-#' @param api_key API key. Defaults to \code{Sys.getenv("openalexPro.apikey")}.
+#' @param api_key API key (character string) or `NULL`. Defaults to
+#'   \code{Sys.getenv("openalexPro.apikey")}. If `NULL` or `""`, this function
+#'   returns \code{FALSE} with an informational message.
 #' @param verbose Logical. If \code{TRUE} (default), prints rate limit info via \code{message()}.
 #' @return Invisibly, the parsed JSON list with all rate limit fields; \code{FALSE}
 #'   if the API key is missing or invalid; or \code{NULL} if the request failed due
@@ -14,13 +16,15 @@ pro_rate_limit_status <- function(
   api_key = Sys.getenv("openalexPro.apikey"),
   verbose = TRUE
 ) {
-  if (!nzchar(api_key)) {
+  if (is.null(api_key) || (is.character(api_key) && length(api_key) == 1 && !nzchar(api_key))) {
     message(
       "No API key found. Set it with:\n",
       "  Sys.setenv(openalexPro.apikey = 'your-key')\n",
       "or add 'openalexPro.apikey=your-key' to your .Renviron file."
     )
     return(invisible(FALSE))
+  } else if (!is.character(api_key) || length(api_key) != 1) {
+    stop("`api_key` must be NULL or a length-1 character string.", call. = FALSE)
   }
 
   req <- httr2::request("https://api.openalex.org/rate-limit") |>

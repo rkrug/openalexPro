@@ -6,6 +6,51 @@ development history for the `openalexPro` package. It is aimed at future contrib
 
 ---
 
+## 2026-03-02 — Normalize `api_key` handling; add live contract tests
+
+**Background:** API key handling diverged across functions and docs. Some code
+paths assumed a key was always required, while OpenAlex still supports
+unauthenticated requests with lower limits. A consistent contract was needed:
+allow explicit unauthenticated mode while validating malformed inputs.
+
+**Implementation:**
+
+- Normalized `api_key` handling in:
+  - `pro_count()`
+  - `pro_request()` / `fetch_query_pages()`
+  - `pro_fetch()`
+  - `pro_download_content()`
+  - `pro_rate_limit_status()`
+  - `pro_validate_credentials()` docs
+- Unified rules:
+  - `api_key = NULL` or `api_key = ""` => send request without API key query param.
+  - Otherwise `api_key` must be a length-1 character string.
+  - Invalid types now fail fast with a clear error.
+- Updated roxygen/man docs for the above functions to reflect optional
+  unauthenticated mode.
+
+**Testing:**
+
+- Added opt-in live API contract tests:
+  - `tests/testthat/helper_live.R`
+  - `tests/testthat/test-900-live_api_contracts.R`
+- Live tests are skipped unless both conditions are met:
+  - `OPENALEXPRO_LIVE_TESTS=true`
+  - `openalexPro.apikey` is set to a non-dummy value
+- Patched `test-014-pro_download_content.R` to reflect new behavior when
+  `api_key` is missing (no longer an immediate error; request sent without key).
+- Full suite passes after this normalization.
+
+**Cassette workflow hardening:**
+
+- Added `inst/scripts/record_cassettes.R` to re-record and sanitize cassettes.
+- Added a preflight key check via `pro_rate_limit_status()` to avoid replacing
+  valid cassettes with HTTP 401 responses when credentials are invalid.
+- Updated `helper_vcr.R` behavior for explicit recording mode
+  (`OPENALEXPRO_RECORD_CASSETTES`).
+
+---
+
 ## 2026-03-02 — Add `pro_rate_limit_status()`; refactor `pro_validate_credentials()`
 
 **Background:** OpenAlex added a dedicated `/rate-limit` endpoint that returns
@@ -313,11 +358,14 @@ was missing the plumbing.
 
 ---
 
-## 2026-02-13 — Remove `mailto`, require `api_key`
+## 2026-02-13 — Remove `mailto`; temporarily require `api_key`
 
 **Motivation:** OpenAlex retired email-based polite-pool access. API keys are now the
 only supported authentication mechanism. Silently passing an empty key caused opaque
 403 errors.
+
+**Note:** This requirement was later relaxed (see 2026-03-02 entry above). Current
+development supports unauthenticated mode via `api_key = NULL` / `""`.
 
 **Changes:**
 

@@ -33,8 +33,9 @@
 #' @param workers Number of parallel download workers. Defaults to \code{1}
 #'   (sequential). Set higher for faster batch downloads, subject to the
 #'   content endpoint's rate limits.
-#' @param api_key OpenAlex API key. Defaults to the
-#'   \code{openalexPro.apikey} environment variable.
+#' @param api_key OpenAlex API key (character string) or `NULL`. Defaults to
+#'   the \code{openalexPro.apikey} environment variable. If `NULL` or `""`,
+#'   requests are sent without an API key.
 #' @param endpoint Base URL of the content endpoint. Defaults to
 #'   \code{"https://content.openalex.org"}.
 #'
@@ -98,15 +99,10 @@ pro_download_content <- function(
 ) {
   format <- match.arg(format)
 
-  if (!nzchar(api_key)) {
-    stop(
-      "An OpenAlex API key is required. ",
-      "Set it with:\n",
-      "  Sys.setenv(openalexPro.apikey = \"your-key\")\n",
-      "or add to your .Renviron file:\n",
-      "  openalexPro.apikey=your-key",
-      call. = FALSE
-    )
+  if (is.null(api_key) || (is.character(api_key) && length(api_key) == 1 && !nzchar(api_key))) {
+    api_key <- NULL
+  } else if (!is.character(api_key) || length(api_key) != 1) {
+    stop("`api_key` must be NULL or a length-1 character string.", call. = FALSE)
   }
 
   if (!length(ids) || all(is.na(ids))) {
@@ -143,9 +139,11 @@ pro_download_content <- function(
         out_file <- file.path(output, paste0(id, ".", format))
 
         result <- tryCatch({
-          req <- httr2::request(url) |>
-            httr2::req_url_query(api_key = api_key) |>
-            httr2::req_user_agent(paste0("openalexPro/", utils::packageVersion("openalexPro")))
+          req <- httr2::request(url)
+          if (!is.null(api_key)) {
+            req <- httr2::req_url_query(req, api_key = api_key)
+          }
+          req <- httr2::req_user_agent(req, paste0("openalexPro/", utils::packageVersion("openalexPro")))
 
           resp <- suppressMessages(api_call(req, max_retries = 5, get_html_response = NULL))
           status_code <- httr2::resp_status(resp)

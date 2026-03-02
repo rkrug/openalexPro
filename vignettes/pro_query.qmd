@@ -1466,7 +1466,7 @@ url <- pro_query(
 
 OpenAlex offers limited API access without credentials. Free API keys with substantially higher rate limits can be obtained from the [OpenAlex website](https://openalex.org). Premium API access with even higher limits can also be purchased.
 
-`openalexPro` uses environment variables for credentials:
+`openalexPro` uses environment variables for credentials (recommended):
 
 ```{r}
 # Set credentials (typically in your .Renviron file)
@@ -1476,7 +1476,10 @@ Sys.setenv(openalexPro.apikey = "your-api-key-here")
 pro_validate_credentials()
 ```
 
-Credentials are used by `pro_request()` and `pro_count()`, not by `pro_query()` itself (which only builds URLs).
+Credentials are used by API-calling functions (`pro_request()`, `pro_count()`,
+`pro_fetch()`, `pro_download_content()`) and are optional. If `api_key` is
+`NULL` or `""`, those functions call OpenAlex without authentication.
+`pro_query()` itself only builds URLs and does not require credentials.
 
 # Integration with openalexPro Workflow
 
@@ -1574,7 +1577,7 @@ dbDisconnect(con)
 
 - `opt_filter_names()` - List available filter names
 - `opt_select_fields()` - List available select fields
-- `pro_validate_credentials()` - Validate API credentials
+- `pro_validate_credentials()` - Validate API credentials (optional helper)
 - `pro_count()` - Get count of results without downloading
 - `pro_request()` - Execute API requests and save results
 - `pro_request_jsonl()` - Convert JSON to JSONL format

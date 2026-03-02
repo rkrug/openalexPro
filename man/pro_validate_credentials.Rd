@@ -10,7 +10,7 @@ pro_validate_credentials(
 )
 }
 \arguments{
-\item{api_key}{API key to validate}
+\item{api_key}{API key to validate (character string) or `NULL`.}
 
 \item{show_credentials}{shows the api_key using `message()`. USE WITH CAUTION!}
 }
