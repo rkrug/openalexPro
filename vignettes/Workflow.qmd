@@ -702,6 +702,7 @@ flowchart TD
 | `pro_request_jsonl()` | Convert to JSONL | input_json, output, workers |
 | `pro_request_jsonl_parquet()` | Convert to Parquet | input_jsonl, output, sample_size |
 | `pro_validate_credentials()` | Test credentials | api_key |
+| `pro_rate_limit_status()` | Check rate limit usage & remaining budget | api_key, verbose |
 
 # See Also
 

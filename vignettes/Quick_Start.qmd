@@ -82,6 +82,9 @@ Sys.setenv(openalexPro.apikey = "your-api-key")
 # Verify credentials work
 library(openalexPro)
 pro_validate_credentials()
+
+# Check your current rate limit usage and remaining budget
+pro_rate_limit_status()
 ```
 
 # Quick Start: 3 Steps to Data
@@ -263,6 +266,7 @@ For detailed technical documentation, see:
 | `pro_fetch()` | **One-step download + transform + convert** |
 | `pro_count()` | Get result count without downloading |
 | `pro_validate_credentials()` | Test your API credentials |
+| `pro_rate_limit_status()` | Check current rate limit usage and remaining budget |
 | `opt_filter_names()` | List available filter names |
 | `opt_select_fields()` | List available select fields |
 

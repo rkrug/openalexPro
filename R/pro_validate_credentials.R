@@ -16,17 +16,6 @@ pro_validate_credentials <- function(
   } else {
     message("    api_key: ", strrep("X", nchar(api_key)))
   }
-  # Minimal request - just get count of 1 work
-  tryCatch(
-    {
-      count <- pro_count(
-        query_url = "https://api.openalex.org/works?per_page=1",
-        api_key = api_key
-      )
-      return(TRUE)
-    },
-    error = function(e) {
-      return(FALSE)
-    }
-  )
+  result <- pro_rate_limit_status(api_key = api_key, verbose = FALSE)
+  isTRUE(is.list(result))
 }

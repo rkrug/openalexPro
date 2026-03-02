@@ -1,0 +1,14 @@
+http_interactions:
+- request:
+    method: GET
+    uri: https://api.openalex.org/rate-limit?api_key=%3Capi-key%3E
+  response:
+    status: 200
+    headers:
+      content-type: application/json
+      access-control-allow-origin: '*'
+      server: cloudflare
+    body:
+      string: '{"api_key":"<api-key>","rate_limit":{"daily_budget_usd":1.0,"daily_used_usd":0.002,"daily_remaining_usd":0.998,"prepaid_balance_usd":10.0,"prepaid_remaining_usd":9.998,"resets_at":"2026-03-03T00:00:00Z","resets_in_seconds":3600,"endpoint_costs_usd":{"singleton":0.0001,"list":0.0001,"search":0.0005,"semantic":0.001,"content":0.005,"text":0.01}}}'
+  recorded_at: 2026-03-02 12:00:00
+recorded_with: VCR-vcr/2.0.0

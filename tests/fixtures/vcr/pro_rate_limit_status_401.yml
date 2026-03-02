@@ -1,0 +1,14 @@
+http_interactions:
+- request:
+    method: GET
+    uri: https://api.openalex.org/rate-limit?api_key=%3Capi-key%3E
+  response:
+    status: 401
+    headers:
+      content-type: application/json
+      access-control-allow-origin: '*'
+      server: cloudflare
+    body:
+      string: '{"error":"Unauthorized","message":"Invalid API key"}'
+  recorded_at: 2026-03-02 12:00:00
+recorded_with: VCR-vcr/2.0.0

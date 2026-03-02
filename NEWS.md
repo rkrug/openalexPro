@@ -2,6 +2,17 @@
 
 ## New Features
 
+* Added `pro_rate_limit_status()` to query the OpenAlex rate-limit endpoint
+  (`GET /rate-limit`). Returns the full rate-limit JSON invisibly (daily budget,
+  used, remaining, prepaid balance, per-endpoint costs, reset time). Prints a
+  human-readable summary via `message()` when `verbose = TRUE` (the default).
+  Returns `FALSE` for a missing or invalid API key, and `NULL` on a network
+  error, so callers can distinguish auth problems from transient failures.
+
+* `pro_validate_credentials()` refactored to use `pro_rate_limit_status()`
+  internally instead of making a separate `pro_count()` request. Behaviour and
+  return value are unchanged.
+
 * Added `pro_download_content()` to download full-text PDFs
   (`format = "pdf"`) or TEI XML (`format = "grobid-xml"`) from the OpenAlex
   content endpoint (`content.openalex.org`). Accepts a vector of work IDs,

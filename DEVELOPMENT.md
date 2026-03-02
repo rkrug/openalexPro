@@ -6,6 +6,49 @@ development history for the `openalexPro` package. It is aimed at future contrib
 
 ---
 
+## 2026-03-02 — Add `pro_rate_limit_status()`; refactor `pro_validate_credentials()`
+
+**Background:** OpenAlex added a dedicated `/rate-limit` endpoint that returns
+the caller's current daily budget, amount used, remaining balance, and
+per-endpoint costs in a single JSON object. This replaces the previous
+credential-check pattern (making a dummy `pro_count()` call) with a purpose-built
+status function.
+
+**Implementation:**
+
+- New file `R/pro_rate_limit_status.R` with exported `pro_rate_limit_status()`.
+- Makes a `GET https://api.openalex.org/rate-limit?api_key=<key>` request.
+- Uses `httr2::req_error(is_error = function(resp) FALSE)` so httr2 never
+  auto-throws — all status codes are inspected in R:
+  - `200` → parse body, return list invisibly; print summary if `verbose = TRUE`.
+  - `401`/`403` → message "Invalid API key …", return `FALSE` invisibly.
+  - Network/connection error (caught by `tryCatch`) → message "Request failed …",
+    return `NULL` invisibly.
+  - Missing key (empty string) → message with setup instructions, return `FALSE`.
+- Deliberately does **not** go through `api_call()`: that helper emits its own
+  warning messages on non-200 responses and applies retry logic that is
+  inappropriate for auth errors.
+- Added `@importFrom httr2 req_user_agent`; all other needed httr2 symbols were
+  already in NAMESPACE.
+
+**Refactor:** `pro_validate_credentials()` now calls
+`pro_rate_limit_status(api_key = api_key, verbose = FALSE)` and checks
+`isTRUE(is.list(result))`. The public interface (messages, `TRUE`/`FALSE` return)
+is unchanged. Using the rate-limit endpoint is more semantically correct and
+avoids wasting quota on a dummy count query.
+
+**Tests:** `tests/testthat/test-015-pro_rate_limit_status.R` with two VCR
+cassettes (`pro_rate_limit_status_200.yml`, `pro_rate_limit_status_401.yml`).
+Covers: missing key, invalid key (401), success verbose=TRUE/FALSE, and network
+error via `local_mocked_bindings`. 13 assertions, all green.
+
+**Key files:** `R/pro_rate_limit_status.R`, `R/pro_validate_credentials.R`,
+`tests/testthat/test-015-pro_rate_limit_status.R`,
+`tests/fixtures/vcr/pro_rate_limit_status_200.yml`,
+`tests/fixtures/vcr/pro_rate_limit_status_401.yml`
+
+---
+
 ## 2026-02-25 — Add `pro_download_content()` for PDF and TEI XML downloads
 
 **Background:** OpenAlex added a new content endpoint (`content.openalex.org`)
