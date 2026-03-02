@@ -1,9 +1,10 @@
 # Convert JSON files to Apache Parquet files
 
 The function takes a directory of JSONL files as written from a call to
-`pro_request_jsonl(...)` and converts it to a Apache Parquet files. Each
-jsonl is processed individually, so there is no limit of the number of
-records.
+`pro_request_jsonl(...)` and converts each file individually to a
+Parquet file. The subfolder structure from the input is preserved in the
+output, so files in `Chunk_1/` will be written to `Chunk_1/` in the
+output directory.
 
 ## Usage
 
@@ -13,9 +14,9 @@ pro_request_jsonl_parquet(
   output = NULL,
   overwrite = FALSE,
   verbose = TRUE,
-  progress = TRUE,
   delete_input = FALSE,
-  sample_size = 1000
+  sample_size = 1000,
+  workers = NULL
 )
 ```
 
@@ -37,12 +38,8 @@ pro_request_jsonl_parquet(
 
 - verbose:
 
-  Logical indicating whether to show a verbose information. Defaults to
+  Logical indicating whether to show verbose information. Defaults to
   `TRUE`
-
-- progress:
-
-  Logical indicating whether to show a progress bar. Default `TRUE`.
 
 - delete_input:
 
@@ -56,32 +53,29 @@ pro_request_jsonl_parquet(
   memory. Default is 1000. Set to -1 to read all records (may be slow
   for large files).
 
+- workers:
+
+  Number of parallel workers for file conversion via
+  [`future.apply::future_lapply()`](https://future.apply.futureverse.org/reference/future_lapply.html).
+  Default is `NULL` (sequential processing).
+
 ## Value
 
-The function does returns the output invisibly.
+The function returns the output path invisibly.
 
 ## Details
 
-The value `page` as created in
-[`pro_request_jsonl()`](https://rkrug.github.io/openalexPro/reference/pro_request_jsonl.md)
-is used for partitioning. All jsonl files are combined into a single
-Apache Parquet dataset, but can be filtered out by using the "page". As
-an example:
+The `page` column (added by
+[`pro_request_jsonl()`](https://rkrug.github.io/openalexPro/reference/pro_request_jsonl.md))
+is preserved as a regular column in the Parquet data.
 
-1.  the subfolder in the `output` folder is called `Chunk_1`
-
-2.  the page othe json file represents is `2`
-
-3.  The resulting values for `page` will be `Chunk_1_2`
-
-When starting the conversion, a file `00_in.progress` which is deleted
-upon completion.
+When starting the conversion, a file `00_in.progress` is created which
+is deleted upon completion.
 
 The function uses DuckDB to read the JSON files and to create the Apache
-Parquet files. The function creates a DuckDB connection in memory and
-reads the JSON files into DuckDB when needed. Then it creates a SQL
-query to convert the JSON files to Apache Parquet files and to copy the
-result to the specified directory.
+Parquet files. Each JSON file is converted individually using its own
+DuckDB connection, which enables parallel processing via
+[`future.apply::future_lapply()`](https://future.apply.futureverse.org/reference/future_lapply.html).
 
 To ensure consistent schemas across all Parquet files, the function
 first infers a unified schema by sampling records from all JSONL files.

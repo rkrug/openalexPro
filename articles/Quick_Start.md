@@ -47,23 +47,26 @@ install.packages(
 
 ## Setup Credentials
 
-OpenAlex provides free API keys with higher rate limits. Get yours at
+OpenAlex provides free API keys with higher rate limits. `openalexPro`
+can run without a key, but for anything beyond very small tests you
+should configure `openalexPro.apikey`. Get a key at
 [openalex.org](https://openalex.org).
 
 ``` r
 # Add to your .Renviron file (recommended)
 # Run: usethis::edit_r_environ()
 # Then add these lines:
-#   openalexPro.email=your.email@example.org
 #   openalexPro.apikey=your-api-key
 
 # Or set temporarily in your session:
-Sys.setenv(openalexPro.email = "your.email@example.org")
 Sys.setenv(openalexPro.apikey = "your-api-key")
 
-# Verify credentials work
+# Verify credentials (TRUE if key works, FALSE if missing/invalid)
 library(openalexPro)
 pro_validate_credentials()
+
+# Check your current rate limit usage and remaining budget (key required)
+pro_rate_limit_status()
 ```
 
 ## Quick Start: 3 Steps to Data
@@ -252,14 +255,15 @@ For detailed technical documentation, see:
 
 ## Function Reference
 
-| Function                                                                                                  | Purpose                                     |
-|-----------------------------------------------------------------------------------------------------------|---------------------------------------------|
-| [`pro_query()`](https://rkrug.github.io/openalexPro/reference/pro_query.md)                               | Build OpenAlex API query URLs               |
-| [`pro_fetch()`](https://rkrug.github.io/openalexPro/reference/pro_fetch.md)                               | **One-step download + transform + convert** |
-| [`pro_count()`](https://rkrug.github.io/openalexPro/reference/pro_count.md)                               | Get result count without downloading        |
-| [`pro_validate_credentials()`](https://rkrug.github.io/openalexPro/reference/pro_validate_credentials.md) | Test your API credentials                   |
-| [`opt_filter_names()`](https://rkrug.github.io/openalexPro/reference/opt_filter_names.md)                 | List available filter names                 |
-| [`opt_select_fields()`](https://rkrug.github.io/openalexPro/reference/opt_select_fields.md)               | List available select fields                |
+| Function                                                                                                  | Purpose                                             |
+|-----------------------------------------------------------------------------------------------------------|-----------------------------------------------------|
+| [`pro_query()`](https://rkrug.github.io/openalexPro/reference/pro_query.md)                               | Build OpenAlex API query URLs                       |
+| [`pro_fetch()`](https://rkrug.github.io/openalexPro/reference/pro_fetch.md)                               | **One-step download + transform + convert**         |
+| [`pro_count()`](https://rkrug.github.io/openalexPro/reference/pro_count.md)                               | Get result count without downloading                |
+| [`pro_validate_credentials()`](https://rkrug.github.io/openalexPro/reference/pro_validate_credentials.md) | Test your API credentials                           |
+| [`pro_rate_limit_status()`](https://rkrug.github.io/openalexPro/reference/pro_rate_limit_status.md)       | Check current rate limit usage and remaining budget |
+| [`opt_filter_names()`](https://rkrug.github.io/openalexPro/reference/opt_filter_names.md)                 | List available filter names                         |
+| [`opt_select_fields()`](https://rkrug.github.io/openalexPro/reference/opt_select_fields.md)               | List available select fields                        |
 
 ## Getting Help
 

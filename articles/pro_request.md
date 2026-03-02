@@ -31,11 +31,10 @@ with substantially higher rate limits can be obtained from the [OpenAlex
 website](https://openalex.org). Premium API access with even higher
 limits can also be purchased.
 
-`openalexPro` uses environment variables for credentials:
+`openalexPro` uses environment variables for credentials (recommended):
 
 ``` r
 # Set credentials (typically in your .Renviron file)
-Sys.setenv(openalexPro.email = "your.email@example.org")
 Sys.setenv(openalexPro.apikey = "your-api-key-here")
 
 # Validate your credentials
@@ -48,8 +47,18 @@ You can also pass credentials directly to functions:
 pro_request(
   query_url = url,
   output = "data/json",
-  mailto = "your.email@example.org",
   api_key = "your-api-key"
+)
+```
+
+To force unauthenticated mode for a call, pass `api_key = NULL` (or
+`""`):
+
+``` r
+pro_request(
+  query_url = url,
+  output = "data/json",
+  api_key = NULL
 )
 ```
 
@@ -180,8 +189,7 @@ pro_request(
 | `pages`      | integer/NULL   | 10000    | Max pages to download. `NULL` = all pages                                                            |
 | `output`     | character      | required | Directory for JSON output files                                                                      |
 | `overwrite`  | logical        | FALSE    | Delete existing output directory if it exists                                                        |
-| `mailto`     | character      | env var  | Email for API polite pool                                                                            |
-| `api_key`    | character      | env var  | API key for authentication                                                                           |
+| `api_key`    | character/NULL | env var  | Optional API key. If `NULL` or `""`, requests are sent without key.                                  |
 | `workers`    | integer        | 1        | Parallel workers for list queries                                                                    |
 | `verbose`    | logical        | FALSE    | Show detailed messages                                                                               |
 | `progress`   | logical        | TRUE     | Show progress bar                                                                                    |
@@ -243,7 +251,7 @@ flowchart TD
 
     DeleteDir --> CreateDir
     CreateDir --> CreateProgress[Create<br/>00_in.progress file]
-    CreateProgress --> BuildRequest[Build httr2 request<br/>with credentials]
+    CreateProgress --> BuildRequest[Build httr2 request<br/>api_key optional]
 
     BuildRequest --> FirstRequest[First API call<br/>to inspect meta]
     FirstRequest --> CheckSingle{Single record<br/>response?}
@@ -793,6 +801,16 @@ with exponential backoff. To reduce rate limit issues:
 2.  Reduce parallel workers
 3.  Add delays between large queries
 
+You can check your current budget and remaining allowance at any time
+with:
+
+``` r
+pro_rate_limit_status()
+```
+
+This queries the `/rate-limit` endpoint and prints your daily budget,
+amount used, remaining balance, and seconds until the daily reset.
+
 #### Request Size Exceeded
 
 OpenAlex has a maximum request size of 4094 characters. If exceeded:
@@ -881,7 +899,9 @@ pro_request_jsonl(input, output, workers = parallel::detectCores() - 1)
 - [`pro_count()`](https://rkrug.github.io/openalexPro/reference/pro_count.md) -
   Get result counts without downloading
 - [`pro_validate_credentials()`](https://rkrug.github.io/openalexPro/reference/pro_validate_credentials.md) -
-  Validate API credentials
+  Validate API credentials (optional helper)
+- [`pro_rate_limit_status()`](https://rkrug.github.io/openalexPro/reference/pro_rate_limit_status.md) -
+  Check current rate limit usage and remaining budget
 - [`opt_filter_names()`](https://rkrug.github.io/openalexPro/reference/opt_filter_names.md) -
   List available filter names
 - [`opt_select_fields()`](https://rkrug.github.io/openalexPro/reference/opt_select_fields.md) -

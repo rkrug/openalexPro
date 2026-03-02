@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">openalexPro</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -40,6 +40,8 @@
     <li><a class="dropdown-item" href="../articles/Workflow.html">Workflow Guide</a></li>
     <li><a class="dropdown-item" href="../articles/pro_query.html">`pro_query()` - Background and Technical Documentation</a></li>
     <li><a class="dropdown-item" href="../articles/pro_request.html">`pro_request()` - Background and Technical Documentation</a></li>
+    <li><a class="dropdown-item" href="../articles/snapshot_conversion.html">Snapshot Conversion: Schema Inference and Parquet Writing</a></li>
+    <li><a class="dropdown-item" href="../articles/snapshot.html">Working with OpenAlex Snapshots</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -64,7 +66,7 @@
 
 
 
-      <small class="dont-index">Source: <a href="https://github.com/rkrug/openalexPro/blob/v0.4.2/vignettes/pro_query.qmd" class="external-link"><code>vignettes/pro_query.qmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/rkrug/openalexPro/blob/main/vignettes/pro_query.qmd" class="external-link"><code>vignettes/pro_query.qmd</code></a></small>
       <div class="d-none name"><code></code></div>
     </div>
 
@@ -277,9 +279,47 @@ https://api.openalex.org/works?search=climate+change&amp;select=ids,title,public
 <span><span class="va">url</span></span>
 <span><span class="co"># [1] "https://api.openalex.org/works"</span></span></code></pre></div>
 </div>
-</section><section class="level2"><h3 id="full-text-search">Full-Text Search<a class="anchor" aria-label="anchor" href="#full-text-search"></a>
+</section><section class="level2"><h3 id="search-modes">Search Modes<a class="anchor" aria-label="anchor" href="#search-modes"></a>
 </h3>
-<p>Add a search term to perform full-text search across title, abstract, and full text:</p>
+<p><code><a href="../reference/pro_query.html">pro_query()</a></code> supports three mutually exclusive search parameters, each with different matching behaviour and cost:</p>
+<table class="table caption-top">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead><tr class="header">
+<th>Parameter</th>
+<th>Matching</th>
+<th>Max results</th>
+<th>Cost</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><code>search</code></td>
+<td>Stemmed keyword (stop-words removed)</td>
+<td>Unlimited</td>
+<td>$0.0001/call</td>
+</tr>
+<tr class="even">
+<td><code>search.exact</code></td>
+<td>Unstemmed, supports boolean/phrase/wildcard</td>
+<td>Unlimited</td>
+<td>$0.0001/call</td>
+</tr>
+<tr class="odd">
+<td><code>search.semantic</code></td>
+<td>AI embedding similarity</td>
+<td>50 per call</td>
+<td>$0.001/call</td>
+</tr>
+</tbody>
+</table>
+<section class="level3"><h4 id="search-standard-keyword-search">
+<code>search</code> — Standard Keyword Search<a class="anchor" aria-label="anchor" href="#search-standard-keyword-search"></a>
+</h4>
+<p>Searches title, abstract, and full text with stemming and stop-word removal. Supports the same boolean/phrase syntax as <code>search.exact</code> but also applies stemming (e.g. “run” also matches “running”, “ran”):</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">url</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span></span>
@@ -289,11 +329,73 @@ https://api.openalex.org/works?search=climate+change&amp;select=ids,title,public
 <span><span class="va">url</span></span>
 <span><span class="co"># [1] "https://api.openalex.org/works?search=climate%20change%20biodiversity"</span></span></code></pre></div>
 </div>
-</section><section class="level2"><h3 id="field-selection">Field Selection<a class="anchor" aria-label="anchor" href="#field-selection"></a>
+</section><section class="level3"><h4 id="search-exact-unstemmed-boolean-search">
+<code>search.exact</code> — Unstemmed / Boolean Search<a class="anchor" aria-label="anchor" href="#search-exact-unstemmed-boolean-search"></a>
+</h4>
+<p>Searches without stemming or stop-word removal. Supports:</p>
+<ul>
+<li>Boolean operators: <code>AND</code>, <code>OR</code>, <code>NOT</code>
+</li>
+<li>Quoted phrases: <code>"deep learning"</code>
+</li>
+<li>Proximity: <code>"climate change"~5</code> (within 5 words)</li>
+<li>Wildcards: <code>microbio*</code>
+</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Exact phrase search</span></span>
+<span><span class="va">url</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span></span>
+<span>  entity <span class="op">=</span> <span class="st">"works"</span>,</span>
+<span>  search.exact <span class="op">=</span> <span class="st">'"large language models" AND (safety OR alignment)'</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Wildcard — matches microbiology, microbiome, microbiota, …</span></span>
+<span><span class="va">url</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span></span>
+<span>  entity <span class="op">=</span> <span class="st">"works"</span>,</span>
+<span>  search.exact <span class="op">=</span> <span class="st">"microbio*"</span>,</span>
+<span>  from_publication_date <span class="op">=</span> <span class="st">"2020-01-01"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</div>
+</section><section class="level3"><h4 id="search-semantic-ai-powered-similarity-search-find-similar-works">
+<code>search.semantic</code> — AI-Powered Similarity Search (Find Similar Works)<a class="anchor" aria-label="anchor" href="#search-semantic-ai-powered-similarity-search-find-similar-works"></a>
+</h4>
+<p>Converts your query to a 1 024-dimension embedding and returns the most conceptually similar works — regardless of whether they share any keywords. This is OpenAlex’s <a href="https://docs.openalex.org/how-to-use-the-api/find-similar-works" class="external-link">“find similar works”</a> feature.</p>
+<p><strong>Constraints:</strong></p>
+<ul>
+<li>Maximum <strong>50 results</strong> per call (the API hard-codes this).</li>
+<li>Requires an API key (costs $0.001 per call).</li>
+<li>Rate-limited to <strong>1 request per second</strong>.</li>
+<li>Pass a sentence or short paragraph — not just a keyword.</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Find works conceptually similar to an abstract or research question</span></span>
+<span><span class="va">url</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span></span>
+<span>  entity <span class="op">=</span> <span class="st">"works"</span>,</span>
+<span>  search.semantic <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span></span>
+<span>    <span class="st">"Large language models trained on scientific text can assist researchers"</span>,</span>
+<span>    <span class="st">"in hypothesis generation and literature synthesis."</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Combine with filters to narrow the similarity search</span></span>
+<span><span class="va">url</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span></span>
+<span>  entity <span class="op">=</span> <span class="st">"works"</span>,</span>
+<span>  search.semantic <span class="op">=</span> <span class="st">"CRISPR base editing for treating sickle cell disease"</span>,</span>
+<span>  from_publication_date <span class="op">=</span> <span class="st">"2019-01-01"</span>,</span>
+<span>  type <span class="op">=</span> <span class="st">"article"</span>,</span>
+<span>  select <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ids"</span>, <span class="st">"title"</span>, <span class="st">"publication_year"</span>, <span class="st">"cited_by_count"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</div>
+<blockquote>
+<p><strong>Note:</strong> Semantic search returns at most 50 results. For large-scale retrieval, combine <code>search</code> or <code>search.exact</code> with <code><a href="../reference/pro_fetch.html">pro_fetch()</a></code>.</p>
+</blockquote>
+</section></section><section class="level2"><h3 id="field-selection">Field Selection<a class="anchor" aria-label="anchor" href="#field-selection"></a>
 </h3>
 <p>Use the <code>select</code> parameter to specify which fields to return. This reduces response size and improves performance:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">url</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span></span>
 <span>  entity <span class="op">=</span> <span class="st">"works"</span>,</span>
 <span>  search <span class="op">=</span> <span class="st">"machine learning"</span>,</span>
@@ -306,7 +408,7 @@ https://api.openalex.org/works?search=climate+change&amp;select=ids,title,public
 </h4>
 <p>Use <code><a href="../reference/opt_select_fields.html">opt_select_fields()</a></code> to see all available fields:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/opt_select_fields.html">opt_select_fields</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co"># [1] "abstract_inverted_index" "authorships"</span></span>
 <span><span class="co"># [3] "biblio"                  "cited_by_count"</span></span>
@@ -315,9 +417,9 @@ https://api.openalex.org/works?search=climate+change&amp;select=ids,title,public
 </div>
 </section></section><section class="level2"><h3 id="single-entity-retrieval">Single Entity Retrieval<a class="anchor" aria-label="anchor" href="#single-entity-retrieval"></a>
 </h3>
-<p>Fetch a specific entity by ID:</p>
+<p>Fetch a specific entity by its OpenAlex ID:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">url</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span></span>
 <span>  entity <span class="op">=</span> <span class="st">"works"</span>,</span>
 <span>  id <span class="op">=</span> <span class="st">"W2741809807"</span></span>
@@ -325,7 +427,72 @@ https://api.openalex.org/works?search=climate+change&amp;select=ids,title,public
 <span><span class="va">url</span></span>
 <span><span class="co"># [1] "https://api.openalex.org/works/W2741809807"</span></span></code></pre></div>
 </div>
-</section></section><section class="section level2"><h2 id="filtering">Filtering<a class="anchor" aria-label="anchor" href="#filtering"></a>
+<section class="level3"><h4 id="external-identifiers">External Identifiers<a class="anchor" aria-label="anchor" href="#external-identifiers"></a>
+</h4>
+<p>You can use any identifier listed in an entity’s <code>ids</code> field — not just the OpenAlex ID. The API accepts three formats:</p>
+<table class="table caption-top">
+<thead><tr class="header">
+<th>Format</th>
+<th>Example</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>Full URL</td>
+<td><code>https://doi.org/10.7717/peerj.4375</code></td>
+</tr>
+<tr class="even">
+<td><code>namespace:value</code></td>
+<td><code>doi:10.7717/peerj.4375</code></td>
+</tr>
+<tr class="odd">
+<td>OpenAlex key</td>
+<td><code>W2741809807</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Works</strong> — DOI:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># By DOI (full URL format)</span></span>
+<span><span class="va">url</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span></span>
+<span>  entity <span class="op">=</span> <span class="st">"works"</span>,</span>
+<span>  id <span class="op">=</span> <span class="st">"https://doi.org/10.7717/peerj.4375"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># By DOI (namespace format)</span></span>
+<span><span class="va">url</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span></span>
+<span>  entity <span class="op">=</span> <span class="st">"works"</span>,</span>
+<span>  id <span class="op">=</span> <span class="st">"doi:10.7717/peerj.4375"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</div>
+<p><strong>Authors</strong> — ORCID:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">url</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span></span>
+<span>  entity <span class="op">=</span> <span class="st">"authors"</span>,</span>
+<span>  id <span class="op">=</span> <span class="st">"orcid:0000-0003-1613-5981"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</div>
+<p><strong>Institutions</strong> — ROR:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">url</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span></span>
+<span>  entity <span class="op">=</span> <span class="st">"institutions"</span>,</span>
+<span>  id <span class="op">=</span> <span class="st">"ror:02mhbdp94"</span>  <span class="co"># MIT</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</div>
+<p><strong>Sources (journals)</strong> — ISSN:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">url</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span></span>
+<span>  entity <span class="op">=</span> <span class="st">"sources"</span>,</span>
+<span>  id <span class="op">=</span> <span class="st">"issn:0028-0836"</span>  <span class="co"># Nature</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</div>
+<blockquote>
+<p><strong>Tip:</strong> For bulk lookup of multiple DOIs or IDs, use a filter (<code>doi = c(...)</code>) rather than the <code>id</code> parameter — <code><a href="../reference/pro_query.html">pro_query()</a></code> will automatically chunk them into batches of up to 50.</p>
+</blockquote>
+</section></section></section><section class="section level2"><h2 id="filtering">Filtering<a class="anchor" aria-label="anchor" href="#filtering"></a>
 </h2>
 <p>Filters are the primary way to narrow down query results. They are passed as named arguments via <code>...</code>.</p>
 <section class="level2"><h3 id="filter-syntax">Filter Syntax<a class="anchor" aria-label="anchor" href="#filter-syntax"></a>
@@ -368,7 +535,7 @@ https://api.openalex.org/works?search=climate+change&amp;select=ids,title,public
 </h3>
 <p>Filters use AND logic between different filter types:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">url</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span></span>
 <span>  entity <span class="op">=</span> <span class="st">"works"</span>,</span>
 <span>  from_publication_date <span class="op">=</span> <span class="st">"2020-01-01"</span>,</span>
@@ -382,7 +549,7 @@ https://api.openalex.org/works?search=climate+change&amp;select=ids,title,public
 </h3>
 <p>Pass a vector to express OR logic within a single filter:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">url</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span></span>
 <span>  entity <span class="op">=</span> <span class="st">"works"</span>,</span>
 <span>  language <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"en"</span>, <span class="st">"de"</span>, <span class="st">"fr"</span><span class="op">)</span>, <span class="co"># English OR German OR French</span></span>
@@ -396,7 +563,7 @@ https://api.openalex.org/works?search=climate+change&amp;select=ids,title,public
 <section class="level3"><h4 id="date-ranges">Date Ranges<a class="anchor" aria-label="anchor" href="#date-ranges"></a>
 </h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Works from 2020 onwards</span></span>
 <span><span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span>entity <span class="op">=</span> <span class="st">"works"</span>, from_publication_date <span class="op">=</span> <span class="st">"2020-01-01"</span><span class="op">)</span></span>
 <span></span>
@@ -413,7 +580,7 @@ https://api.openalex.org/works?search=climate+change&amp;select=ids,title,public
 </section><section class="level3"><h4 id="citation-counts">Citation Counts<a class="anchor" aria-label="anchor" href="#citation-counts"></a>
 </h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Highly cited works (100+ citations)</span></span>
 <span><span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span>entity <span class="op">=</span> <span class="st">"works"</span>, from_cited_by_count <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span>
 <span></span>
@@ -427,7 +594,7 @@ https://api.openalex.org/works?search=climate+change&amp;select=ids,title,public
 </section><section class="level3"><h4 id="open-access">Open Access<a class="anchor" aria-label="anchor" href="#open-access"></a>
 </h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Only open access works</span></span>
 <span><span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span>entity <span class="op">=</span> <span class="st">"works"</span>, is_oa <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
@@ -438,7 +605,7 @@ https://api.openalex.org/works?search=climate+change&amp;select=ids,title,public
 </section><section class="level3"><h4 id="by-author-or-institution">By Author or Institution<a class="anchor" aria-label="anchor" href="#by-author-or-institution"></a>
 </h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Works by a specific author (use backticks for dots)</span></span>
 <span><span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span>entity <span class="op">=</span> <span class="st">"works"</span>, `author.id` <span class="op">=</span> <span class="st">"A2208157607"</span><span class="op">)</span></span>
 <span></span>
@@ -450,51 +617,120 @@ https://api.openalex.org/works?search=climate+change&amp;select=ids,title,public
 </div>
 </section><section class="level3"><h4 id="by-concepttopic">By Concept/Topic<a class="anchor" aria-label="anchor" href="#by-concepttopic"></a>
 </h4>
-<p>``<code>{r # Works about machine learning pro_query(entity = "works",</code>concepts.id` = “C119857082”)</p>
-</section></section></section><section class="section level2"><h2 id="works-in-multiple-fields">Works in multiple fields<a class="anchor" aria-label="anchor" href="#works-in-multiple-fields"></a>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Works about machine learning</span></span>
+<span><span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span>entity <span class="op">=</span> <span class="st">"works"</span>, `concepts.id` <span class="op">=</span> <span class="st">"C119857082"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Works in multiple fields</span></span>
+<span><span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span>entity <span class="op">=</span> <span class="st">"works"</span>, `concepts.id` <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"C119857082"</span>, <span class="st">"C41008148"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+</div>
+</section></section><section class="level2"><h3 id="filter-reference-table">Filter Reference Table<a class="anchor" aria-label="anchor" href="#filter-reference-table"></a>
+</h3>
+<table class="table caption-top">
+<thead><tr class="header">
+<th>Filter</th>
+<th>Description</th>
+<th>Example Values</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><code>publication_year</code></td>
+<td>Exact year</td>
+<td>2023</td>
+</tr>
+<tr class="even">
+<td><code>from_publication_date</code></td>
+<td>Start date</td>
+<td>“2020-01-01”</td>
+</tr>
+<tr class="odd">
+<td><code>to_publication_date</code></td>
+<td>End date</td>
+<td>“2023-12-31”</td>
+</tr>
+<tr class="even">
+<td><code>type</code></td>
+<td>Work type</td>
+<td>“article”, “book”, “dataset”</td>
+</tr>
+<tr class="odd">
+<td><code>language</code></td>
+<td>ISO language code</td>
+<td>“en”, “de”, “fr”</td>
+</tr>
+<tr class="even">
+<td><code>is_oa</code></td>
+<td>Open access status</td>
+<td>TRUE, FALSE</td>
+</tr>
+<tr class="odd">
+<td><code>oa_status</code></td>
+<td>OA type</td>
+<td>“gold”, “green”, “hybrid”, “bronze”</td>
+</tr>
+<tr class="even">
+<td><code>from_cited_by_count</code></td>
+<td>Minimum citations</td>
+<td>100</td>
+</tr>
+<tr class="odd">
+<td><code>to_cited_by_count</code></td>
+<td>Maximum citations</td>
+<td>1000</td>
+</tr>
+<tr class="even">
+<td><code>doi</code></td>
+<td>Digital Object Identifier</td>
+<td>“10.1234/example”</td>
+</tr>
+<tr class="odd">
+<td><code>openalex</code></td>
+<td>OpenAlex ID</td>
+<td>“W2741809807”</td>
+</tr>
+<tr class="even">
+<td><code>author.id</code></td>
+<td>Author OpenAlex ID</td>
+<td>“A2208157607”</td>
+</tr>
+<tr class="odd">
+<td><code>institutions.id</code></td>
+<td>Institution ID</td>
+<td>“I4200000001”</td>
+</tr>
+<tr class="even">
+<td><code>concepts.id</code></td>
+<td>Concept ID</td>
+<td>“C119857082”</td>
+</tr>
+<tr class="odd">
+<td><code>cites</code></td>
+<td>Works that cite this ID</td>
+<td>“W2741809807”</td>
+</tr>
+<tr class="even">
+<td><code>cited_by</code></td>
+<td>Works cited by this ID</td>
+<td>“W2741809807”</td>
+</tr>
+</tbody>
+</table>
+<p>Use <code><a href="../reference/opt_filter_names.html">opt_filter_names()</a></code> to see all available filters.</p>
+</section></section><section class="section level2"><h2 id="advanced-features">Advanced Features<a class="anchor" aria-label="anchor" href="#advanced-features"></a>
 </h2>
-<p>pro_query(entity = “works”, <code>concepts.id</code> = c(“C119857082”, “C41008148”))</p>
-<pre><code>
-## Filter Reference Table
-
-| Filter | Description | Example Values |
-|--------|-------------|----------------|
-| `publication_year` | Exact year | 2023 |
-| `from_publication_date` | Start date | "2020-01-01" |
-| `to_publication_date` | End date | "2023-12-31" |
-| `type` | Work type | "article", "book", "dataset" |
-| `language` | ISO language code | "en", "de", "fr" |
-| `is_oa` | Open access status | TRUE, FALSE |
-| `oa_status` | OA type | "gold", "green", "hybrid", "bronze" |
-| `from_cited_by_count` | Minimum citations | 100 |
-| `to_cited_by_count` | Maximum citations | 1000 |
-| `doi` | Digital Object Identifier | "10.1234/example" |
-| `openalex` | OpenAlex ID | "W2741809807" |
-| `author.id` | Author OpenAlex ID | "A2208157607" |
-| `institutions.id` | Institution ID | "I4200000001" |
-| `concepts.id` | Concept ID | "C119857082" |
-| `cites` | Works that cite this ID | "W2741809807" |
-| `cited_by` | Works cited by this ID | "W2741809807" |
-
-Use `opt_filter_names()` to see all available filters.
-
-# Advanced Features
-
-## Grouping (Facets)
-
-Use `group_by` to get aggregate counts instead of individual records:
-
-
-::: {.cell}
-
-```{.r .cell-code}
-url &lt;- pro_query(
-  entity = "works",
-  search = "artificial intelligence",
-  group_by = "publication_year"
-)
-# Returns counts per year instead of individual works</code></pre>
-<p>:::</p>
+<section class="level2"><h3 id="grouping-facets">Grouping (Facets)<a class="anchor" aria-label="anchor" href="#grouping-facets"></a>
+</h3>
+<p>Use <code>group_by</code> to get aggregate counts instead of individual records:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">url</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span></span>
+<span>  entity <span class="op">=</span> <span class="st">"works"</span>,</span>
+<span>  search <span class="op">=</span> <span class="st">"artificial intelligence"</span>,</span>
+<span>  group_by <span class="op">=</span> <span class="st">"publication_year"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co"># Returns counts per year instead of individual works</span></span></code></pre></div>
+</div>
 <section class="level3"><h4 id="grouping-options">Grouping Options<a class="anchor" aria-label="anchor" href="#grouping-options"></a>
 </h4>
 <table class="table caption-top">
@@ -523,12 +759,60 @@ url &lt;- pro_query(
 <td><code>is_oa</code></td>
 <td>Count by open access</td>
 </tr>
+<tr class="even">
+<td><code>authorships.institutions.id</code></td>
+<td>Count by institution</td>
+</tr>
+<tr class="odd">
+<td><code>authorships.countries</code></td>
+<td>Count by country</td>
+</tr>
+<tr class="even">
+<td><code>primary_topic.id</code></td>
+<td>Count by topic</td>
+</tr>
 </tbody>
-</table></section><section class="level2"><h3 id="additional-options">Additional Options<a class="anchor" aria-label="anchor" href="#additional-options"></a>
+</table></section><section class="level3"><h4 id="response-structure">Response Structure<a class="anchor" aria-label="anchor" href="#response-structure"></a>
+</h4>
+<p>A <code>group_by</code> query returns a list of groups rather than individual records. Each group has three fields:</p>
+<table class="table caption-top">
+<thead><tr class="header">
+<th>Field</th>
+<th>Description</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><code>key</code></td>
+<td>The raw value (e.g. <code>"2023"</code>, an OpenAlex ID)</td>
+</tr>
+<tr class="even">
+<td><code>key_display_name</code></td>
+<td>Human-readable name (e.g. <code>"2023"</code>, <code>"Nature"</code>)</td>
+</tr>
+<tr class="odd">
+<td><code>count</code></td>
+<td>Number of entities in this group</td>
+</tr>
+</tbody>
+</table>
+<p>The API returns at most 200 groups per page.</p>
+</section><section class="level3"><h4 id="including-unknown-values">Including Unknown Values<a class="anchor" aria-label="anchor" href="#including-unknown-values"></a>
+</h4>
+<p>By default, entities with no value for the grouped field are hidden. Append <code>:include_unknown</code> to expose them as a separate group with <code>key = "unknown"</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Count works by OA status, including works with unknown status</span></span>
+<span><span class="va">url</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span></span>
+<span>  entity <span class="op">=</span> <span class="st">"works"</span>,</span>
+<span>  search <span class="op">=</span> <span class="st">"climate change"</span>,</span>
+<span>  group_by <span class="op">=</span> <span class="st">"oa_status:include_unknown"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</div>
+</section></section><section class="level2"><h3 id="additional-options">Additional Options<a class="anchor" aria-label="anchor" href="#additional-options"></a>
 </h3>
 <p>The <code>options</code> parameter accepts additional query parameters:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">url</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span></span>
 <span>  entity <span class="op">=</span> <span class="st">"works"</span>,</span>
 <span>  search <span class="op">=</span> <span class="st">"quantum computing"</span>,</span>
@@ -578,7 +862,7 @@ url &lt;- pro_query(
 </table></section><section class="level3"><h4 id="sorting-options">Sorting Options<a class="anchor" aria-label="anchor" href="#sorting-options"></a>
 </h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Sort by publication date (newest first)</span></span>
 <span><span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span>entity <span class="op">=</span> <span class="st">"works"</span>, options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>sort <span class="op">=</span> <span class="st">"publication_date:desc"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
@@ -592,6 +876,55 @@ url &lt;- pro_query(
 <span>  options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>sort <span class="op">=</span> <span class="st">"relevance_score:desc"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
+</section><section class="level3"><h4 id="xpac-expansion-pack-works">XPAC — Expansion Pack Works<a class="anchor" aria-label="anchor" href="#xpac-expansion-pack-works"></a>
+</h4>
+<p>OpenAlex XPAC (“expansion pack”) adds approximately 190 million additional works from DataCite and institutional/subject repositories to the standard ~278 million works, bringing the total to ~470 million. These works are excluded from API responses by default to avoid disrupting existing queries; they tend to have lower metadata quality than the standard corpus, though quality is improving over time.</p>
+<p>Enable XPAC by passing <code>include_xpac = TRUE</code> via the <code>options</code> parameter:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Include XPAC works in results (~470 M total instead of ~278 M)</span></span>
+<span><span class="va">url</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span></span>
+<span>  entity <span class="op">=</span> <span class="st">"works"</span>,</span>
+<span>  search <span class="op">=</span> <span class="st">"grey literature"</span>,</span>
+<span>  options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>include_xpac <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</div>
+<p>To retrieve <strong>only</strong> XPAC works (excluding standard works), combine <code>include_xpac = TRUE</code> with the <code>is_xpac</code> filter:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Query XPAC-only works (must also set include_xpac = TRUE)</span></span>
+<span><span class="va">url</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span></span>
+<span>  entity <span class="op">=</span> <span class="st">"works"</span>,</span>
+<span>  is_xpac <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  from_publication_date <span class="op">=</span> <span class="st">"2024-01-01"</span>,</span>
+<span>  options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>include_xpac <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</div>
+<p>XPAC works can be combined with any other filter or search mode, including semantic search:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Semantic search across the full XPAC-inclusive corpus</span></span>
+<span><span class="va">url</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span></span>
+<span>  entity <span class="op">=</span> <span class="st">"works"</span>,</span>
+<span>  search.semantic <span class="op">=</span> <span class="st">"institutional repository preprint data management"</span>,</span>
+<span>  options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>include_xpac <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</div>
+<p>XPAC work IDs can be passed directly to <code><a href="../reference/pro_download_content.html">pro_download_content()</a></code> — <code>include_xpac</code> is a discovery-phase parameter and is not needed at download time. To find XPAC works that also have downloadable full-text, combine the filters:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Find XPAC works with PDFs, then download them</span></span>
+<span><span class="va">urls</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span></span>
+<span>  entity          <span class="op">=</span> <span class="st">"works"</span>,</span>
+<span>  has_content.pdf <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  is_xpac         <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  from_publication_date <span class="op">=</span> <span class="st">"2024-01-01"</span>,</span>
+<span>  options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>include_xpac <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co"># After fetching and extracting IDs from the metadata:</span></span>
+<span><span class="co"># result &lt;- pro_download_content(ids = xpac_ids, format = "pdf")</span></span></code></pre></div>
+</div>
+<p>See the <a href="https://docs.openalex.org/how-to-use-the-api/xpac" class="external-link">OpenAlex XPAC documentation</a> for more details.</p>
 </section></section></section><section class="section level2"><h2 id="automatic-chunking">Automatic Chunking<a class="anchor" aria-label="anchor" href="#automatic-chunking"></a>
 </h2>
 <p>When querying with large lists of DOIs or IDs, <code><a href="../reference/pro_query.html">pro_query()</a></code> automatically splits the request into chunks to avoid API URL length limits (max ~4094 characters).</p>
@@ -667,7 +1000,7 @@ url &lt;- pro_query(
 <section class="level3"><h4 id="basic-chunking">Basic Chunking<a class="anchor" aria-label="anchor" href="#basic-chunking"></a>
 </h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Create a list of 120 DOIs</span></span>
 <span><span class="va">dois</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"10.1234/example"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">120</span><span class="op">)</span></span>
 <span></span>
@@ -686,7 +1019,7 @@ url &lt;- pro_query(
 </section><section class="level3"><h4 id="custom-chunk-size">Custom Chunk Size<a class="anchor" aria-label="anchor" href="#custom-chunk-size"></a>
 </h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">urls</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span></span>
 <span>  entity <span class="op">=</span> <span class="st">"works"</span>,</span>
 <span>  doi <span class="op">=</span> <span class="va">dois</span>,</span>
@@ -699,7 +1032,7 @@ url &lt;- pro_query(
 </h4>
 <p>When multiple chunkable filters exceed the limit, chunking creates a cross-product:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Both DOI and cites will be chunked</span></span>
 <span><span class="va">urls</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span></span>
 <span>  entity <span class="op">=</span> <span class="st">"works"</span>,</span>
@@ -766,7 +1099,7 @@ url &lt;- pro_query(
 </h4>
 <p>When passing multiple IDs to the <code>id</code> parameter, they are automatically moved to <code>ids.openalex</code> filter:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Multiple IDs are converted to filter</span></span>
 <span><span class="va">urls</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span></span>
 <span>  entity <span class="op">=</span> <span class="st">"works"</span>,</span>
@@ -780,7 +1113,7 @@ url &lt;- pro_query(
 </h3>
 <p>Scholarly documents including articles, books, datasets, and more:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span>entity <span class="op">=</span> <span class="st">"works"</span>, search <span class="op">=</span> <span class="st">"CRISPR gene editing"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span></span>
 <span>  entity <span class="op">=</span> <span class="st">"works"</span>,</span>
@@ -792,7 +1125,7 @@ url &lt;- pro_query(
 </h3>
 <p>Researchers and their metadata:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span>entity <span class="op">=</span> <span class="st">"authors"</span>, search <span class="op">=</span> <span class="st">"Marie Curie"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span>entity <span class="op">=</span> <span class="st">"authors"</span>, `last_known_institution.id` <span class="op">=</span> <span class="st">"I4200000001"</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -800,7 +1133,7 @@ url &lt;- pro_query(
 </h3>
 <p>Universities, research organizations, companies:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span>entity <span class="op">=</span> <span class="st">"institutions"</span>, search <span class="op">=</span> <span class="st">"MIT"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span>entity <span class="op">=</span> <span class="st">"institutions"</span>, type <span class="op">=</span> <span class="st">"education"</span>, country_code <span class="op">=</span> <span class="st">"US"</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -808,7 +1141,7 @@ url &lt;- pro_query(
 </h3>
 <p>Journals, repositories, conferences:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span>entity <span class="op">=</span> <span class="st">"venues"</span>, search <span class="op">=</span> <span class="st">"Nature"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span>entity <span class="op">=</span> <span class="st">"venues"</span>, is_oa <span class="op">=</span> <span class="cn">TRUE</span>, type <span class="op">=</span> <span class="st">"journal"</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -816,7 +1149,7 @@ url &lt;- pro_query(
 </h3>
 <p>Topics and fields of study:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span>entity <span class="op">=</span> <span class="st">"concepts"</span>, search <span class="op">=</span> <span class="st">"machine learning"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span>entity <span class="op">=</span> <span class="st">"concepts"</span>, level <span class="op">=</span> <span class="fl">0</span><span class="op">)</span> <span class="co"># Top-level concepts only</span></span></code></pre></div>
 </div>
@@ -824,7 +1157,7 @@ url &lt;- pro_query(
 </h3>
 <p>Organizations that publish venues:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span>entity <span class="op">=</span> <span class="st">"publishers"</span>, search <span class="op">=</span> <span class="st">"Springer"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span>entity <span class="op">=</span> <span class="st">"publishers"</span>, country_codes <span class="op">=</span> <span class="st">"US"</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -832,7 +1165,7 @@ url &lt;- pro_query(
 </h3>
 <p>Organizations that fund research:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span>entity <span class="op">=</span> <span class="st">"funders"</span>, search <span class="op">=</span> <span class="st">"NSF"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span>entity <span class="op">=</span> <span class="st">"funders"</span>, country_code <span class="op">=</span> <span class="st">"US"</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -881,7 +1214,7 @@ url &lt;- pro_query(
 </h3>
 <p>Filter names are validated against <code><a href="../reference/opt_filter_names.html">opt_filter_names()</a></code>:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># This will error with suggestions</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/try.html" class="external-link">try</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span></span>
@@ -897,7 +1230,7 @@ url &lt;- pro_query(
 </h3>
 <p>Select fields are validated against <code><a href="../reference/opt_select_fields.html">opt_select_fields()</a></code>:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb41"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># This will error with suggestions</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/try.html" class="external-link">try</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span></span>
@@ -913,7 +1246,7 @@ url &lt;- pro_query(
 </h3>
 <p>Entity type is validated using <code><a href="https://rdrr.io/r/base/match.arg.html" class="external-link">match.arg()</a></code>:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb42"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/try.html" class="external-link">try</a></span><span class="op">(</span><span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span>entity <span class="op">=</span> <span class="st">"paper"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co"># Error: 'arg' should be one of "works", "authors", "venues",</span></span>
 <span><span class="co">#        "institutions", "concepts", "publishers", "funders"</span></span></code></pre></div>
@@ -983,7 +1316,7 @@ url &lt;- pro_query(
         Entity[entity = "works"]
         ID[id = NULL or single ID]
         Search[search = "climate"]
-        Select[select = c"ids", "title"]
+        Select[select = c&amp;#40;"ids", "title"&amp;#41;]
         GroupBy[group_by = "year"]
         Options[options = list&lt;br/&gt;per_page = 200]
         Filters[... filters]
@@ -1083,7 +1416,7 @@ url &lt;- pro_query(
 </h3>
 <p>Checks if an object is NULL or has zero length:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb31"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb43"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">.is_empty</span><span class="op">(</span><span class="cn">NULL</span><span class="op">)</span> <span class="co"># TRUE</span></span>
 <span><span class="fu">.is_empty</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="co"># TRUE</span></span>
 <span><span class="fu">.is_empty</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="co"># TRUE</span></span>
@@ -1092,7 +1425,7 @@ url &lt;- pro_query(
 </div>
 <p><strong>Implementation:</strong></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb32"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb44"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">.is_empty</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">||</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
@@ -1102,7 +1435,7 @@ url &lt;- pro_query(
 </h3>
 <p>Collapses vectors into pipe-separated strings for the OpenAlex API:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb33"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb45"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">.oa_collapse</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"en"</span>, <span class="st">"de"</span>, <span class="st">"fr"</span><span class="op">)</span><span class="op">)</span> <span class="co"># "en|de|fr"</span></span>
 <span><span class="fu">.oa_collapse</span><span class="op">(</span><span class="st">"single"</span><span class="op">)</span> <span class="co"># "single"</span></span>
 <span><span class="fu">.oa_collapse</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">TRUE</span>, <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span> <span class="co"># "true|false"</span></span>
@@ -1149,7 +1482,7 @@ url &lt;- pro_query(
 </h3>
 <p>Constructs the filter query string from a named list:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb34"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb46"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">filters</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  from_publication_date <span class="op">=</span> <span class="st">"2020-01-01"</span>,</span>
 <span>  language <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"en"</span>, <span class="st">"de"</span><span class="op">)</span>,</span>
@@ -1197,7 +1530,7 @@ url &lt;- pro_query(
 </h3>
 <p>Provides spelling suggestions for invalid field names using Levenshtein edit distance:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb35"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb47"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">.fuzzy_suggest</span><span class="op">(</span><span class="st">"titel"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"title"</span>, <span class="st">"author"</span>, <span class="st">"year"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co"># "title" (edit distance 1)</span></span>
 <span></span>
@@ -1243,7 +1576,7 @@ url &lt;- pro_query(
 </h3>
 <p>Constructs helpful error messages with fuzzy suggestions:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb36"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb48"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">.build_validation_error</span><span class="op">(</span></span>
 <span>  bad <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"id"</span>, <span class="st">"titel"</span><span class="op">)</span>,</span>
 <span>  allowed <span class="op">=</span> <span class="fu"><a href="../reference/opt_select_fields.html">opt_select_fields</a></span><span class="op">(</span><span class="op">)</span>,</span>
@@ -1261,60 +1594,52 @@ url &lt;- pro_query(
 <section class="level3"><h4 id="invalid-entity">Invalid Entity<a class="anchor" aria-label="anchor" href="#invalid-entity"></a>
 </h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">try</span>(<span class="fu">pro_query</span>(<span class="at">entity =</span> <span class="st">"paper"</span>))</span>
-<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Error: 'arg' should be one of "works", "authors", "venues",</span></span>
-<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a><span class="co">#        "institutions", "concepts", "publishers", "funders"</span></span>
-<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a><span class="st">``</span></span>
-<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a><span class="st">`</span></span>
-<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a><span class="at">**Solution:** Use a valid entity name.</span></span>
-<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a><span class="at">### Invalid Filter Name</span></span></code></pre></div>
+<div class="sourceCode cell-code" id="cb49"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/try.html" class="external-link">try</a></span><span class="op">(</span><span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span>entity <span class="op">=</span> <span class="st">"paper"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co"># Error: 'arg' should be one of "works", "authors", "venues",</span></span>
+<span><span class="co">#        "institutions", "concepts", "publishers", "funders"</span></span></code></pre></div>
 </div>
+<p><strong>Solution:</strong> Use a valid entity name.</p>
+</section><section class="level3"><h4 id="invalid-filter-name">Invalid Filter Name<a class="anchor" aria-label="anchor" href="#invalid-filter-name"></a>
+</h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">try</span>(<span class="fu">pro_query</span>(<span class="at">entity =</span> <span class="st">"works"</span>, <span class="at">invalid_filter =</span> <span class="st">"value"</span>))</span>
-<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Error: Invalid filter name(s): invalid_filter.</span></span>
-<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Valid filter names are defined in `</span></span>
-<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a><span class="fu">opt_filter_names</span>()</span>
-<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">.</span></span>
-<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a><span class="st">`</span></span>
-<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a><span class="st">``</span></span>
-<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a><span class="sc">**</span>Solution<span class="sc">:</span><span class="er">**</span> Check <span class="st">`</span><span class="at">opt_filter_names()</span><span class="st">`</span> <span class="cf">for</span> valid filter names.</span>
-<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a><span class="do">### Invalid Select Field</span></span></code></pre></div>
+<div class="sourceCode cell-code" id="cb50"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/try.html" class="external-link">try</a></span><span class="op">(</span><span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span>entity <span class="op">=</span> <span class="st">"works"</span>, invalid_filter <span class="op">=</span> <span class="st">"value"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co"># Error: Invalid filter name(s): invalid_filter.</span></span>
+<span><span class="co"># Valid filter names are defined in `opt_filter_names()`.</span></span></code></pre></div>
 </div>
+<p><strong>Solution:</strong> Check <code><a href="../reference/opt_filter_names.html">opt_filter_names()</a></code> for valid filter names.</p>
+</section><section class="level3"><h4 id="invalid-select-field">Invalid Select Field<a class="anchor" aria-label="anchor" href="#invalid-select-field"></a>
+</h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">try</span>(<span class="fu">pro_query</span>(<span class="at">entity =</span> <span class="st">"works"</span>, <span class="at">select =</span> <span class="fu">c</span>(<span class="st">"id"</span>, <span class="st">"titel"</span>)))</span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Error: Invalid select field(s): id, titel.</span></span>
-<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Did you mean: id → ids, titel → title?</span></span>
-<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Valid select fields are defined in `opt_select_fields()`.</span></span>
-<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a><span class="st">``</span></span>
-<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a><span class="st">`</span></span>
-<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a><span class="at">**Solution:** Use suggested corrections or check </span><span class="st">`</span><span class="fu">opt_select_fields</span>()<span class="st">`</span><span class="at">.</span></span>
-<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a><span class="at">### URL Too Long</span></span>
-<span id="cb39-10"><a href="#cb39-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb39-11"><a href="#cb39-11" aria-hidden="true" tabindex="-1"></a><span class="at">When a query URL exceeds ~4094 characters, the API returns an error. </span><span class="st">`</span><span class="fu">pro_query</span>()<span class="st">`</span><span class="at"> prevents this through automatic chunking, but if you manually construct very long URLs:</span></span></code></pre></div>
+<div class="sourceCode cell-code" id="cb51"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/try.html" class="external-link">try</a></span><span class="op">(</span><span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span>entity <span class="op">=</span> <span class="st">"works"</span>, select <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"id"</span>, <span class="st">"titel"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co"># Error: Invalid select field(s): id, titel.</span></span>
+<span><span class="co"># Did you mean: id → ids, titel → title?</span></span>
+<span><span class="co"># Valid select fields are defined in `opt_select_fields()`.</span></span></code></pre></div>
 </div>
+<p><strong>Solution:</strong> Use suggested corrections or check <code><a href="../reference/opt_select_fields.html">opt_select_fields()</a></code>.</p>
+</section><section class="level3"><h4 id="url-too-long">URL Too Long<a class="anchor" aria-label="anchor" href="#url-too-long"></a>
+</h4>
+<p>When a query URL exceeds ~4094 characters, the API returns an error. <code><a href="../reference/pro_query.html">pro_query()</a></code> prevents this through automatic chunking, but if you manually construct very long URLs:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="co"># This would fail at the API level</span></span>
-<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>very_long_url <span class="ot">&lt;-</span> <span class="fu">pro_query</span>(</span>
-<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">entity =</span> <span class="st">"works"</span>,</span>
-<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">doi =</span> <span class="fu">paste0</span>(<span class="st">"10.1234/"</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">1000</span>),</span>
-<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">chunk_limit =</span> <span class="dv">1000</span> <span class="co"># Disabling chunking</span></span>
-<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a><span class="co"># URL too long → API error</span></span>
-<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a><span class="st">`</span></span>
-<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a><span class="st">``</span></span>
-<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a><span class="at">**Solution:** Use appropriate </span><span class="st">`</span>chunk_limit<span class="st">`</span><span class="at"> (default 50 works well).</span></span>
-<span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb40-12"><a href="#cb40-12" aria-hidden="true" tabindex="-1"></a><span class="at"># Best Practices</span></span>
-<span id="cb40-13"><a href="#cb40-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb40-14"><a href="#cb40-14" aria-hidden="true" tabindex="-1"></a><span class="at">## 1. Always Use Field Selection</span></span>
-<span id="cb40-15"><a href="#cb40-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb40-16"><a href="#cb40-16" aria-hidden="true" tabindex="-1"></a><span class="at">Reduce response size and improve performance:</span></span></code></pre></div>
+<div class="sourceCode cell-code" id="cb52"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># This would fail at the API level</span></span>
+<span><span class="va">very_long_url</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span></span>
+<span>  entity <span class="op">=</span> <span class="st">"works"</span>,</span>
+<span>  doi <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"10.1234/"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">1000</span><span class="op">)</span>,</span>
+<span>  chunk_limit <span class="op">=</span> <span class="fl">1000</span> <span class="co"># Disabling chunking</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co"># URL too long → API error</span></span></code></pre></div>
 </div>
+<p><strong>Solution:</strong> Use appropriate <code>chunk_limit</code> (default 50 works well).</p>
+</section></section></section><section class="section level2"><h2 id="best-practices">Best Practices<a class="anchor" aria-label="anchor" href="#best-practices"></a>
+</h2>
+<section class="level2"><h3 id="always-use-field-selection">1. Always Use Field Selection<a class="anchor" aria-label="anchor" href="#always-use-field-selection"></a>
+</h3>
+<p>Reduce response size and improve performance:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb41"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb53"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Good: Only request needed fields</span></span>
 <span><span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span></span>
 <span>  entity <span class="op">=</span> <span class="st">"works"</span>,</span>
@@ -1325,11 +1650,11 @@ url &lt;- pro_query(
 <span><span class="co"># Avoid: Requesting all fields (large responses)</span></span>
 <span><span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span>entity <span class="op">=</span> <span class="st">"works"</span>, search <span class="op">=</span> <span class="st">"climate"</span><span class="op">)</span></span></code></pre></div>
 </div>
-</section></section><section class="level2"><h3 id="use-date-filters-for-large-queries">2. Use Date Filters for Large Queries<a class="anchor" aria-label="anchor" href="#use-date-filters-for-large-queries"></a>
+</section><section class="level2"><h3 id="use-date-filters-for-large-queries">2. Use Date Filters for Large Queries<a class="anchor" aria-label="anchor" href="#use-date-filters-for-large-queries"></a>
 </h3>
 <p>Narrow down results to manageable sizes:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb42"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb54"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Good: Filtered by date</span></span>
 <span><span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span></span>
 <span>  entity <span class="op">=</span> <span class="st">"works"</span>,</span>
@@ -1344,7 +1669,7 @@ url &lt;- pro_query(
 </h3>
 <p>Use <code><a href="../reference/pro_count.html">pro_count()</a></code> to check query size:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb43"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb55"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">url</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span>entity <span class="op">=</span> <span class="st">"works"</span>, search <span class="op">=</span> <span class="st">"CRISPR"</span><span class="op">)</span></span>
 <span><span class="va">count</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pro_count.html">pro_count</a></span><span class="op">(</span><span class="va">url</span><span class="op">)</span></span>
 <span><span class="va">count</span><span class="op">$</span><span class="va">count</span></span>
@@ -1354,7 +1679,7 @@ url &lt;- pro_query(
 </h3>
 <p>Let <code><a href="../reference/pro_query.html">pro_query()</a></code> handle large ID lists:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb44"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb56"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Good: Automatic chunking</span></span>
 <span><span class="va">urls</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span>entity <span class="op">=</span> <span class="st">"works"</span>, doi <span class="op">=</span> <span class="va">large_doi_vector</span><span class="op">)</span></span>
 <span><span class="co"># Returns list of manageable URLs</span></span>
@@ -1366,7 +1691,7 @@ url &lt;- pro_query(
 </h3>
 <p>Check your parameters before long-running downloads:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb45"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb57"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Check available filters</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="../reference/opt_filter_names.html">opt_filter_names</a></span><span class="op">(</span><span class="op">)</span>, <span class="fl">20</span><span class="op">)</span></span>
 <span></span>
@@ -1385,7 +1710,7 @@ url &lt;- pro_query(
 <section class="level2"><h3 id="finding-recent-publications-in-a-field">Finding Recent Publications in a Field<a class="anchor" aria-label="anchor" href="#finding-recent-publications-in-a-field"></a>
 </h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb46"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb58"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">url</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span></span>
 <span>  entity <span class="op">=</span> <span class="st">"works"</span>,</span>
 <span>  search <span class="op">=</span> <span class="st">"CRISPR gene therapy"</span>,</span>
@@ -1408,7 +1733,7 @@ url &lt;- pro_query(
 </section><section class="level2"><h3 id="analyzing-highly-cited-works">Analyzing Highly Cited Works<a class="anchor" aria-label="anchor" href="#analyzing-highly-cited-works"></a>
 </h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb47"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb59"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">url</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span></span>
 <span>  entity <span class="op">=</span> <span class="st">"works"</span>,</span>
 <span>  from_cited_by_count <span class="op">=</span> <span class="fl">1000</span>,</span>
@@ -1430,7 +1755,7 @@ url &lt;- pro_query(
 </section><section class="level2"><h3 id="author-publication-list">Author Publication List<a class="anchor" aria-label="anchor" href="#author-publication-list"></a>
 </h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb48"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb60"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">url</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span></span>
 <span>  entity <span class="op">=</span> <span class="st">"works"</span>,</span>
 <span>  `author.id` <span class="op">=</span> <span class="st">"A2208157607"</span>,</span>
@@ -1441,7 +1766,7 @@ url &lt;- pro_query(
 </section><section class="level2"><h3 id="institution-research-output">Institution Research Output<a class="anchor" aria-label="anchor" href="#institution-research-output"></a>
 </h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb49"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb61"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">url</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span></span>
 <span>  entity <span class="op">=</span> <span class="st">"works"</span>,</span>
 <span>  `institutions.id` <span class="op">=</span> <span class="st">"I4200000001"</span>,</span>
@@ -1453,7 +1778,7 @@ url &lt;- pro_query(
 </section><section class="level2"><h3 id="bulk-doi-lookup">Bulk DOI Lookup<a class="anchor" aria-label="anchor" href="#bulk-doi-lookup"></a>
 </h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb50"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb62"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Read DOIs from file</span></span>
 <span><span class="va">dois</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readLines.html" class="external-link">readLines</a></span><span class="op">(</span><span class="st">"my_dois.txt"</span><span class="op">)</span></span>
 <span></span>
@@ -1470,7 +1795,7 @@ url &lt;- pro_query(
 </section><section class="level2"><h3 id="citation-network-analysis">Citation Network Analysis<a class="anchor" aria-label="anchor" href="#citation-network-analysis"></a>
 </h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb51"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb63"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Find works that cite a specific paper</span></span>
 <span><span class="va">url_citing</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span></span>
 <span>  entity <span class="op">=</span> <span class="st">"works"</span>,</span>
@@ -1488,7 +1813,7 @@ url &lt;- pro_query(
 </section><section class="level2"><h3 id="publication-year-distribution">Publication Year Distribution<a class="anchor" aria-label="anchor" href="#publication-year-distribution"></a>
 </h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb52"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb64"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">url</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span></span>
 <span>  entity <span class="op">=</span> <span class="st">"works"</span>,</span>
 <span>  search <span class="op">=</span> <span class="st">"artificial intelligence"</span>,</span>
@@ -1500,17 +1825,16 @@ url &lt;- pro_query(
 </section></section><section class="section level2"><h2 id="authentication">Authentication<a class="anchor" aria-label="anchor" href="#authentication"></a>
 </h2>
 <p>OpenAlex offers limited API access without credentials. Free API keys with substantially higher rate limits can be obtained from the <a href="https://openalex.org" class="external-link">OpenAlex website</a>. Premium API access with even higher limits can also be purchased.</p>
-<p><code>openalexPro</code> uses environment variables for credentials:</p>
+<p><code>openalexPro</code> uses environment variables for credentials (recommended):</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb53"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb65"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Set credentials (typically in your .Renviron file)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/Sys.setenv.html" class="external-link">Sys.setenv</a></span><span class="op">(</span>openalexPro.email <span class="op">=</span> <span class="st">"your.email@example.org"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Sys.setenv.html" class="external-link">Sys.setenv</a></span><span class="op">(</span>openalexPro.apikey <span class="op">=</span> <span class="st">"your-api-key-here"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Validate your credentials</span></span>
 <span><span class="fu"><a href="../reference/pro_validate_credentials.html">pro_validate_credentials</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
-<p>Credentials are used by <code><a href="../reference/pro_request.html">pro_request()</a></code> and <code><a href="../reference/pro_count.html">pro_count()</a></code>, not by <code><a href="../reference/pro_query.html">pro_query()</a></code> itself (which only builds URLs).</p>
+<p>Credentials are used by API-calling functions (<code><a href="../reference/pro_request.html">pro_request()</a></code>, <code><a href="../reference/pro_count.html">pro_count()</a></code>, <code><a href="../reference/pro_fetch.html">pro_fetch()</a></code>, <code><a href="../reference/pro_download_content.html">pro_download_content()</a></code>) and are optional. If <code>api_key</code> is <code>NULL</code> or <code>""</code>, those functions call OpenAlex without authentication. <code><a href="../reference/pro_query.html">pro_query()</a></code> itself only builds URLs and does not require credentials.</p>
 </section><section class="section level2"><h2 id="integration-with-openalexpro-workflow">Integration with openalexPro Workflow<a class="anchor" aria-label="anchor" href="#integration-with-openalexpro-workflow"></a>
 </h2>
 <p><code><a href="../reference/pro_query.html">pro_query()</a></code> is the first step in the typical <code>openalexPro</code> data pipeline:</p>
@@ -1560,7 +1884,7 @@ url &lt;- pro_query(
 <section class="level2"><h3 id="complete-example">Complete Example<a class="anchor" aria-label="anchor" href="#complete-example"></a>
 </h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb54"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb66"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/rkrug/openalexPro" class="external-link">openalexPro</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Step 1: Build query</span></span>
@@ -1619,7 +1943,7 @@ url &lt;- pro_query(
 <li>
 <code><a href="../reference/opt_select_fields.html">opt_select_fields()</a></code> - List available select fields</li>
 <li>
-<code><a href="../reference/pro_validate_credentials.html">pro_validate_credentials()</a></code> - Validate API credentials</li>
+<code><a href="../reference/pro_validate_credentials.html">pro_validate_credentials()</a></code> - Validate API credentials (optional helper)</li>
 <li>
 <code><a href="../reference/pro_count.html">pro_count()</a></code> - Get count of results without downloading</li>
 <li>

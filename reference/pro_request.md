@@ -12,7 +12,6 @@ pro_request(
   pages = 1e+05,
   output = NULL,
   overwrite = FALSE,
-  mailto = Sys.getenv("openalexPro.email"),
   api_key = Sys.getenv("openalexPro.apikey"),
   workers = 1,
   verbose = FALSE,
@@ -45,13 +44,12 @@ pro_request(
 
   Logical. If `TRUE`, `output` will be deleted if it already exists.
 
-- mailto:
-
-  The email address of the user.
-
 - api_key:
 
-  The API key of the user.
+  Character string API key or `NULL`. Defaults to
+  `Sys.getenv("openalexPro.apikey")`. If `NULL` or `""`, requests are
+  sent without an API key (subject to OpenAlex's unauthenticated
+  limits).
 
 - workers:
 
@@ -68,7 +66,7 @@ pro_request(
 
 - count_only:
 
-  return count only as a named numeric vector or list.
+  return count only as a data.frame.
 
 - error_log:
 
@@ -77,9 +75,10 @@ pro_request(
 ## Value
 
 If `count_only` is `FALSE` (the default) the complete path to the
-expanded and normalized `output`. If `count_only` is `TRUE`, a named
-numeric vector with the count of the works from the specified
-query_url(s).
+expanded and normalized `output`. If `count_only` is `TRUE`, a
+data.frame with metadata about the query (count, db_response_time_ms,
+page, per_page, error). When `query_url` is a list, an additional
+`query` column identifies each query.
 
 ## Details
 

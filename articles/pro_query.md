@@ -114,10 +114,23 @@ url
 # [1] "https://api.openalex.org/works"
 ```
 
-### Full-Text Search
+### Search Modes
 
-Add a search term to perform full-text search across title, abstract,
-and full text:
+[`pro_query()`](https://rkrug.github.io/openalexPro/reference/pro_query.md)
+supports three mutually exclusive search parameters, each with different
+matching behaviour and cost:
+
+| Parameter         | Matching                                    | Max results | Cost          |
+|-------------------|---------------------------------------------|-------------|---------------|
+| `search`          | Stemmed keyword (stop-words removed)        | Unlimited   | \$0.0001/call |
+| `search.exact`    | Unstemmed, supports boolean/phrase/wildcard | Unlimited   | \$0.0001/call |
+| `search.semantic` | AI embedding similarity                     | 50 per call | \$0.001/call  |
+
+#### `search` — Standard Keyword Search
+
+Searches title, abstract, and full text with stemming and stop-word
+removal. Supports the same boolean/phrase syntax as `search.exact` but
+also applies stemming (e.g. “run” also matches “running”, “ran”):
 
 ``` r
 url <- pro_query(
@@ -127,6 +140,69 @@ url <- pro_query(
 url
 # [1] "https://api.openalex.org/works?search=climate%20change%20biodiversity"
 ```
+
+#### `search.exact` — Unstemmed / Boolean Search
+
+Searches without stemming or stop-word removal. Supports:
+
+- Boolean operators: `AND`, `OR`, `NOT`
+- Quoted phrases: `"deep learning"`
+- Proximity: `"climate change"~5` (within 5 words)
+- Wildcards: `microbio*`
+
+``` r
+# Exact phrase search
+url <- pro_query(
+  entity = "works",
+  search.exact = '"large language models" AND (safety OR alignment)'
+)
+
+# Wildcard — matches microbiology, microbiome, microbiota, …
+url <- pro_query(
+  entity = "works",
+  search.exact = "microbio*",
+  from_publication_date = "2020-01-01"
+)
+```
+
+#### `search.semantic` — AI-Powered Similarity Search (Find Similar Works)
+
+Converts your query to a 1 024-dimension embedding and returns the most
+conceptually similar works — regardless of whether they share any
+keywords. This is OpenAlex’s [“find similar
+works”](https://docs.openalex.org/how-to-use-the-api/find-similar-works)
+feature.
+
+**Constraints:**
+
+- Maximum **50 results** per call (the API hard-codes this).
+- Requires an API key (costs \$0.001 per call).
+- Rate-limited to **1 request per second**.
+- Pass a sentence or short paragraph — not just a keyword.
+
+``` r
+# Find works conceptually similar to an abstract or research question
+url <- pro_query(
+  entity = "works",
+  search.semantic = paste(
+    "Large language models trained on scientific text can assist researchers",
+    "in hypothesis generation and literature synthesis."
+  )
+)
+
+# Combine with filters to narrow the similarity search
+url <- pro_query(
+  entity = "works",
+  search.semantic = "CRISPR base editing for treating sickle cell disease",
+  from_publication_date = "2019-01-01",
+  type = "article",
+  select = c("ids", "title", "publication_year", "cited_by_count")
+)
+```
+
+> **Note:** Semantic search returns at most 50 results. For large-scale
+> retrieval, combine `search` or `search.exact` with
+> [`pro_fetch()`](https://rkrug.github.io/openalexPro/reference/pro_fetch.md).
 
 ### Field Selection
 
@@ -159,7 +235,7 @@ opt_select_fields()
 
 ### Single Entity Retrieval
 
-Fetch a specific entity by ID:
+Fetch a specific entity by its OpenAlex ID:
 
 ``` r
 url <- pro_query(
@@ -169,6 +245,65 @@ url <- pro_query(
 url
 # [1] "https://api.openalex.org/works/W2741809807"
 ```
+
+#### External Identifiers
+
+You can use any identifier listed in an entity’s `ids` field — not just
+the OpenAlex ID. The API accepts three formats:
+
+| Format            | Example                              |
+|-------------------|--------------------------------------|
+| Full URL          | `https://doi.org/10.7717/peerj.4375` |
+| `namespace:value` | `doi:10.7717/peerj.4375`             |
+| OpenAlex key      | `W2741809807`                        |
+
+**Works** — DOI:
+
+``` r
+# By DOI (full URL format)
+url <- pro_query(
+  entity = "works",
+  id = "https://doi.org/10.7717/peerj.4375"
+)
+
+# By DOI (namespace format)
+url <- pro_query(
+  entity = "works",
+  id = "doi:10.7717/peerj.4375"
+)
+```
+
+**Authors** — ORCID:
+
+``` r
+url <- pro_query(
+  entity = "authors",
+  id = "orcid:0000-0003-1613-5981"
+)
+```
+
+**Institutions** — ROR:
+
+``` r
+url <- pro_query(
+  entity = "institutions",
+  id = "ror:02mhbdp94"  # MIT
+)
+```
+
+**Sources (journals)** — ISSN:
+
+``` r
+url <- pro_query(
+  entity = "sources",
+  id = "issn:0028-0836"  # Nature
+)
+```
+
+> **Tip:** For bulk lookup of multiple DOIs or IDs, use a filter
+> (`doi = c(...)`) rather than the `id` parameter —
+> [`pro_query()`](https://rkrug.github.io/openalexPro/reference/pro_query.md)
+> will automatically chunk them into batches of up to 50.
 
 ## Filtering
 
@@ -290,65 +425,94 @@ pro_query(entity = "works", `institutions.country_code` = "US")
 
 #### By Concept/Topic
 
-\`\``{r # Works about machine learning pro_query(entity = "works",`concepts.id\`
-= “C119857082”)
+``` r
+# Works about machine learning
+pro_query(entity = "works", `concepts.id` = "C119857082")
 
-## Works in multiple fields
+# Works in multiple fields
+pro_query(entity = "works", `concepts.id` = c("C119857082", "C41008148"))
+```
 
-pro_query(entity = “works”, `concepts.id` = c(“C119857082”,
-“C41008148”))
+### Filter Reference Table
 
-    ## Filter Reference Table
+| Filter                  | Description               | Example Values                      |
+|-------------------------|---------------------------|-------------------------------------|
+| `publication_year`      | Exact year                | 2023                                |
+| `from_publication_date` | Start date                | “2020-01-01”                        |
+| `to_publication_date`   | End date                  | “2023-12-31”                        |
+| `type`                  | Work type                 | “article”, “book”, “dataset”        |
+| `language`              | ISO language code         | “en”, “de”, “fr”                    |
+| `is_oa`                 | Open access status        | TRUE, FALSE                         |
+| `oa_status`             | OA type                   | “gold”, “green”, “hybrid”, “bronze” |
+| `from_cited_by_count`   | Minimum citations         | 100                                 |
+| `to_cited_by_count`     | Maximum citations         | 1000                                |
+| `doi`                   | Digital Object Identifier | “10.1234/example”                   |
+| `openalex`              | OpenAlex ID               | “W2741809807”                       |
+| `author.id`             | Author OpenAlex ID        | “A2208157607”                       |
+| `institutions.id`       | Institution ID            | “I4200000001”                       |
+| `concepts.id`           | Concept ID                | “C119857082”                        |
+| `cites`                 | Works that cite this ID   | “W2741809807”                       |
+| `cited_by`              | Works cited by this ID    | “W2741809807”                       |
 
-    | Filter | Description | Example Values |
-    |--------|-------------|----------------|
-    | `publication_year` | Exact year | 2023 |
-    | `from_publication_date` | Start date | "2020-01-01" |
-    | `to_publication_date` | End date | "2023-12-31" |
-    | `type` | Work type | "article", "book", "dataset" |
-    | `language` | ISO language code | "en", "de", "fr" |
-    | `is_oa` | Open access status | TRUE, FALSE |
-    | `oa_status` | OA type | "gold", "green", "hybrid", "bronze" |
-    | `from_cited_by_count` | Minimum citations | 100 |
-    | `to_cited_by_count` | Maximum citations | 1000 |
-    | `doi` | Digital Object Identifier | "10.1234/example" |
-    | `openalex` | OpenAlex ID | "W2741809807" |
-    | `author.id` | Author OpenAlex ID | "A2208157607" |
-    | `institutions.id` | Institution ID | "I4200000001" |
-    | `concepts.id` | Concept ID | "C119857082" |
-    | `cites` | Works that cite this ID | "W2741809807" |
-    | `cited_by` | Works cited by this ID | "W2741809807" |
+Use
+[`opt_filter_names()`](https://rkrug.github.io/openalexPro/reference/opt_filter_names.md)
+to see all available filters.
 
-    Use `opt_filter_names()` to see all available filters.
+## Advanced Features
 
-    # Advanced Features
+### Grouping (Facets)
 
-    ## Grouping (Facets)
+Use `group_by` to get aggregate counts instead of individual records:
 
-    Use `group_by` to get aggregate counts instead of individual records:
-
-
-    ::: {.cell}
-
-    ```{.r .cell-code}
-    url <- pro_query(
-      entity = "works",
-      search = "artificial intelligence",
-      group_by = "publication_year"
-    )
-    # Returns counts per year instead of individual works
-
-:::
+``` r
+url <- pro_query(
+  entity = "works",
+  search = "artificial intelligence",
+  group_by = "publication_year"
+)
+# Returns counts per year instead of individual works
+```
 
 #### Grouping Options
 
-| Group By           | Description          |
-|--------------------|----------------------|
-| `publication_year` | Count by year        |
-| `type`             | Count by work type   |
-| `oa_status`        | Count by OA status   |
-| `language`         | Count by language    |
-| `is_oa`            | Count by open access |
+| Group By                      | Description          |
+|-------------------------------|----------------------|
+| `publication_year`            | Count by year        |
+| `type`                        | Count by work type   |
+| `oa_status`                   | Count by OA status   |
+| `language`                    | Count by language    |
+| `is_oa`                       | Count by open access |
+| `authorships.institutions.id` | Count by institution |
+| `authorships.countries`       | Count by country     |
+| `primary_topic.id`            | Count by topic       |
+
+#### Response Structure
+
+A `group_by` query returns a list of groups rather than individual
+records. Each group has three fields:
+
+| Field              | Description                                     |
+|--------------------|-------------------------------------------------|
+| `key`              | The raw value (e.g. `"2023"`, an OpenAlex ID)   |
+| `key_display_name` | Human-readable name (e.g. `"2023"`, `"Nature"`) |
+| `count`            | Number of entities in this group                |
+
+The API returns at most 200 groups per page.
+
+#### Including Unknown Values
+
+By default, entities with no value for the grouped field are hidden.
+Append `:include_unknown` to expose them as a separate group with
+`key = "unknown"`:
+
+``` r
+# Count works by OA status, including works with unknown status
+url <- pro_query(
+  entity = "works",
+  search = "climate change",
+  group_by = "oa_status:include_unknown"
+)
+```
 
 ### Additional Options
 
@@ -393,6 +557,75 @@ pro_query(
   options = list(sort = "relevance_score:desc")
 )
 ```
+
+#### XPAC — Expansion Pack Works
+
+OpenAlex XPAC (“expansion pack”) adds approximately 190 million
+additional works from DataCite and institutional/subject repositories to
+the standard ~278 million works, bringing the total to ~470 million.
+These works are excluded from API responses by default to avoid
+disrupting existing queries; they tend to have lower metadata quality
+than the standard corpus, though quality is improving over time.
+
+Enable XPAC by passing `include_xpac = TRUE` via the `options`
+parameter:
+
+``` r
+# Include XPAC works in results (~470 M total instead of ~278 M)
+url <- pro_query(
+  entity = "works",
+  search = "grey literature",
+  options = list(include_xpac = TRUE)
+)
+```
+
+To retrieve **only** XPAC works (excluding standard works), combine
+`include_xpac = TRUE` with the `is_xpac` filter:
+
+``` r
+# Query XPAC-only works (must also set include_xpac = TRUE)
+url <- pro_query(
+  entity = "works",
+  is_xpac = TRUE,
+  from_publication_date = "2024-01-01",
+  options = list(include_xpac = TRUE)
+)
+```
+
+XPAC works can be combined with any other filter or search mode,
+including semantic search:
+
+``` r
+# Semantic search across the full XPAC-inclusive corpus
+url <- pro_query(
+  entity = "works",
+  search.semantic = "institutional repository preprint data management",
+  options = list(include_xpac = TRUE)
+)
+```
+
+XPAC work IDs can be passed directly to
+[`pro_download_content()`](https://rkrug.github.io/openalexPro/reference/pro_download_content.md)
+— `include_xpac` is a discovery-phase parameter and is not needed at
+download time. To find XPAC works that also have downloadable full-text,
+combine the filters:
+
+``` r
+# Find XPAC works with PDFs, then download them
+urls <- pro_query(
+  entity          = "works",
+  has_content.pdf = TRUE,
+  is_xpac         = TRUE,
+  from_publication_date = "2024-01-01",
+  options = list(include_xpac = TRUE)
+)
+# After fetching and extracting IDs from the metadata:
+# result <- pro_download_content(ids = xpac_ids, format = "pdf")
+```
+
+See the [OpenAlex XPAC
+documentation](https://docs.openalex.org/how-to-use-the-api/xpac) for
+more details.
 
 ## Automatic Chunking
 
@@ -751,7 +984,7 @@ flowchart TD
         Entity[entity = "works"]
         ID[id = NULL or single ID]
         Search[search = "climate"]
-        Select[select = c"ids", "title"]
+        Select[select = c&#40;"ids", "title"&#41;]
         GroupBy[group_by = "year"]
         Options[options = list<br/>per_page = 200]
         Filters[... filters]
@@ -1001,39 +1234,40 @@ Constructs helpful error messages with fuzzy suggestions:
 try(pro_query(entity = "paper"))
 # Error: 'arg' should be one of "works", "authors", "venues",
 #        "institutions", "concepts", "publishers", "funders"
-``
-`
+```
+
 **Solution:** Use a valid entity name.
 
-### Invalid Filter Name
-```
+#### Invalid Filter Name
 
 ``` r
 try(pro_query(entity = "works", invalid_filter = "value"))
 # Error: Invalid filter name(s): invalid_filter.
-# Valid filter names are defined in `
-opt_filter_names()
-`.
-`
-``
-**Solution:** Check `opt_filter_names()` for valid filter names.
-
-### Invalid Select Field
+# Valid filter names are defined in `opt_filter_names()`.
 ```
+
+**Solution:** Check
+[`opt_filter_names()`](https://rkrug.github.io/openalexPro/reference/opt_filter_names.md)
+for valid filter names.
+
+#### Invalid Select Field
 
 ``` r
 try(pro_query(entity = "works", select = c("id", "titel")))
 # Error: Invalid select field(s): id, titel.
 # Did you mean: id → ids, titel → title?
 # Valid select fields are defined in `opt_select_fields()`.
-``
-`
-**Solution:** Use suggested corrections or check `opt_select_fields()`.
-
-### URL Too Long
-
-When a query URL exceeds ~4094 characters, the API returns an error. `pro_query()` prevents this through automatic chunking, but if you manually construct very long URLs:
 ```
+
+**Solution:** Use suggested corrections or check
+[`opt_select_fields()`](https://rkrug.github.io/openalexPro/reference/opt_select_fields.md).
+
+#### URL Too Long
+
+When a query URL exceeds ~4094 characters, the API returns an error.
+[`pro_query()`](https://rkrug.github.io/openalexPro/reference/pro_query.md)
+prevents this through automatic chunking, but if you manually construct
+very long URLs:
 
 ``` r
 # This would fail at the API level
@@ -1043,16 +1277,15 @@ very_long_url <- pro_query(
   chunk_limit = 1000 # Disabling chunking
 )
 # URL too long → API error
-`
-``
+```
+
 **Solution:** Use appropriate `chunk_limit` (default 50 works well).
 
-# Best Practices
+## Best Practices
 
-## 1. Always Use Field Selection
+### 1. Always Use Field Selection
 
 Reduce response size and improve performance:
-```
 
 ``` r
 # Good: Only request needed fields
@@ -1253,24 +1486,25 @@ with substantially higher rate limits can be obtained from the [OpenAlex
 website](https://openalex.org). Premium API access with even higher
 limits can also be purchased.
 
-`openalexPro` uses environment variables for credentials:
+`openalexPro` uses environment variables for credentials (recommended):
 
 ``` r
 # Set credentials (typically in your .Renviron file)
-Sys.setenv(openalexPro.email = "your.email@example.org")
 Sys.setenv(openalexPro.apikey = "your-api-key-here")
 
 # Validate your credentials
 pro_validate_credentials()
 ```
 
-Credentials are used by
-[`pro_request()`](https://rkrug.github.io/openalexPro/reference/pro_request.md)
-and
+Credentials are used by API-calling functions
+([`pro_request()`](https://rkrug.github.io/openalexPro/reference/pro_request.md),
 [`pro_count()`](https://rkrug.github.io/openalexPro/reference/pro_count.md),
-not by
+[`pro_fetch()`](https://rkrug.github.io/openalexPro/reference/pro_fetch.md),
+[`pro_download_content()`](https://rkrug.github.io/openalexPro/reference/pro_download_content.md))
+and are optional. If `api_key` is `NULL` or `""`, those functions call
+OpenAlex without authentication.
 [`pro_query()`](https://rkrug.github.io/openalexPro/reference/pro_query.md)
-itself (which only builds URLs).
+itself only builds URLs and does not require credentials.
 
 ## Integration with openalexPro Workflow
 
@@ -1372,7 +1606,7 @@ dbDisconnect(con)
 - [`opt_select_fields()`](https://rkrug.github.io/openalexPro/reference/opt_select_fields.md) -
   List available select fields
 - [`pro_validate_credentials()`](https://rkrug.github.io/openalexPro/reference/pro_validate_credentials.md) -
-  Validate API credentials
+  Validate API credentials (optional helper)
 - [`pro_count()`](https://rkrug.github.io/openalexPro/reference/pro_count.md) -
   Get count of results without downloading
 - [`pro_request()`](https://rkrug.github.io/openalexPro/reference/pro_request.md) -

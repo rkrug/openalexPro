@@ -14,7 +14,6 @@ pro_fetch(
   pages = 10000,
   project_folder = NULL,
   overwrite = FALSE,
-  mailto = Sys.getenv("openalexPro.email"),
   api_key = Sys.getenv("openalexPro.apikey"),
   workers = 1,
   verbose = FALSE,
@@ -48,13 +47,12 @@ pro_fetch(
 
   Logical. If `TRUE`, `output` will be deleted if it already exists.
 
-- mailto:
-
-  The email address of the user.
-
 - api_key:
 
-  The API key of the user.
+  Character string API key or `NULL`. Defaults to
+  `Sys.getenv("openalexPro.apikey")`. If `NULL` or `""`, requests are
+  sent without an API key (subject to OpenAlex's unauthenticated
+  limits).
 
 - workers:
 

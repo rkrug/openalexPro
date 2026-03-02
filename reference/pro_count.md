@@ -9,7 +9,6 @@ is requested and the first page is fetched to minimise API usage.
 ``` r
 pro_count(
   query_url,
-  mailto = Sys.getenv("openalexPro.email"),
   api_key = Sys.getenv("openalexPro.apikey"),
   error_log = NULL
 )
@@ -22,17 +21,12 @@ pro_count(
   Character string containing the fully constructed OpenAlex PRO
   endpoint URL.
 
-- mailto:
-
-  Character string used for the API \`mailto\` query parameter and the
-  request \`User-Agent\`. Defaults to the configured
-  \`Sys.getenv("openalexPro.email")\`.
-
 - api_key:
 
-  Either a character string API key or a function returning one.
-  Defaults to \`Sys.getenv("openalexPro.apikey")\`, and gracefully
-  handles \`NULL\` or lazy evaluation.
+  Character string API key or \`NULL\`. Defaults to
+  \`Sys.getenv("openalexPro.apikey")\`. If \`NULL\` or \`""\`, the
+  request is sent without an API key (subject to OpenAlex's
+  unauthenticated limits).
 
 - error_log:
 

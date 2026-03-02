@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">openalexPro</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -40,6 +40,8 @@
     <li><a class="dropdown-item" href="../articles/Workflow.html">Workflow Guide</a></li>
     <li><a class="dropdown-item" href="../articles/pro_query.html">`pro_query()` - Background and Technical Documentation</a></li>
     <li><a class="dropdown-item" href="../articles/pro_request.html">`pro_request()` - Background and Technical Documentation</a></li>
+    <li><a class="dropdown-item" href="../articles/snapshot_conversion.html">Snapshot Conversion: Schema Inference and Parquet Writing</a></li>
+    <li><a class="dropdown-item" href="../articles/snapshot.html">Working with OpenAlex Snapshots</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -63,7 +65,7 @@
 
 
 
-      <small class="dont-index">Source: <a href="https://github.com/rkrug/openalexPro/blob/v0.4.2/vignettes/Workflow.qmd" class="external-link"><code>vignettes/Workflow.qmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/rkrug/openalexPro/blob/main/vignettes/Workflow.qmd" class="external-link"><code>vignettes/Workflow.qmd</code></a></small>
       <div class="d-none name"><code></code></div>
     </div>
 
@@ -76,7 +78,94 @@
 </h2>
 <p>The <code>openalexPro</code> package enables downloading and processing large scholarly datasets from <a href="https://openalex.org" class="external-link">OpenAlex</a>. Unlike <code>openalexR</code> which processes everything in memory, <code>openalexPro</code> writes results to disk, enabling analysis of datasets too large to fit in RAM.</p>
 <p>Processing uses <a href="https://duckdb.org" class="external-link">DuckDB</a> for efficient queries without loading entire datasets into memory.</p>
-</section><section class="section level2"><h2 id="two-approaches">Two Approaches<a class="anchor" aria-label="anchor" href="#two-approaches"></a>
+</section><section class="section level2"><h2 id="architecture-overview">Architecture Overview<a class="anchor" aria-label="anchor" href="#architecture-overview"></a>
+</h2>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p>
+<figure class=""><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart TD
+    OA[("OpenAlex&lt;br/&gt;api.openalex.org · content.openalex.org")]
+    SNAP[("OpenAlex Snapshot&lt;br/&gt;bulk ndjson.gz")]
+
+    PQ["pro_query()&lt;br/&gt;build URL · validate filters · chunk IDs"]
+    PC["pro_count()"]
+    PRL["pro_rate_limit_status()&lt;br/&gt;pro_validate_credentials()"]
+
+    AC["api_call()  ·  internal helper&lt;br/&gt;retry · backoff · error handling"]
+
+    subgraph PF["pro_fetch()  —  convenience wrapper"]
+        PR["pro_request()&lt;br/&gt;download metadata pages → JSON"]
+        PRJ["pro_request_jsonl()&lt;br/&gt;JSON → JSONL&lt;br/&gt;reconstruct abstract · build citation"]
+        PRJP["pro_request_jsonl_parquet()&lt;br/&gt;JSONL → partitioned Parquet"]
+        PR --&gt; PRJ --&gt; PRJP
+    end
+
+    PDC["pro_download_content()&lt;br/&gt;download PDFs / TEI XML"]
+
+    STP["snapshot_to_parquet()"]
+    BCI["build_corpus_index()"]
+    LBI["lookup_by_id()&lt;br/&gt;snapshot_filter_ids()"]
+
+    OUT[("Parquet dataset&lt;br/&gt;read_corpus() · DuckDB · arrow")]
+    FILES[("PDF / TEI XML files&lt;br/&gt;on disk")]
+
+    OA &lt;--&gt; AC
+    PQ --&gt;|URL| PR
+    PQ --&gt;|URL| PC
+
+    PR -.-&gt;|via| AC
+    PDC -.-&gt;|via| AC
+    PRL -.-&gt;|via| AC
+    PC -.-&gt;|via| AC
+
+    PRJP --&gt; OUT
+    PDC --&gt; FILES
+
+    SNAP --&gt; STP --&gt; BCI --&gt; LBI --&gt; OUT
+
+    style OA    fill:#e3f2fd,stroke:#1565c0,stroke-width:2px
+    style SNAP  fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    style OUT   fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+    style FILES fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+    style AC    fill:#cce5ff,stroke:#0066cc,stroke-width:2px
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<table class="table caption-top">
+<colgroup>
+<col style="width: 47%">
+<col style="width: 52%">
+</colgroup>
+<thead><tr class="header">
+<th>Colour</th>
+<th>Meaning</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>Blue</td>
+<td>OpenAlex online resource</td>
+</tr>
+<tr class="even">
+<td>Orange</td>
+<td>OpenAlex Snapshot (local bulk input)</td>
+</tr>
+<tr class="odd">
+<td>Green</td>
+<td>Output data (Parquet dataset, PDF/XML files)</td>
+</tr>
+<tr class="even">
+<td>Light blue</td>
+<td>
+<code>api_call()</code> — internal HTTP helper shared by all API-calling functions</td>
+</tr>
+</tbody>
+</table></section><section class="section level2"><h2 id="two-approaches">Two Approaches<a class="anchor" aria-label="anchor" href="#two-approaches"></a>
 </h2>
 <p><code>openalexPro</code> offers two approaches depending on your needs:</p>
 <div class="cell" data-layout-align="default">
@@ -744,6 +833,59 @@
 <span></span>
 <span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbDisconnect.html" class="external-link">dbDisconnect</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span></code></pre></div>
 </div>
+</section><section class="level2"><h3 id="example-5-downloading-full-text-content">Example 5: Downloading Full-Text Content<a class="anchor" aria-label="anchor" href="#example-5-downloading-full-text-content"></a>
+</h3>
+<p>OpenAlex provides full-text PDFs (~60 M works) and Grobid TEI XML (~43 M works) via <code>content.openalex.org</code>. Use <code><a href="../reference/pro_download_content.html">pro_download_content()</a></code> to retrieve them. Each file costs <strong>$0.01</strong>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Step 1: find works that have a PDF available</span></span>
+<span><span class="va">url</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span></span>
+<span>  entity <span class="op">=</span> <span class="st">"works"</span>,</span>
+<span>  `has_content.pdf` <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  `best_oa_location.license` <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"cc-by"</span>, <span class="st">"cc-by-sa"</span><span class="op">)</span>,</span>
+<span>  from_publication_date <span class="op">=</span> <span class="st">"2023-01-01"</span>,</span>
+<span>  type <span class="op">=</span> <span class="st">"article"</span>,</span>
+<span>  select <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ids"</span>, <span class="st">"title"</span>, <span class="st">"publication_year"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Step 2: download metadata to get the work IDs</span></span>
+<span><span class="fu"><a href="../reference/pro_fetch.html">pro_fetch</a></span><span class="op">(</span></span>
+<span>  query_url <span class="op">=</span> <span class="va">url</span>,</span>
+<span>  project_folder <span class="op">=</span> <span class="st">"oa_works"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Step 3: read IDs from the parquet dataset</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r.duckdb.org/" class="external-link">duckdb</a></span><span class="op">)</span></span>
+<span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu"><a href="https://r.duckdb.org/reference/duckdb.html" class="external-link">duckdb</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">ids</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dbi.r-dbi.org/reference/dbGetQuery.html" class="external-link">dbGetQuery</a></span><span class="op">(</span></span>
+<span>  <span class="va">con</span>,</span>
+<span>  <span class="st">"SELECT id FROM read_parquet('oa_works/parquet/**/*.parquet')"</span></span>
+<span><span class="op">)</span><span class="op">$</span><span class="va">id</span></span>
+<span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbDisconnect.html" class="external-link">dbDisconnect</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Step 4: download full-text PDFs</span></span>
+<span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pro_download_content.html">pro_download_content</a></span><span class="op">(</span></span>
+<span>  ids     <span class="op">=</span> <span class="va">ids</span>,</span>
+<span>  output  <span class="op">=</span> <span class="st">"oa_works/pdfs"</span>,</span>
+<span>  format  <span class="op">=</span> <span class="st">"pdf"</span>,</span>
+<span>  workers <span class="op">=</span> <span class="fl">4</span>         <span class="co"># parallel downloads</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># results is a data frame: id | file | status | message</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">results</span><span class="op">$</span><span class="va">status</span><span class="op">)</span></span>
+<span><span class="co"># ok        not_found  error</span></span>
+<span><span class="co"># 892       45         3</span></span></code></pre></div>
+</div>
+<p><code><a href="../reference/pro_download_content.html">pro_download_content()</a></code> never aborts on partial failures — inspect the <code>status</code> column to identify any files that need retrying.</p>
+<p>For TEI XML (structured full text parsed by Grobid):</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">results_xml</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pro_download_content.html">pro_download_content</a></span><span class="op">(</span></span>
+<span>  ids    <span class="op">=</span> <span class="va">ids</span>,</span>
+<span>  output <span class="op">=</span> <span class="st">"oa_works/xml"</span>,</span>
+<span>  format <span class="op">=</span> <span class="st">"grobid-xml"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</div>
 </section></section><section class="section level2"><h2 id="data-pipeline-summary">Data Pipeline Summary<a class="anchor" aria-label="anchor" href="#data-pipeline-summary"></a>
 </h2>
 <div class="cell" data-layout-align="default">
@@ -860,8 +1002,18 @@
 </tr>
 <tr class="odd">
 <td><code><a href="../reference/pro_validate_credentials.html">pro_validate_credentials()</a></code></td>
-<td>Test credentials</td>
-<td>mailto, api_key</td>
+<td>Test credentials (optional helper)</td>
+<td>api_key</td>
+</tr>
+<tr class="even">
+<td><code><a href="../reference/pro_rate_limit_status.html">pro_rate_limit_status()</a></code></td>
+<td>Check rate limit usage &amp; remaining budget</td>
+<td>api_key, verbose</td>
+</tr>
+<tr class="odd">
+<td><code><a href="../reference/pro_download_content.html">pro_download_content()</a></code></td>
+<td>Download full-text PDFs or TEI XML</td>
+<td>ids, output, format, workers</td>
 </tr>
 </tbody>
 </table></section><section class="section level2"><h2 id="see-also">See Also<a class="anchor" aria-label="anchor" href="#see-also"></a>

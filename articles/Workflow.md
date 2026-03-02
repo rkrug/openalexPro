@@ -10,6 +10,63 @@ results to disk, enabling analysis of datasets too large to fit in RAM.
 Processing uses [DuckDB](https://duckdb.org) for efficient queries
 without loading entire datasets into memory.
 
+## Architecture Overview
+
+``` mermaid
+flowchart TD
+    OA[("OpenAlex<br/>api.openalex.org · content.openalex.org")]
+    SNAP[("OpenAlex Snapshot<br/>bulk ndjson.gz")]
+
+    PQ["pro_query()<br/>build URL · validate filters · chunk IDs"]
+    PC["pro_count()"]
+    PRL["pro_rate_limit_status()<br/>pro_validate_credentials()"]
+
+    AC["api_call()  ·  internal helper<br/>retry · backoff · error handling"]
+
+    subgraph PF["pro_fetch()  —  convenience wrapper"]
+        PR["pro_request()<br/>download metadata pages → JSON"]
+        PRJ["pro_request_jsonl()<br/>JSON → JSONL<br/>reconstruct abstract · build citation"]
+        PRJP["pro_request_jsonl_parquet()<br/>JSONL → partitioned Parquet"]
+        PR --> PRJ --> PRJP
+    end
+
+    PDC["pro_download_content()<br/>download PDFs / TEI XML"]
+
+    STP["snapshot_to_parquet()"]
+    BCI["build_corpus_index()"]
+    LBI["lookup_by_id()<br/>snapshot_filter_ids()"]
+
+    OUT[("Parquet dataset<br/>read_corpus() · DuckDB · arrow")]
+    FILES[("PDF / TEI XML files<br/>on disk")]
+
+    OA <--> AC
+    PQ -->|URL| PR
+    PQ -->|URL| PC
+
+    PR -.->|via| AC
+    PDC -.->|via| AC
+    PRL -.->|via| AC
+    PC -.->|via| AC
+
+    PRJP --> OUT
+    PDC --> FILES
+
+    SNAP --> STP --> BCI --> LBI --> OUT
+
+    style OA    fill:#e3f2fd,stroke:#1565c0,stroke-width:2px
+    style SNAP  fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    style OUT   fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+    style FILES fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+    style AC    fill:#cce5ff,stroke:#0066cc,stroke-width:2px
+```
+
+| Colour     | Meaning                                                                 |
+|------------|-------------------------------------------------------------------------|
+| Blue       | OpenAlex online resource                                                |
+| Orange     | OpenAlex Snapshot (local bulk input)                                    |
+| Green      | Output data (Parquet dataset, PDF/XML files)                            |
+| Light blue | `api_call()` — internal HTTP helper shared by all API-calling functions |
+
 ## Two Approaches
 
 `openalexPro` offers two approaches depending on your needs:
@@ -612,6 +669,67 @@ concept_counts <- dbGetQuery(
 dbDisconnect(con)
 ```
 
+### Example 5: Downloading Full-Text Content
+
+OpenAlex provides full-text PDFs (~60 M works) and Grobid TEI XML (~43 M
+works) via `content.openalex.org`. Use
+[`pro_download_content()`](https://rkrug.github.io/openalexPro/reference/pro_download_content.md)
+to retrieve them. Each file costs **\$0.01**.
+
+``` r
+# Step 1: find works that have a PDF available
+url <- pro_query(
+  entity = "works",
+  `has_content.pdf` = TRUE,
+  `best_oa_location.license` = c("cc-by", "cc-by-sa"),
+  from_publication_date = "2023-01-01",
+  type = "article",
+  select = c("ids", "title", "publication_year")
+)
+
+# Step 2: download metadata to get the work IDs
+pro_fetch(
+  query_url = url,
+  project_folder = "oa_works"
+)
+
+# Step 3: read IDs from the parquet dataset
+library(duckdb)
+con <- dbConnect(duckdb())
+ids <- dbGetQuery(
+  con,
+  "SELECT id FROM read_parquet('oa_works/parquet/**/*.parquet')"
+)$id
+dbDisconnect(con)
+
+# Step 4: download full-text PDFs
+results <- pro_download_content(
+  ids     = ids,
+  output  = "oa_works/pdfs",
+  format  = "pdf",
+  workers = 4         # parallel downloads
+)
+
+# results is a data frame: id | file | status | message
+table(results$status)
+# ok        not_found  error
+# 892       45         3
+```
+
+[`pro_download_content()`](https://rkrug.github.io/openalexPro/reference/pro_download_content.md)
+never aborts on partial failures — inspect the `status` column to
+identify any files that need retrying.
+
+For TEI XML (structured full text parsed by Grobid):
+
+``` r
+results_xml <- pro_download_content(
+  ids    = ids,
+  output = "oa_works/xml",
+  format = "grobid-xml"
+)
+```
+
 ## Data Pipeline Summary
 
 ``` mermaid
@@ -675,15 +793,17 @@ flowchart TD
 
 ## Function Quick Reference
 
-| Function                                                                                                    | Purpose                 | Key Parameters                    |
-|-------------------------------------------------------------------------------------------------------------|-------------------------|-----------------------------------|
-| [`pro_query()`](https://rkrug.github.io/openalexPro/reference/pro_query.md)                                 | Build API URL           | entity, search, filters, select   |
-| [`pro_count()`](https://rkrug.github.io/openalexPro/reference/pro_count.md)                                 | Get result count        | query_url                         |
-| [`pro_fetch()`](https://rkrug.github.io/openalexPro/reference/pro_fetch.md)                                 | **All-in-one download** | query_url, project_folder         |
-| [`pro_request()`](https://rkrug.github.io/openalexPro/reference/pro_request.md)                             | Download JSON           | query_url, output, pages, workers |
-| [`pro_request_jsonl()`](https://rkrug.github.io/openalexPro/reference/pro_request_jsonl.md)                 | Convert to JSONL        | input_json, output, workers       |
-| [`pro_request_jsonl_parquet()`](https://rkrug.github.io/openalexPro/reference/pro_request_jsonl_parquet.md) | Convert to Parquet      | input_jsonl, output, sample_size  |
-| [`pro_validate_credentials()`](https://rkrug.github.io/openalexPro/reference/pro_validate_credentials.md)   | Test credentials        | mailto, api_key                   |
+| Function                                                                                                    | Purpose                                   | Key Parameters                    |
+|-------------------------------------------------------------------------------------------------------------|-------------------------------------------|-----------------------------------|
+| [`pro_query()`](https://rkrug.github.io/openalexPro/reference/pro_query.md)                                 | Build API URL                             | entity, search, filters, select   |
+| [`pro_count()`](https://rkrug.github.io/openalexPro/reference/pro_count.md)                                 | Get result count                          | query_url                         |
+| [`pro_fetch()`](https://rkrug.github.io/openalexPro/reference/pro_fetch.md)                                 | **All-in-one download**                   | query_url, project_folder         |
+| [`pro_request()`](https://rkrug.github.io/openalexPro/reference/pro_request.md)                             | Download JSON                             | query_url, output, pages, workers |
+| [`pro_request_jsonl()`](https://rkrug.github.io/openalexPro/reference/pro_request_jsonl.md)                 | Convert to JSONL                          | input_json, output, workers       |
+| [`pro_request_jsonl_parquet()`](https://rkrug.github.io/openalexPro/reference/pro_request_jsonl_parquet.md) | Convert to Parquet                        | input_jsonl, output, sample_size  |
+| [`pro_validate_credentials()`](https://rkrug.github.io/openalexPro/reference/pro_validate_credentials.md)   | Test credentials (optional helper)        | api_key                           |
+| [`pro_rate_limit_status()`](https://rkrug.github.io/openalexPro/reference/pro_rate_limit_status.md)         | Check rate limit usage & remaining budget | api_key, verbose                  |
+| [`pro_download_content()`](https://rkrug.github.io/openalexPro/reference/pro_download_content.md)           | Download full-text PDFs or TEI XML        | ids, output, format, workers      |
 
 ## See Also
 

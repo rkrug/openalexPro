@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">openalexPro</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -40,6 +40,8 @@
     <li><a class="dropdown-item" href="../articles/Workflow.html">Workflow Guide</a></li>
     <li><a class="dropdown-item" href="../articles/pro_query.html">`pro_query()` - Background and Technical Documentation</a></li>
     <li><a class="dropdown-item" href="../articles/pro_request.html">`pro_request()` - Background and Technical Documentation</a></li>
+    <li><a class="dropdown-item" href="../articles/snapshot_conversion.html">Snapshot Conversion: Schema Inference and Parquet Writing</a></li>
+    <li><a class="dropdown-item" href="../articles/snapshot.html">Working with OpenAlex Snapshots</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -63,7 +65,7 @@
 
 
 
-      <small class="dont-index">Source: <a href="https://github.com/rkrug/openalexPro/blob/v0.4.2/vignettes/Quick_Start.qmd" class="external-link"><code>vignettes/Quick_Start.qmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/rkrug/openalexPro/blob/main/vignettes/Quick_Start.qmd" class="external-link"><code>vignettes/Quick_Start.qmd</code></a></small>
       <div class="d-none name"><code></code></div>
     </div>
 
@@ -125,22 +127,23 @@
 </div>
 </section><section class="section level2"><h2 id="setup-credentials">Setup Credentials<a class="anchor" aria-label="anchor" href="#setup-credentials"></a>
 </h2>
-<p>OpenAlex provides free API keys with higher rate limits. Get yours at <a href="https://openalex.org" class="external-link">openalex.org</a>.</p>
+<p>OpenAlex provides free API keys with higher rate limits. <code>openalexPro</code> can run without a key, but for anything beyond very small tests you should configure <code>openalexPro.apikey</code>. Get a key at <a href="https://openalex.org" class="external-link">openalex.org</a>.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Add to your .Renviron file (recommended)</span></span>
 <span><span class="co"># Run: usethis::edit_r_environ()</span></span>
 <span><span class="co"># Then add these lines:</span></span>
-<span><span class="co">#   openalexPro.email=your.email@example.org</span></span>
 <span><span class="co">#   openalexPro.apikey=your-api-key</span></span>
 <span></span>
 <span><span class="co"># Or set temporarily in your session:</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/Sys.setenv.html" class="external-link">Sys.setenv</a></span><span class="op">(</span>openalexPro.email <span class="op">=</span> <span class="st">"your.email@example.org"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Sys.setenv.html" class="external-link">Sys.setenv</a></span><span class="op">(</span>openalexPro.apikey <span class="op">=</span> <span class="st">"your-api-key"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Verify credentials work</span></span>
+<span><span class="co"># Verify credentials (TRUE if key works, FALSE if missing/invalid)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/rkrug/openalexPro" class="external-link">openalexPro</a></span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/pro_validate_credentials.html">pro_validate_credentials</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/pro_validate_credentials.html">pro_validate_credentials</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Check your current rate limit usage and remaining budget (key required)</span></span>
+<span><span class="fu"><a href="../reference/pro_rate_limit_status.html">pro_rate_limit_status</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
 </section><section class="section level2"><h2 id="quick-start-3-steps-to-data">Quick Start: 3 Steps to Data<a class="anchor" aria-label="anchor" href="#quick-start-3-steps-to-data"></a>
 </h2>
@@ -344,6 +347,10 @@
 </ul></section><section class="section level2"><h2 id="function-reference">Function Reference<a class="anchor" aria-label="anchor" href="#function-reference"></a>
 </h2>
 <table class="table caption-top">
+<colgroup>
+<col style="width: 52%">
+<col style="width: 47%">
+</colgroup>
 <thead><tr class="header">
 <th>Function</th>
 <th>Purpose</th>
@@ -366,10 +373,14 @@
 <td>Test your API credentials</td>
 </tr>
 <tr class="odd">
+<td><code><a href="../reference/pro_rate_limit_status.html">pro_rate_limit_status()</a></code></td>
+<td>Check current rate limit usage and remaining budget</td>
+</tr>
+<tr class="even">
 <td><code><a href="../reference/opt_filter_names.html">opt_filter_names()</a></code></td>
 <td>List available filter names</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code><a href="../reference/opt_select_fields.html">opt_select_fields()</a></code></td>
 <td>List available select fields</td>
 </tr>

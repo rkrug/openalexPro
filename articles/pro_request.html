@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">openalexPro</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.4.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -40,6 +40,8 @@
     <li><a class="dropdown-item" href="../articles/Workflow.html">Workflow Guide</a></li>
     <li><a class="dropdown-item" href="../articles/pro_query.html">`pro_query()` - Background and Technical Documentation</a></li>
     <li><a class="dropdown-item" href="../articles/pro_request.html">`pro_request()` - Background and Technical Documentation</a></li>
+    <li><a class="dropdown-item" href="../articles/snapshot_conversion.html">Snapshot Conversion: Schema Inference and Parquet Writing</a></li>
+    <li><a class="dropdown-item" href="../articles/snapshot.html">Working with OpenAlex Snapshots</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -64,7 +66,7 @@
 
 
 
-      <small class="dont-index">Source: <a href="https://github.com/rkrug/openalexPro/blob/v0.4.2/vignettes/pro_request.qmd" class="external-link"><code>vignettes/pro_request.qmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/rkrug/openalexPro/blob/main/vignettes/pro_request.qmd" class="external-link"><code>vignettes/pro_request.qmd</code></a></small>
       <div class="d-none name"><code></code></div>
     </div>
 
@@ -86,11 +88,10 @@
 </ul></section><section class="section level2"><h2 id="authentication">Authentication<a class="anchor" aria-label="anchor" href="#authentication"></a>
 </h2>
 <p>OpenAlex offers limited API access without credentials. Free API keys with substantially higher rate limits can be obtained from the <a href="https://openalex.org" class="external-link">OpenAlex website</a>. Premium API access with even higher limits can also be purchased.</p>
-<p><code>openalexPro</code> uses environment variables for credentials:</p>
+<p><code>openalexPro</code> uses environment variables for credentials (recommended):</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Set credentials (typically in your .Renviron file)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/Sys.setenv.html" class="external-link">Sys.setenv</a></span><span class="op">(</span>openalexPro.email <span class="op">=</span> <span class="st">"your.email@example.org"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Sys.setenv.html" class="external-link">Sys.setenv</a></span><span class="op">(</span>openalexPro.apikey <span class="op">=</span> <span class="st">"your-api-key-here"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Validate your credentials</span></span>
@@ -102,8 +103,16 @@
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/pro_request.html">pro_request</a></span><span class="op">(</span></span>
 <span>  query_url <span class="op">=</span> <span class="va">url</span>,</span>
 <span>  output <span class="op">=</span> <span class="st">"data/json"</span>,</span>
-<span>  mailto <span class="op">=</span> <span class="st">"your.email@example.org"</span>,</span>
 <span>  api_key <span class="op">=</span> <span class="st">"your-api-key"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</div>
+<p>To force unauthenticated mode for a call, pass <code>api_key = NULL</code> (or <code>""</code>):</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/pro_request.html">pro_request</a></span><span class="op">(</span></span>
+<span>  query_url <span class="op">=</span> <span class="va">url</span>,</span>
+<span>  output <span class="op">=</span> <span class="st">"data/json"</span>,</span>
+<span>  api_key <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
 </section><section class="section level2"><h2 id="basic-usage">Basic Usage<a class="anchor" aria-label="anchor" href="#basic-usage"></a>
@@ -112,7 +121,7 @@
 </h3>
 <p>The most basic usage requires a query URL (from <code><a href="../reference/pro_query.html">pro_query()</a></code>) and an output directory:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/rkrug/openalexPro" class="external-link">openalexPro</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Build query</span></span>
@@ -132,7 +141,7 @@
 </h3>
 <p>To check how many results a query returns without downloading:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Get count for a single query</span></span>
 <span><span class="va">count</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pro_request.html">pro_request</a></span><span class="op">(</span></span>
 <span>  query_url <span class="op">=</span> <span class="va">url</span>,</span>
@@ -151,7 +160,7 @@
 </h3>
 <p>Progress bars are enabled by default:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/pro_request.html">pro_request</a></span><span class="op">(</span></span>
 <span>  query_url <span class="op">=</span> <span class="va">url</span>,</span>
 <span>  output <span class="op">=</span> <span class="st">"data/json"</span>,</span>
@@ -165,7 +174,7 @@
 </h3>
 <p>By default, <code><a href="../reference/pro_request.html">pro_request()</a></code> downloads up to 10,000 pages (2 million records at 200 per page). You can adjust this:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Download only first 100 pages (20,000 records)</span></span>
 <span><span class="fu"><a href="../reference/pro_request.html">pro_request</a></span><span class="op">(</span></span>
 <span>  query_url <span class="op">=</span> <span class="va">url</span>,</span>
@@ -184,7 +193,7 @@
 </h2>
 <p>When <code><a href="../reference/pro_query.html">pro_query()</a></code> returns a list of URLs (due to automatic chunking of large ID lists), <code><a href="../reference/pro_request.html">pro_request()</a></code> handles them seamlessly:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Query with many DOIs triggers automatic chunking</span></span>
 <span><span class="va">dois</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"10.1234/example"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">150</span><span class="op">)</span></span>
 <span><span class="va">urls</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pro_query.html">pro_query</a></span><span class="op">(</span>entity <span class="op">=</span> <span class="st">"works"</span>, doi <span class="op">=</span> <span class="va">dois</span><span class="op">)</span></span>
@@ -203,7 +212,7 @@
 </h3>
 <p>For chunked queries, enable parallel processing:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/pro_request.html">pro_request</a></span><span class="op">(</span></span>
 <span>  query_url <span class="op">=</span> <span class="va">urls</span>,</span>
 <span>  output <span class="op">=</span> <span class="st">"data/json"</span>,</span>
@@ -252,42 +261,36 @@
 <td>Delete existing output directory if it exists</td>
 </tr>
 <tr class="odd">
-<td><code>mailto</code></td>
-<td>character</td>
+<td><code>api_key</code></td>
+<td>character/NULL</td>
 <td>env var</td>
-<td>Email for API polite pool</td>
+<td>Optional API key. If <code>NULL</code> or <code>""</code>, requests are sent without key.</td>
 </tr>
 <tr class="even">
-<td><code>api_key</code></td>
-<td>character</td>
-<td>env var</td>
-<td>API key for authentication</td>
-</tr>
-<tr class="odd">
 <td><code>workers</code></td>
 <td>integer</td>
 <td>1</td>
 <td>Parallel workers for list queries</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>verbose</code></td>
 <td>logical</td>
 <td>FALSE</td>
 <td>Show detailed messages</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>progress</code></td>
 <td>logical</td>
 <td>TRUE</td>
 <td>Show progress bar</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>count_only</code></td>
 <td>logical</td>
 <td>FALSE</td>
 <td>Return count without downloading</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>error_log</code></td>
 <td>character/NULL</td>
 <td>NULL</td>
@@ -361,7 +364,7 @@
 
     DeleteDir --&gt; CreateDir
     CreateDir --&gt; CreateProgress[Create&lt;br/&gt;00_in.progress file]
-    CreateProgress --&gt; BuildRequest[Build httr2 request&lt;br/&gt;with credentials]
+    CreateProgress --&gt; BuildRequest[Build httr2 request&lt;br/&gt;api_key optional]
 
     BuildRequest --&gt; FirstRequest[First API call&lt;br/&gt;to inspect meta]
     FirstRequest --&gt; CheckSingle{Single record&lt;br/&gt;response?}
@@ -551,7 +554,7 @@
 </section><section class="level2"><h3 id="complete-example">Complete Example<a class="anchor" aria-label="anchor" href="#complete-example"></a>
 </h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/rkrug/openalexPro" class="external-link">openalexPro</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Step 1: Build query</span></span>
@@ -615,7 +618,7 @@
 </ol></section><section class="level2"><h3 id="function-signature">Function Signature<a class="anchor" aria-label="anchor" href="#function-signature"></a>
 </h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/pro_request_jsonl.html">pro_request_jsonl</a></span><span class="op">(</span></span>
 <span>  input_json <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  output <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -803,19 +806,19 @@
 </h4>
 <p>OpenAlex stores abstracts as inverted indices for efficiency. The transformation reconstructs readable text:</p>
 <p><strong>Input (inverted index):</strong></p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"abstract_inverted_index"</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"Climate"</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">0</span><span class="ot">]</span><span class="fu">,</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"change"</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">1</span><span class="ot">,</span> <span class="dv">5</span><span class="ot">]</span><span class="fu">,</span></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"affects"</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">2</span><span class="ot">]</span><span class="fu">,</span></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"biodiversity"</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">3</span><span class="ot">]</span><span class="fu">,</span></span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"and"</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">4</span><span class="ot">]</span></span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">}</span></span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
-<p><strong>Output (reconstructed):</strong></p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"abstract"</span><span class="fu">:</span> <span class="st">"Climate change affects biodiversity and change"</span></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"abstract_inverted_index"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"Climate"</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">0</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"change"</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">1</span><span class="ot">,</span> <span class="dv">5</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"affects"</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">2</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"biodiversity"</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">3</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"and"</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">4</span><span class="ot">]</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">}</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<p><strong>Output (reconstructed):</strong></p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"abstract"</span><span class="fu">:</span> <span class="st">"Climate change affects biodiversity and change"</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
 </section><section class="level3"><h4 id="citation-string-generation">Citation String Generation<a class="anchor" aria-label="anchor" href="#citation-string-generation"></a>
 </h4>
 <p>The function generates citation strings based on author count:</p>
@@ -856,7 +859,7 @@
 </ol></section><section class="level2"><h3 id="function-signature-1">Function Signature<a class="anchor" aria-label="anchor" href="#function-signature-1"></a>
 </h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/pro_request_jsonl_parquet.html">pro_request_jsonl_parquet</a></span><span class="op">(</span></span>
 <span>  input_jsonl <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  output <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -1047,7 +1050,7 @@
 <section class="level3"><h4 id="output-directory-exists">Output Directory Exists<a class="anchor" aria-label="anchor" href="#output-directory-exists"></a>
 </h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/pro_request.html">pro_request</a></span><span class="op">(</span>query_url <span class="op">=</span> <span class="va">url</span>, output <span class="op">=</span> <span class="st">"data/json"</span><span class="op">)</span></span>
 <span><span class="co"># Error: Directory data/json exists.</span></span>
 <span><span class="co"># Either specify `overwrite = TRUE` or delete it.</span></span>
@@ -1058,7 +1061,7 @@
 </section><section class="level3"><h4 id="no-output-specified">No Output Specified<a class="anchor" aria-label="anchor" href="#no-output-specified"></a>
 </h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/pro_request.html">pro_request</a></span><span class="op">(</span>query_url <span class="op">=</span> <span class="va">url</span><span class="op">)</span></span>
 <span><span class="co"># Error: No `output` specified!</span></span></code></pre></div>
 </div>
@@ -1069,11 +1072,18 @@
 <li>Use an API key (free from OpenAlex)</li>
 <li>Reduce parallel workers</li>
 <li>Add delays between large queries</li>
-</ol></section><section class="level3"><h4 id="request-size-exceeded">Request Size Exceeded<a class="anchor" aria-label="anchor" href="#request-size-exceeded"></a>
+</ol>
+<p>You can check your current budget and remaining allowance at any time with:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/pro_rate_limit_status.html">pro_rate_limit_status</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+</div>
+<p>This queries the <code>/rate-limit</code> endpoint and prints your daily budget, amount used, remaining balance, and seconds until the daily reset.</p>
+</section><section class="level3"><h4 id="request-size-exceeded">Request Size Exceeded<a class="anchor" aria-label="anchor" href="#request-size-exceeded"></a>
 </h4>
 <p>OpenAlex has a maximum request size of 4094 characters. If exceeded:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">meta</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pro_count.html">pro_count</a></span><span class="op">(</span>query_url <span class="op">=</span> <span class="va">very_long_url</span><span class="op">)</span></span>
 <span><span class="va">meta</span><span class="op">$</span><span class="va">count</span></span>
 <span><span class="co"># [1] -4195  # Negative indicates error</span></span>
@@ -1088,14 +1098,14 @@
 </h3>
 <p>Progress bars help monitor long downloads and estimate completion:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/pro_request.html">pro_request</a></span><span class="op">(</span><span class="va">url</span>, output <span class="op">=</span> <span class="st">"data"</span>, progress <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 </div>
 </section><section class="level2"><h3 id="use-appropriate-page-limits">2. Use Appropriate Page Limits<a class="anchor" aria-label="anchor" href="#use-appropriate-page-limits"></a>
 </h3>
 <p>Start with smaller page limits during development:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Development: small sample</span></span>
 <span><span class="fu"><a href="../reference/pro_request.html">pro_request</a></span><span class="op">(</span><span class="va">url</span>, output <span class="op">=</span> <span class="st">"test"</span>, pages <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span>
 <span></span>
@@ -1105,7 +1115,7 @@
 </section><section class="level2"><h3 id="enable-error-logging-for-large-jobs">3. Enable Error Logging for Large Jobs<a class="anchor" aria-label="anchor" href="#enable-error-logging-for-large-jobs"></a>
 </h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/pro_request.html">pro_request</a></span><span class="op">(</span></span>
 <span>  query_url <span class="op">=</span> <span class="va">urls</span>,</span>
 <span>  output <span class="op">=</span> <span class="st">"data/json"</span>,</span>
@@ -1116,7 +1126,7 @@
 </h3>
 <p>Use <code>delete_input = TRUE</code> to save disk space:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Convert and delete JSON</span></span>
 <span><span class="fu"><a href="../reference/pro_request_jsonl.html">pro_request_jsonl</a></span><span class="op">(</span></span>
 <span>  input_json <span class="op">=</span> <span class="st">"data/json"</span>,</span>
@@ -1135,7 +1145,7 @@
 </h3>
 <p>More workers isn’t always better:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Good for many small chunks</span></span>
 <span><span class="fu"><a href="../reference/pro_request.html">pro_request</a></span><span class="op">(</span><span class="va">urls</span>, output <span class="op">=</span> <span class="st">"data"</span>, workers <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span>
 <span></span>
@@ -1150,7 +1160,9 @@
 <li>
 <code><a href="../reference/pro_count.html">pro_count()</a></code> - Get result counts without downloading</li>
 <li>
-<code><a href="../reference/pro_validate_credentials.html">pro_validate_credentials()</a></code> - Validate API credentials</li>
+<code><a href="../reference/pro_validate_credentials.html">pro_validate_credentials()</a></code> - Validate API credentials (optional helper)</li>
+<li>
+<code><a href="../reference/pro_rate_limit_status.html">pro_rate_limit_status()</a></code> - Check current rate limit usage and remaining budget</li>
 <li>
 <code><a href="../reference/opt_filter_names.html">opt_filter_names()</a></code> - List available filter names</li>
 <li>

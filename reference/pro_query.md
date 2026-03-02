@@ -12,6 +12,8 @@ pro_query(
     "funders"),
   id = NULL,
   search = NULL,
+  search.exact = NULL,
+  search.semantic = NULL,
   group_by = NULL,
   select = NULL,
   options = NULL,
@@ -36,7 +38,24 @@ pro_query(
 
 - search:
 
-  Optional full-text search string.
+  Optional full-text search string. Applies stemming and stop-word
+  removal. Supports boolean operators (`AND`, `OR`, `NOT` in uppercase),
+  quoted phrases (`"exact phrase"`), proximity (`"word1 word2"~N`),
+  wildcards (`*`, `?`), and fuzzy matching (`term~N`). Replaces the
+  deprecated `filter = field.search:keyword` syntax.
+
+- search.exact:
+
+  Optional full-text search without stemming or stop-word removal.
+  Supports the same boolean/phrase/wildcard syntax as `search`. Use when
+  you need to match exact word forms (e.g. `"surgery"` should not match
+  `"surgical"`).
+
+- search.semantic:
+
+  Optional semantic (AI-powered) search string. Uses embeddings to match
+  conceptual meaning rather than exact keywords. Limited to 1 request
+  per second and returns at most 50 results per query.
 
 - group_by:
 
@@ -79,6 +98,34 @@ If multiple more then 50 \`doi\` or openalex \`id\`s are provided, the
 request is automatically split into chunks of 50 and a named list of
 URLs is returned.
 
+## Search syntax
+
+All three search parameters (`search`, `search.exact`,
+`search.semantic`) accept a query string. For `search` and
+`search.exact`, the following syntax is supported:
+
+- Boolean: `biodiversity AND finance`, `climate OR weather`,
+  `ocean NOT pollution` (operators must be uppercase).
+
+- Exact phrase: `"biodiversity finance"` (double quotes).
+
+- Proximity: `"biodiversity finance"~5` (words within 5 positions).
+
+- Wildcard: `bio*` (zero or more characters), `organi?ation`.
+
+- Fuzzy: `biodiversty~1` (allows 1 character edit).
+
+`search.semantic` does not use keyword syntax; pass a natural-language
+phrase or even a full abstract. It returns at most 50 results per call.
+
+## Deprecated search filters
+
+Filter arguments with a `.search` suffix (e.g.
+`title_and_abstract.search = "biodiversity"`) are deprecated by the
+OpenAlex API. They still work but emit a warning. Use the `search`,
+`search.exact`, or `search.semantic` parameters instead. See
+<https://developers.openalex.org/guides/searching> for details.
+
 ## Examples
 
 ``` r
@@ -90,8 +137,7 @@ req <- oa_build_req(
   from_publication_date = "2020-01-01",
   language = c("en","de"),
   select = c("id","title","publication_year"),
-  options = list(per_page = 5),
-  mailto = "you@example.org"
+  options = list(per_page = 5)
 )
 # resp <- api_call(req)
 # httr2::resp_body_json(resp)
