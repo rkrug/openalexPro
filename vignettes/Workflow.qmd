@@ -29,6 +29,63 @@ The `openalexPro` package enables downloading and processing large scholarly dat
 
 Processing uses [DuckDB](https://duckdb.org) for efficient queries without loading entire datasets into memory.
 
+# Architecture Overview
+
+```{mermaid}
+flowchart TD
+    OA[("OpenAlex<br/>api.openalex.org · content.openalex.org")]
+    SNAP[("OpenAlex Snapshot<br/>bulk ndjson.gz")]
+
+    PQ["pro_query()<br/>build URL · validate filters · chunk IDs"]
+    PC["pro_count()"]
+    PRL["pro_rate_limit_status()<br/>pro_validate_credentials()"]
+
+    AC["api_call()  ·  internal helper<br/>retry · backoff · error handling"]
+
+    subgraph PF["pro_fetch()  —  convenience wrapper"]
+        PR["pro_request()<br/>download metadata pages → JSON"]
+        PRJ["pro_request_jsonl()<br/>JSON → JSONL<br/>reconstruct abstract · build citation"]
+        PRJP["pro_request_jsonl_parquet()<br/>JSONL → partitioned Parquet"]
+        PR --> PRJ --> PRJP
+    end
+
+    PDC["pro_download_content()<br/>download PDFs / TEI XML"]
+
+    STP["snapshot_to_parquet()"]
+    BCI["build_corpus_index()"]
+    LBI["lookup_by_id()<br/>snapshot_filter_ids()"]
+
+    OUT[("Parquet dataset<br/>read_corpus() · DuckDB · arrow")]
+    FILES[("PDF / TEI XML files<br/>on disk")]
+
+    OA <--> AC
+    PQ -->|URL| PR
+    PQ -->|URL| PC
+
+    PR -.->|via| AC
+    PDC -.->|via| AC
+    PRL -.->|via| AC
+    PC -.->|via| AC
+
+    PRJP --> OUT
+    PDC --> FILES
+
+    SNAP --> STP --> BCI --> LBI --> OUT
+
+    style OA    fill:#e3f2fd,stroke:#1565c0,stroke-width:2px
+    style SNAP  fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    style OUT   fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+    style FILES fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+    style AC    fill:#cce5ff,stroke:#0066cc,stroke-width:2px
+```
+
+| Colour | Meaning |
+|--------|---------|
+| Blue | OpenAlex online resource |
+| Orange | OpenAlex Snapshot (local bulk input) |
+| Green | Output data (Parquet dataset, PDF/XML files) |
+| Light blue | `api_call()` — internal HTTP helper shared by all API-calling functions |
+
 # Two Approaches
 
 `openalexPro` offers two approaches depending on your needs:
