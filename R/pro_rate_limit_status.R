@@ -8,7 +8,7 @@
 #' @return Invisibly, the parsed JSON list with all rate limit fields; \code{FALSE}
 #'   if the API key is missing or invalid; or \code{NULL} if the request failed due
 #'   to a network error.
-#' @importFrom httr2 req_user_agent
+#' @importFrom httr2 request req_url_query req_user_agent resp_status resp_body_json
 #' @export
 pro_rate_limit_status <- function(
   api_key = Sys.getenv("openalexPro.apikey"),
@@ -23,14 +23,14 @@ pro_rate_limit_status <- function(
     return(invisible(FALSE))
   }
 
+  req <- httr2::request("https://api.openalex.org/rate-limit") |>
+    httr2::req_url_query(api_key = api_key) |>
+    httr2::req_user_agent(paste0("openalexPro/", utils::packageVersion("openalexPro")))
+
   resp <- tryCatch(
-    httr2::request("https://api.openalex.org/rate-limit") |>
-      httr2::req_url_query(api_key = api_key) |>
-      httr2::req_user_agent(paste0("openalexPro/", utils::packageVersion("openalexPro"))) |>
-      httr2::req_error(is_error = function(resp) FALSE) |>
-      httr2::req_perform(),
+    suppressMessages(api_call(req, get_html_response = NULL)),
     error = function(e) {
-      message("Request failed: ", e$message)
+      message("Request failed: ", conditionMessage(e))
       NULL
     }
   )

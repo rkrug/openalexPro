@@ -67,10 +67,22 @@
 #' works <- pro_request(urls, output = tempdir())
 #' # ... extract IDs from works data, then:
 #' result <- pro_download_content(ids = work_ids, format = "pdf", workers = 4)
+#'
+#' # XPAC works: discover via pro_query() with include_xpac = TRUE, then download
+#' # (pro_download_content() works with any valid OpenAlex ID, including XPAC IDs)
+#' urls_xpac <- pro_query(
+#'   entity          = "works",
+#'   has_content.pdf = TRUE,
+#'   from_publication_date = "2023-01-01",
+#'   options = list(include_xpac = TRUE, per_page = 10)
+#' )
+#' works_xpac <- pro_request(urls_xpac, output = tempdir())
+#' # ... extract IDs from works_xpac data, then:
+#' result_xpac <- pro_download_content(ids = xpac_ids, format = "pdf", workers = 4)
 #' }
 #'
 #' @export
-#' @importFrom httr2 request req_url_query req_perform req_retry req_error
+#' @importFrom httr2 request req_url_query req_user_agent req_perform
 #'   resp_body_raw resp_body_string resp_status
 #' @importFrom future plan multisession sequential
 #' @importFrom future.apply future_lapply
@@ -133,13 +145,9 @@ pro_download_content <- function(
         result <- tryCatch({
           req <- httr2::request(url) |>
             httr2::req_url_query(api_key = api_key) |>
-            httr2::req_retry(
-              max_tries = 5,
-              is_transient = \(resp) httr2::resp_status(resp) %in% c(429, 500, 502, 503, 504)
-            ) |>
-            httr2::req_error(is_error = \(resp) FALSE)  # handle errors manually
+            httr2::req_user_agent(paste0("openalexPro/", utils::packageVersion("openalexPro")))
 
-          resp <- httr2::req_perform(req)
+          resp <- suppressMessages(api_call(req, max_retries = 5, get_html_response = NULL))
           status_code <- httr2::resp_status(resp)
 
           if (status_code == 404L) {

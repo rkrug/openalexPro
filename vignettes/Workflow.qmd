@@ -630,6 +630,65 @@ concept_counts <- dbGetQuery(
 dbDisconnect(con)
 ```
 
+## Example 5: Downloading Full-Text Content
+
+OpenAlex provides full-text PDFs (~60 M works) and Grobid TEI XML (~43 M works)
+via `content.openalex.org`. Use `pro_download_content()` to retrieve them.
+Each file costs **$0.01**.
+
+```{r}
+# Step 1: find works that have a PDF available
+url <- pro_query(
+  entity = "works",
+  `has_content.pdf` = TRUE,
+  `best_oa_location.license` = c("cc-by", "cc-by-sa"),
+  from_publication_date = "2023-01-01",
+  type = "article",
+  select = c("ids", "title", "publication_year")
+)
+
+# Step 2: download metadata to get the work IDs
+pro_fetch(
+  query_url = url,
+  project_folder = "oa_works"
+)
+
+# Step 3: read IDs from the parquet dataset
+library(duckdb)
+con <- dbConnect(duckdb())
+ids <- dbGetQuery(
+  con,
+  "SELECT id FROM read_parquet('oa_works/parquet/**/*.parquet')"
+)$id
+dbDisconnect(con)
+
+# Step 4: download full-text PDFs
+results <- pro_download_content(
+  ids     = ids,
+  output  = "oa_works/pdfs",
+  format  = "pdf",
+  workers = 4         # parallel downloads
+)
+
+# results is a data frame: id | file | status | message
+table(results$status)
+# ok        not_found  error
+# 892       45         3
+```
+
+`pro_download_content()` never aborts on partial failures — inspect the
+`status` column to identify any files that need retrying.
+
+For TEI XML (structured full text parsed by Grobid):
+
+```{r}
+results_xml <- pro_download_content(
+  ids    = ids,
+  output = "oa_works/xml",
+  format = "grobid-xml"
+)
+```
+
 # Data Pipeline Summary
 
 ```{mermaid}
@@ -703,6 +762,7 @@ flowchart TD
 | `pro_request_jsonl_parquet()` | Convert to Parquet | input_jsonl, output, sample_size |
 | `pro_validate_credentials()` | Test credentials | api_key |
 | `pro_rate_limit_status()` | Check rate limit usage & remaining budget | api_key, verbose |
+| `pro_download_content()` | Download full-text PDFs or TEI XML | ids, output, format, workers |
 
 # See Also
 

@@ -134,9 +134,22 @@ url
 # [1] "https://api.openalex.org/works"
 ```
 
-## Full-Text Search
+## Search Modes
 
-Add a search term to perform full-text search across title, abstract, and full text:
+`pro_query()` supports three mutually exclusive search parameters, each with different
+matching behaviour and cost:
+
+| Parameter | Matching | Max results | Cost |
+|---|---|---|---|
+| `search` | Stemmed keyword (stop-words removed) | Unlimited | $0.0001/call |
+| `search.exact` | Unstemmed, supports boolean/phrase/wildcard | Unlimited | $0.0001/call |
+| `search.semantic` | AI embedding similarity | 50 per call | $0.001/call |
+
+### `search` — Standard Keyword Search
+
+Searches title, abstract, and full text with stemming and stop-word removal.
+Supports the same boolean/phrase syntax as `search.exact` but also applies stemming
+(e.g. "run" also matches "running", "ran"):
 
 ```{r}
 url <- pro_query(
@@ -146,6 +159,66 @@ url <- pro_query(
 url
 # [1] "https://api.openalex.org/works?search=climate%20change%20biodiversity"
 ```
+
+### `search.exact` — Unstemmed / Boolean Search
+
+Searches without stemming or stop-word removal. Supports:
+
+- Boolean operators: `AND`, `OR`, `NOT`
+- Quoted phrases: `"deep learning"`
+- Proximity: `"climate change"~5` (within 5 words)
+- Wildcards: `microbio*`
+
+```{r}
+# Exact phrase search
+url <- pro_query(
+  entity = "works",
+  search.exact = '"large language models" AND (safety OR alignment)'
+)
+
+# Wildcard — matches microbiology, microbiome, microbiota, …
+url <- pro_query(
+  entity = "works",
+  search.exact = "microbio*",
+  from_publication_date = "2020-01-01"
+)
+```
+
+### `search.semantic` — AI-Powered Similarity Search (Find Similar Works)
+
+Converts your query to a 1 024-dimension embedding and returns the most
+conceptually similar works — regardless of whether they share any keywords.
+This is OpenAlex's ["find similar works"](https://docs.openalex.org/how-to-use-the-api/find-similar-works) feature.
+
+**Constraints:**
+
+- Maximum **50 results** per call (the API hard-codes this).
+- Requires an API key (costs $0.001 per call).
+- Rate-limited to **1 request per second**.
+- Pass a sentence or short paragraph — not just a keyword.
+
+```{r}
+# Find works conceptually similar to an abstract or research question
+url <- pro_query(
+  entity = "works",
+  search.semantic = paste(
+    "Large language models trained on scientific text can assist researchers",
+    "in hypothesis generation and literature synthesis."
+  )
+)
+
+# Combine with filters to narrow the similarity search
+url <- pro_query(
+  entity = "works",
+  search.semantic = "CRISPR base editing for treating sickle cell disease",
+  from_publication_date = "2019-01-01",
+  type = "article",
+  select = c("ids", "title", "publication_year", "cited_by_count")
+)
+```
+
+> **Note:** Semantic search returns at most 50 results. For large-scale
+> retrieval, combine `search` or `search.exact` with `pro_fetch()`.
 
 ## Field Selection
 
@@ -175,7 +248,7 @@ opt_select_fields()
 
 ## Single Entity Retrieval
 
-Fetch a specific entity by ID:
+Fetch a specific entity by its OpenAlex ID:
 
 ```{r}
 url <- pro_query(
@@ -185,6 +258,64 @@ url <- pro_query(
 url
 # [1] "https://api.openalex.org/works/W2741809807"
 ```
+
+### External Identifiers
+
+You can use any identifier listed in an entity's `ids` field — not just the
+OpenAlex ID. The API accepts three formats:
+
+| Format | Example |
+|---|---|
+| Full URL | `https://doi.org/10.7717/peerj.4375` |
+| `namespace:value` | `doi:10.7717/peerj.4375` |
+| OpenAlex key | `W2741809807` |
+
+**Works** — DOI:
+
+```{r}
+# By DOI (full URL format)
+url <- pro_query(
+  entity = "works",
+  id = "https://doi.org/10.7717/peerj.4375"
+)
+
+# By DOI (namespace format)
+url <- pro_query(
+  entity = "works",
+  id = "doi:10.7717/peerj.4375"
+)
+```
+
+**Authors** — ORCID:
+
+```{r}
+url <- pro_query(
+  entity = "authors",
+  id = "orcid:0000-0003-1613-5981"
+)
+```
+
+**Institutions** — ROR:
+
+```{r}
+url <- pro_query(
+  entity = "institutions",
+  id = "ror:02mhbdp94"  # MIT
+)
+```
+
+**Sources (journals)** — ISSN:
+
+```{r}
+url <- pro_query(
+  entity = "sources",
+  id = "issn:0028-0836"  # Nature
+)
+```
+
+> **Tip:** For bulk lookup of multiple DOIs or IDs, use a filter (`doi = c(...)`)
+> rather than the `id` parameter — `pro_query()` will automatically chunk them
+> into batches of up to 50.
 
 # Filtering
 
@@ -360,6 +491,37 @@ url <- pro_query(
 | `oa_status` | Count by OA status |
 | `language` | Count by language |
 | `is_oa` | Count by open access |
+| `authorships.institutions.id` | Count by institution |
+| `authorships.countries` | Count by country |
+| `primary_topic.id` | Count by topic |
+
+### Response Structure
+
+A `group_by` query returns a list of groups rather than individual records.
+Each group has three fields:
+
+| Field | Description |
+|---|---|
+| `key` | The raw value (e.g. `"2023"`, an OpenAlex ID) |
+| `key_display_name` | Human-readable name (e.g. `"2023"`, `"Nature"`) |
+| `count` | Number of entities in this group |
+
+The API returns at most 200 groups per page.
+
+### Including Unknown Values
+
+By default, entities with no value for the grouped field are hidden.
+Append `:include_unknown` to expose them as a separate group with
+`key = "unknown"`:
+
+```{r}
+# Count works by OA status, including works with unknown status
+url <- pro_query(
+  entity = "works",
+  search = "climate change",
+  group_by = "oa_status:include_unknown"
+)
+```
 
 ## Additional Options
 
@@ -404,6 +566,71 @@ pro_query(
   options = list(sort = "relevance_score:desc")
 )
 ```
+
+### XPAC — Expansion Pack Works
+
+OpenAlex XPAC ("expansion pack") adds approximately 190 million additional works
+from DataCite and institutional/subject repositories to the standard ~278 million
+works, bringing the total to ~470 million. These works are excluded from API
+responses by default to avoid disrupting existing queries; they tend to have lower
+metadata quality than the standard corpus, though quality is improving over time.
+
+Enable XPAC by passing `include_xpac = TRUE` via the `options` parameter:
+
+```{r}
+# Include XPAC works in results (~470 M total instead of ~278 M)
+url <- pro_query(
+  entity = "works",
+  search = "grey literature",
+  options = list(include_xpac = TRUE)
+)
+```
+
+To retrieve **only** XPAC works (excluding standard works), combine
+`include_xpac = TRUE` with the `is_xpac` filter:
+
+```{r}
+# Query XPAC-only works (must also set include_xpac = TRUE)
+url <- pro_query(
+  entity = "works",
+  is_xpac = TRUE,
+  from_publication_date = "2024-01-01",
+  options = list(include_xpac = TRUE)
+)
+```
+
+XPAC works can be combined with any other filter or search mode, including
+semantic search:
+
+```{r}
+# Semantic search across the full XPAC-inclusive corpus
+url <- pro_query(
+  entity = "works",
+  search.semantic = "institutional repository preprint data management",
+  options = list(include_xpac = TRUE)
+)
+```
+
+XPAC work IDs can be passed directly to `pro_download_content()` —
+`include_xpac` is a discovery-phase parameter and is not needed at download
+time. To find XPAC works that also have downloadable full-text, combine the
+filters:
+
+```{r}
+# Find XPAC works with PDFs, then download them
+urls <- pro_query(
+  entity          = "works",
+  has_content.pdf = TRUE,
+  is_xpac         = TRUE,
+  from_publication_date = "2024-01-01",
+  options = list(include_xpac = TRUE)
+)
+# After fetching and extracting IDs from the metadata:
+# result <- pro_download_content(ids = xpac_ids, format = "pdf")
+```
+
+See the [OpenAlex XPAC documentation](https://docs.openalex.org/how-to-use-the-api/xpac)
+for more details.
 
 # Automatic Chunking
 

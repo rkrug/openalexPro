@@ -33,6 +33,15 @@
   clause from a set of JSON/NDJSON files via per-file `DESCRIBE` queries with
   type-widening and optional two-level disk caching (`schema_cache_dir`).
 
+## Internal Changes
+
+* `pro_rate_limit_status()` and `pro_download_content()` now route their HTTP
+  requests through the internal `api_call()` helper, unifying retry logic and
+  error handling across all real API call sites. `suppressMessages()` is used
+  to suppress `api_call()`'s internal logging so each function emits its own
+  user-facing messages. `pro_download_content()` now also sends a `User-Agent`
+  header (previously omitted).
+
 ## Deprecations
 
 * Filter arguments with a `.search` suffix (e.g. `title_and_abstract.search = "..."`)

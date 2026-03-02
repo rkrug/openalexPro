@@ -25,11 +25,9 @@ status function.
   - Network/connection error (caught by `tryCatch`) → message "Request failed …",
     return `NULL` invisibly.
   - Missing key (empty string) → message with setup instructions, return `FALSE`.
-- Deliberately does **not** go through `api_call()`: that helper emits its own
-  warning messages on non-200 responses and applies retry logic that is
-  inappropriate for auth errors.
-- Added `@importFrom httr2 req_user_agent`; all other needed httr2 symbols were
-  already in NAMESPACE.
+- *(Updated 2026-03-02)* Now goes through `api_call(get_html_response = NULL)`
+  wrapped in `suppressMessages()` — see the refactor entry below for rationale.
+- `@importFrom httr2` updated to drop `req_error` (now handled inside `api_call`).
 
 **Refactor:** `pro_validate_credentials()` now calls
 `pro_rate_limit_status(api_key = api_key, verbose = FALSE)` and checks
@@ -46,6 +44,49 @@ error via `local_mocked_bindings`. 13 assertions, all green.
 `tests/testthat/test-015-pro_rate_limit_status.R`,
 `tests/fixtures/vcr/pro_rate_limit_status_200.yml`,
 `tests/fixtures/vcr/pro_rate_limit_status_401.yml`
+
+---
+
+## 2026-03-02 — Unify API calls through `api_call()`; document XPAC
+
+**Background:** Two functions (`pro_rate_limit_status` and `pro_download_content`)
+were building their own httr2 pipelines with inline `req_retry()` and `req_error()`
+calls, duplicating logic already centralised in `api_call()`. A separate set of
+documentation gaps was identified around OpenAlex XPAC support.
+
+**API call unification:**
+
+- Both functions now call `api_call(req, ..., get_html_response = NULL)`.
+  `get_html_response = NULL` tells `api_call` to return (not abort) for all
+  non-200 responses; the caller then inspects the status code itself.
+- `suppressMessages()` wraps the `api_call()` call so the helper's internal
+  logging (`"⚠ HTTP 401 - returning response for caller inspection"`, etc.) is
+  suppressed; each function emits its own user-facing messages instead.
+- `pro_download_content()` gains a `User-Agent` header (was previously missing).
+- `pro_download_content()` passes `max_retries = 5` (matching its previous
+  `req_retry(max_tries = 5)`); `transient_responses` defaults are identical.
+- `pro_rate_limit_status()`'s `tryCatch` catches `rlang::abort` thrown by
+  `api_call()` on network errors, returning `NULL` as before.
+- 32 tests (014 + 015) all green after the refactor.
+
+**Key insight — `get_html_response = NULL` vs missing:**
+`api_call()` uses R's `missing()` to detect whether the argument was provided.
+Passing `NULL` explicitly selects "return all non-200 responses"; omitting the
+argument entirely selects "abort on all non-200". This is the correct mode for
+both of these callers.
+
+**XPAC documentation:**
+
+- Added `### XPAC — Expansion Pack Works` subsection to `vignettes/pro_query.qmd`
+  under `## Additional Options`. Explains what XPAC is, how to enable it via
+  `options = list(include_xpac = TRUE)`, how to filter for XPAC-only works with
+  `is_xpac = TRUE`, and how to chain discovery into `pro_download_content()`.
+  No code changes needed — the `options` parameter already splices arbitrary
+  query parameters via `httr2::req_url_query(req, !!!q)`.
+- Added XPAC example to `pro_download_content()` `@examples` roxygen block.
+
+**Key files:** `R/pro_rate_limit_status.R`, `R/pro_download_content.R`,
+`vignettes/pro_query.qmd`
 
 ---
 
