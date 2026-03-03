@@ -1,5 +1,11 @@
 # openalexPro (development)
 
+# openalexPro 0.6.1
+
+## Bug Fixes
+* Manual add the `id` field to the `opt_select_names()` as it is missing from the returned 
+  list from OpenAlex
+  
 ## Changes
 
 * Normalized `api_key` handling across API-calling functions:
