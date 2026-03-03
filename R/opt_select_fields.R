@@ -24,6 +24,15 @@ opt_select_fields <- function(update = FALSE) {
 
     select <- select[[1]][-1]
 
+    ## <<
+    ## This is to make sure that `id` is in the filter list, which it is not at the moment, but always present.
+
+    if (!("id" %in% select)) {
+      select <- c("id", select)
+    }
+
+    ## >>
+
     oao <- getOption("openalexPro")
     if (is.null(oao)) {
       oao <- list(
