@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">openalexPro</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.6.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -38,9 +38,28 @@
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Changelog</h1>
-      <small>Source: <a href="https://github.com/rkrug/openalexPro/blob/v0.6.0/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
+      <small>Source: <a href="https://github.com/rkrug/openalexPro/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.6.1" id="openalexpro-061">openalexPro 0.6.1<a class="anchor" aria-label="anchor" href="#openalexpro-061"></a></h2>
+<div class="section level3">
+<h3 id="bug-fixes-0-6-1">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-6-1"></a></h3>
+<ul><li>Manual add the <code>id</code> field to the <code>opt_select_names()</code> as it is missing from the returned list from OpenAlex</li>
+</ul></div>
+<div class="section level3">
+<h3 id="changes-0-6-1">Changes<a class="anchor" aria-label="anchor" href="#changes-0-6-1"></a></h3>
+<ul><li><p>Normalized <code>api_key</code> handling across API-calling functions: <code><a href="../reference/pro_request.html">pro_request()</a></code>, <code><a href="../reference/pro_fetch.html">pro_fetch()</a></code>, <code><a href="../reference/pro_count.html">pro_count()</a></code>, and <code><a href="../reference/pro_download_content.html">pro_download_content()</a></code> now accept <code>api_key = NULL</code> or <code>api_key = ""</code>. In that case, requests are sent without an API key (subject to OpenAlex’s unauthenticated limits).</p></li>
+<li><p>Added explicit <code>api_key</code> type validation in API-calling functions. Accepted inputs are now limited to <code>NULL</code> or a length-1 character string.</p></li>
+<li><p>Updated <code><a href="../reference/pro_rate_limit_status.html">pro_rate_limit_status()</a></code> to handle <code>api_key = NULL</code> safely (informational message + <code>FALSE</code> return), and aligned documentation.</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="testing-and-tooling-0-6-1">Testing and Tooling<a class="anchor" aria-label="anchor" href="#testing-and-tooling-0-6-1"></a></h3>
+<ul><li><p>Added opt-in live API contract tests (<code>tests/testthat/test-900-live_api_contracts.R</code>) gated by <code>OPENALEXPRO_LIVE_TESTS=true</code> and a non-dummy <code>openalexPro.apikey</code>.</p></li>
+<li><p>Added <code>inst/scripts/record_cassettes.R</code> and recording safeguards to prevent accidental re-recording with invalid credentials.</p></li>
+<li><p>Reduced warning noise in test runs by cleaning up deprecated-search warning handling and removing unused cassette hooks.</p></li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.6.0" id="openalexpro-060">openalexPro 0.6.0<a class="anchor" aria-label="anchor" href="#openalexpro-060"></a></h2>
 <div class="section level3">

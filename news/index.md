@@ -1,5 +1,45 @@
 # Changelog
 
+## openalexPro 0.6.1
+
+### Bug Fixes
+
+- Manual add the `id` field to the `opt_select_names()` as it is missing
+  from the returned list from OpenAlex
+
+### Changes
+
+- Normalized `api_key` handling across API-calling functions:
+  [`pro_request()`](https://rkrug.github.io/openalexPro/reference/pro_request.md),
+  [`pro_fetch()`](https://rkrug.github.io/openalexPro/reference/pro_fetch.md),
+  [`pro_count()`](https://rkrug.github.io/openalexPro/reference/pro_count.md),
+  and
+  [`pro_download_content()`](https://rkrug.github.io/openalexPro/reference/pro_download_content.md)
+  now accept `api_key = NULL` or `api_key = ""`. In that case, requests
+  are sent without an API key (subject to OpenAlex’s unauthenticated
+  limits).
+
+- Added explicit `api_key` type validation in API-calling functions.
+  Accepted inputs are now limited to `NULL` or a length-1 character
+  string.
+
+- Updated
+  [`pro_rate_limit_status()`](https://rkrug.github.io/openalexPro/reference/pro_rate_limit_status.md)
+  to handle `api_key = NULL` safely (informational message + `FALSE`
+  return), and aligned documentation.
+
+### Testing and Tooling
+
+- Added opt-in live API contract tests
+  (`tests/testthat/test-900-live_api_contracts.R`) gated by
+  `OPENALEXPRO_LIVE_TESTS=true` and a non-dummy `openalexPro.apikey`.
+
+- Added `inst/scripts/record_cassettes.R` and recording safeguards to
+  prevent accidental re-recording with invalid credentials.
+
+- Reduced warning noise in test runs by cleaning up deprecated-search
+  warning handling and removing unused cassette hooks.
+
 ## openalexPro 0.6.0
 
 ### New Features
