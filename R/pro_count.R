@@ -18,6 +18,8 @@
 #'
 #' @keywords internal
 #'
+#' @export
+#'
 #' @examples
 #' \dontrun{
 #' meta <- pro_count("https://api.openalex.org/works?filter=host_venue.id:V123")
@@ -28,10 +30,16 @@ pro_count <- function(
   api_key = Sys.getenv("openalexPro.apikey"),
   error_log = NULL
 ) {
-  if (is.null(api_key) || (is.character(api_key) && length(api_key) == 1 && !nzchar(api_key))) {
+  if (
+    is.null(api_key) ||
+      (is.character(api_key) && length(api_key) == 1 && !nzchar(api_key))
+  ) {
     api_key <- NULL
   } else if (!is.character(api_key) || length(api_key) != 1) {
-    stop("`api_key` must be NULL or a length-1 character string.", call. = FALSE)
+    stop(
+      "`api_key` must be NULL or a length-1 character string.",
+      call. = FALSE
+    )
   }
 
   query <- list(
