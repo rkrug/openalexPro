@@ -184,7 +184,7 @@ to discover downloadable works.
 [`pro_download_content()`](https://rkrug.github.io/openalexPro/reference/pro_download_content.md). -
 Accepts a character vector of work IDs (or full OpenAlex URLs,
 normalised). - Downloads via
-[`httr2::req_perform()`](https://rdrr.io/pkg/httr2/man/req_perform.html):
+[`httr2::req_perform()`](https://httr2.r-lib.org/reference/req_perform.html):
 PDF → `resp_body_raw()` +
 [`writeBin()`](https://rdrr.io/r/base/readBin.html); grobid-xml →
 `resp_body_string()` +
@@ -193,7 +193,7 @@ PDF → `resp_body_raw()` +
 frame (`id`, `file`, `status`, `message`) — never aborts on partial
 failures. - API key passed as `?api_key=` query parameter (same as all
 other functions). - Tests use
-[`httr2::with_mocked_responses()`](https://rdrr.io/pkg/httr2/man/with_mocked_responses.html)
+[`httr2::with_mocked_responses()`](https://httr2.r-lib.org/reference/with_mocked_responses.html)
 — no VCR cassettes needed.
 
 **Key file:** `R/pro_download_content.R`
