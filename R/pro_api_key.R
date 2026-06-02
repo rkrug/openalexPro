@@ -30,7 +30,7 @@
 #' \code{\link[base:Sys.getenv]{Sys.getenv}}
 #'
 #' @export
-pro_api_key = function() {
+pro_api_key <- function() {
   api_key <- opt_api_key()
   if (is.null(api_key)) {
     api_key <- Sys.getenv("openalexPro.api_key")

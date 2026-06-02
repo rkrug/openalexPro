@@ -3,19 +3,26 @@
 #' Extracts DOIs or specific DOI components (resolver, prefix, or suffix) from a character vector.
 #' Assumes that each element of `x` contains at most one DOI (with or without resolver).
 #'
-#' @param x A character vector potentially containing DOIs (e.g., raw DOIs, DOI URLs, or strings with embedded DOIs).
-#' @param non_doi_value Value to use for elements where no DOI or component is found. If `NULL`, only matched elements are returned.
-#' @param normalize Logical. If `TRUE` (default), convert extracted DOIs and suffixes to lowercase and trim surrounding whitespace. Has no effect for `what = "prefix"` or `what = "resolver"`.
+#' @param x A character vector potentially containing DOIs (e.g., raw DOIs,
+#'   DOI URLs, or strings with embedded DOIs).
+#' @param non_doi_value Value to use for elements where no DOI or component is
+#'   found. If `NULL`, only matched elements are returned.
+#' @param normalize Logical. If `TRUE` (default), convert extracted DOIs and
+#'   suffixes to lowercase and trim surrounding whitespace. Has no effect for
+#'   `what = "prefix"` or `what = "resolver"`.
 #' @param what What to extract from each element. One of:
 #' \describe{
-#'   \item{"doi"}{The full DOI name (prefix + "/" + suffix). Example: `"10.5281/zenodo.1234567"` (default)}
-#'   \item{"resolver"}{The resolver URL (e.g., `"https://doi.org/"`, `"http://dx.doi.org/"`) if present}
+#'   \item{"doi"}{The full DOI name (prefix + "/" + suffix). Example:
+#'     `"10.5281/zenodo.1234567"` (default)}
+#'   \item{"resolver"}{The resolver URL (e.g., `"https://doi.org/"`,
+#'     `"http://dx.doi.org/"`) if present}
 #'   \item{"prefix"}{The DOI prefix only (e.g., `"10.5281"`)}
 #'   \item{"suffix"}{The DOI suffix only (e.g., `"zenodo.1234567"`)}
 #' }
 #'
 #' @return A character vector:
-#'   - If `non_doi_value` is not `NULL`, a vector of the same length as `x`, with unmatched entries replaced.
+#'   - If `non_doi_value` is not `NULL`, a vector of the same length as `x`,
+#'     with unmatched entries replaced.
 #'   - If `non_doi_value` is `NULL`, a vector of only matched entries.
 #'
 #' @examples

@@ -53,7 +53,10 @@ makefile_dst <- file.path(path, "Makefile")
 
   # Copy Makefile
   if (file.exists(makefile_dst) && !overwrite) {
-    cli::cli_alert_warning("Makefile already exists at {.path {makefile_dst}}. Use {.arg overwrite = TRUE} to replace.")
+    cli::cli_alert_warning(c(
+      "Makefile already exists at {.path {makefile_dst}}. ",
+      "Use {.arg overwrite = TRUE} to replace."
+    ))
   } else {
     file.copy(makefile_src, makefile_dst, overwrite = overwrite)
     cli::cli_alert_success("Copied Makefile to {.path {makefile_dst}}")
@@ -62,7 +65,10 @@ makefile_dst <- file.path(path, "Makefile")
   # Copy vignette HTML if it exists
   if (file.exists(vignette_src)) {
     if (file.exists(vignette_dst) && !overwrite) {
-      cli::cli_alert_warning("Documentation already exists at {.path {vignette_dst}}. Use {.arg overwrite = TRUE} to replace.")
+      cli::cli_alert_warning(c(
+        "Documentation already exists at {.path {vignette_dst}}. ",
+        "Use {.arg overwrite = TRUE} to replace."
+      ))
     } else {
       file.copy(vignette_src, vignette_dst, overwrite = overwrite)
       cli::cli_alert_success("Copied documentation to {.path {vignette_dst}}")

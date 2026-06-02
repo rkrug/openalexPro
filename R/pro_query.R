@@ -137,8 +137,14 @@
   search_filters <- grep("\\.search(\\.no_stem)?$", names(fl), value = TRUE)
   if (length(search_filters)) {
     cli::cli_warn(c(
-      "!" = "The filter argument{?s} {.val {search_filters}} use{?s/} the deprecated {.code field.search} syntax.",
-      "i" = "Use the {.arg search} parameter instead: {.code pro_query(..., search = \"your terms\")}.",
+      "!" = paste0(
+        "The filter argument{?s} {.val {search_filters}} use{?s/} the ",
+        "deprecated {.code field.search} syntax."
+      ),
+      "i" = paste0(
+        "Use the {.arg search} parameter instead: ",
+        "{.code pro_query(..., search = \"your terms\")}."
+      ),
       "i" = "See {.url https://developers.openalex.org/guides/searching} for details."
     ))
   }

@@ -24,7 +24,8 @@ opt_select_fields <- function(update = FALSE) {
     select <- select[[1]][-1]
 
     ## <<
-    ## This is to make sure that `id` is in the filter list, which it is not at the moment, but always present.
+    ## Ensure `id` is in the filter list: it is not returned at the moment
+    ## but is always present in responses.
 
     if (!("id" %in% select)) {
       select <- c("id", select)
