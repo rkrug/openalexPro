@@ -7,7 +7,8 @@
 opt_api_key(api_key)
 }
 \arguments{
-\item{api_key}{character vector or NULL. If specified, value to assign to the api key option. Default is `NULL`.}
+\item{api_key}{character vector or NULL. If specified, value to assign to
+the api key option. Default is `NULL`.}
 }
 \value{
 The API key, if `api_key` is not specified the current one, otherwise the old one.
