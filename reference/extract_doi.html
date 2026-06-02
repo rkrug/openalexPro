@@ -9,7 +9,7 @@ Assumes that each element of `x` contains at most one DOI (with or without resol
 
     <a class="navbar-brand me-2" href="../index.html">openalexPro</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -64,23 +64,29 @@ Assumes that each element of `x` contains at most one DOI (with or without resol
 
 
 <dl><dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
-<dd><p>A character vector potentially containing DOIs (e.g., raw DOIs, DOI URLs, or strings with embedded DOIs).</p></dd>
+<dd><p>A character vector potentially containing DOIs (e.g., raw DOIs,
+DOI URLs, or strings with embedded DOIs).</p></dd>
 
 
 <dt id="arg-non-doi-value">non_doi_value<a class="anchor" aria-label="anchor" href="#arg-non-doi-value"></a></dt>
-<dd><p>Value to use for elements where no DOI or component is found. If `NULL`, only matched elements are returned.</p></dd>
+<dd><p>Value to use for elements where no DOI or component is
+found. If `NULL`, only matched elements are returned.</p></dd>
 
 
 <dt id="arg-normalize">normalize<a class="anchor" aria-label="anchor" href="#arg-normalize"></a></dt>
-<dd><p>Logical. If `TRUE` (default), convert extracted DOIs and suffixes to lowercase and trim surrounding whitespace. Has no effect for `what = "prefix"` or `what = "resolver"`.</p></dd>
+<dd><p>Logical. If `TRUE` (default), convert extracted DOIs and
+suffixes to lowercase and trim surrounding whitespace. Has no effect for
+`what = "prefix"` or `what = "resolver"`.</p></dd>
 
 
 <dt id="arg-what">what<a class="anchor" aria-label="anchor" href="#arg-what"></a></dt>
 <dd><p>What to extract from each element. One of:</p><dl><dt>"doi"</dt>
-<dd><p>The full DOI name (prefix + "/" + suffix). Example: `"10.5281/zenodo.1234567"` (default)</p></dd>
+<dd><p>The full DOI name (prefix + "/" + suffix). Example:
+    `"10.5281/zenodo.1234567"` (default)</p></dd>
 
   <dt>"resolver"</dt>
-<dd><p>The resolver URL (e.g., `"https://doi.org/"`, `"http://dx.doi.org/"`) if present</p></dd>
+<dd><p>The resolver URL (e.g., `"https://doi.org/"`,
+    `"http://dx.doi.org/"`) if present</p></dd>
 
   <dt>"prefix"</dt>
 <dd><p>The DOI prefix only (e.g., `"10.5281"`)</p></dd>
@@ -95,7 +101,8 @@ Assumes that each element of `x` contains at most one DOI (with or without resol
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A character vector:
-  - If `non_doi_value` is not `NULL`, a vector of the same length as `x`, with unmatched entries replaced.
+  - If `non_doi_value` is not `NULL`, a vector of the same length as `x`,
+    with unmatched entries replaced.
   - If `non_doi_value` is `NULL`, a vector of only matched entries.</p>
     </div>
 

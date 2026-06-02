@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">openalexPro</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,6 +41,37 @@
       <small>Source: <a href="https://github.com/openalexPro/openalexPro/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.10.4" id="openalexpro-0104">openalexPro 0.10.4<a class="anchor" aria-label="anchor" href="#openalexpro-0104"></a></h2>
+<div class="section level3">
+<h3 id="internal--code-quality-0-10-4">Internal / Code Quality<a class="anchor" aria-label="anchor" href="#internal--code-quality-0-10-4"></a></h3>
+<ul><li><p><code><a href="../reference/pro_request_parquet.html">pro_request_parquet()</a></code> refactored into small internal helpers (<code>.prr_prepare_output</code>, <code>.prr_discover_jsons</code>, <code>.prr_infer_schema</code>, <code>.prr_apply_baseline</code>, <code>.prr_fix_json_types</code>, <code>.prr_output_paths</code>, <code>.prr_convert_one</code>) to drop cyclomatic complexity below the <code>goodpractice</code> threshold. Behaviour is unchanged.</p></li>
+<li><p>Added tests for <code><a href="../reference/find_oas_binary.html">find_oas_binary()</a></code>, <code><a href="../reference/run_oas.html">run_oas()</a></code>, <code><a href="../reference/pro_validate_credentials.html">pro_validate_credentials()</a></code>, <code><a href="../reference/prepare_snapshot.html">prepare_snapshot()</a></code>, and <code><a href="../reference/sample_parquet_n.html">sample_parquet_n()</a></code>. Package test coverage rose from ~73% to ~80%.</p></li>
+<li><p>Tests that intentionally exercise the deprecated <code><a href="../reference/pro_request_jsonl_R.html">pro_request_jsonl_R()</a></code> / <code><a href="../reference/pro_request_jsonl_parquet.html">pro_request_jsonl_parquet()</a></code> pipeline now wrap those calls in <code><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings()</a></code> to keep test output clean.</p></li>
+<li><p>Added a <code>.lintr</code> configuration setting <code>line_length_linter(100)</code> (modern tidyverse default) and reflowed remaining long lines in package code.</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="new-features-0-10-4">New Features<a class="anchor" aria-label="anchor" href="#new-features-0-10-4"></a></h3>
+<ul><li><p><code><a href="../reference/pro_request_parquet.html">pro_request_parquet()</a></code> gains a <code>schema</code> parameter (default <code>"auto"</code>) that uses pre-built field-type schemas — inferred from the complete OpenAlex snapshot — to resolve ambiguous DuckDB type inference on small API pages. This eliminates <code>VARCHAR[] → JSON</code> type-conflict errors when unioning parquet files from separate API calls (e.g. keypaper + cited + citing in a snowball search).</p></li>
+<li><p>New <code><a href="../reference/oa_cache_schema.html">oa_cache_schema()</a></code> function copies schemas from a snapshot metadata directory (e.g. <code>/Volumes/openalex/openalex-snapshot_metadata</code>) into the user-level cache so the correct types are available even when the volume is not mounted.</p></li>
+<li><p>Factory-default schemas for all 21 OpenAlex entity types are now bundled in <code>inst/extdata/schemata/</code> and used automatically when <code>schema = "auto"</code>, so the feature works out-of-the-box without any manual cache population.</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="bug-fixes-0-10-4">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-10-4"></a></h3>
+<ul><li><p><code><a href="../reference/oa_works_abstract_sql.html">oa_works_abstract_sql()</a></code> now casts <code>abstract_inverted_index</code> through JSON (<code>::JSON::MAP(VARCHAR, BIGINT[])</code>) before calling <code>map_entries()</code>. This fixes abstract reconstruction when DuckDB infers the column as <code>STRUCT</code> (which happens when a sampled API page contains no duplicate-cased keys) rather than <code>MAP</code>. The expression now handles <code>STRUCT</code>, <code>MAP</code>, and <code>VARCHAR</code> inputs uniformly (#XXX).</p></li>
+<li><p><code><a href="../reference/pro_request_parquet.html">pro_request_parquet()</a></code> now overrides the inferred DuckDB type of <code>abstract_inverted_index</code> to <code>MAP(VARCHAR, BIGINT[])</code> when building the paginated <code>read_json</code> schema, so the fix applies even before the abstract SQL runs.</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="breaking-changes-0-10-4">Breaking Changes<a class="anchor" aria-label="anchor" href="#breaking-changes-0-10-4"></a></h3>
+<ul><li><p><code><a href="../reference/snapshot_to_parquet.html">snapshot_to_parquet()</a></code>, <code><a href="../reference/build_corpus_index.html">build_corpus_index()</a></code>, and <code><a href="../reference/lookup_by_id.html">lookup_by_id()</a></code> have moved to the <strong>openalexSnapshot</strong> package. Calling them in <code>openalexPro</code> now raises an informative error. Their <code>_R</code> variants have been removed entirely.</p></li>
+<li><p><code>pro_request_parquet_R()</code> and <code>pro_fetch_R()</code> removed. <code><a href="../reference/pro_request_parquet.html">pro_request_parquet()</a></code> and <code><a href="../reference/pro_fetch.html">pro_fetch()</a></code> are now the single pure-R/DuckDB implementations.</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="internal-changes-0-10-4">Internal Changes<a class="anchor" aria-label="anchor" href="#internal-changes-0-10-4"></a></h3>
+<ul><li><p>Rust/Cargo build dependency removed; <code>openalexPro</code> is now a pure-R package. No Rust toolchain is required to install or use it.</p></li>
+<li><p><code><a href="../reference/oa_works_abstract_sql.html">oa_works_abstract_sql()</a></code>, <code><a href="../reference/oa_works_citation_sql.html">oa_works_citation_sql()</a></code>, and <code><a href="../reference/oa_normalize_duckdb_type.html">oa_normalize_duckdb_type()</a></code> are now implemented in R (behaviour unchanged).</p></li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.9.0" id="openalexpro-090">openalexPro 0.9.0<a class="anchor" aria-label="anchor" href="#openalexpro-090"></a></h2>
 <div class="section level3">

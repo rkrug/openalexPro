@@ -1,5 +1,101 @@
 # Changelog
 
+## openalexPro 0.10.4
+
+### Internal / Code Quality
+
+- [`pro_request_parquet()`](https://openalexpro.github.io/openalexPro/reference/pro_request_parquet.md)
+  refactored into small internal helpers (`.prr_prepare_output`,
+  `.prr_discover_jsons`, `.prr_infer_schema`, `.prr_apply_baseline`,
+  `.prr_fix_json_types`, `.prr_output_paths`, `.prr_convert_one`) to
+  drop cyclomatic complexity below the `goodpractice` threshold.
+  Behaviour is unchanged.
+
+- Added tests for
+  [`find_oas_binary()`](https://openalexpro.github.io/openalexPro/reference/find_oas_binary.md),
+  [`run_oas()`](https://openalexpro.github.io/openalexPro/reference/run_oas.md),
+  [`pro_validate_credentials()`](https://openalexpro.github.io/openalexPro/reference/pro_validate_credentials.md),
+  [`prepare_snapshot()`](https://openalexpro.github.io/openalexPro/reference/prepare_snapshot.md),
+  and
+  [`sample_parquet_n()`](https://openalexpro.github.io/openalexPro/reference/sample_parquet_n.md).
+  Package test coverage rose from ~73% to ~80%.
+
+- Tests that intentionally exercise the deprecated
+  [`pro_request_jsonl_R()`](https://openalexpro.github.io/openalexPro/reference/pro_request_jsonl_R.md)
+  /
+  [`pro_request_jsonl_parquet()`](https://openalexpro.github.io/openalexPro/reference/pro_request_jsonl_parquet.md)
+  pipeline now wrap those calls in
+  [`suppressWarnings()`](https://rdrr.io/r/base/warning.html) to keep
+  test output clean.
+
+- Added a `.lintr` configuration setting `line_length_linter(100)`
+  (modern tidyverse default) and reflowed remaining long lines in
+  package code.
+
+### New Features
+
+- [`pro_request_parquet()`](https://openalexpro.github.io/openalexPro/reference/pro_request_parquet.md)
+  gains a `schema` parameter (default `"auto"`) that uses pre-built
+  field-type schemas — inferred from the complete OpenAlex snapshot — to
+  resolve ambiguous DuckDB type inference on small API pages. This
+  eliminates `VARCHAR[] → JSON` type-conflict errors when unioning
+  parquet files from separate API calls (e.g. keypaper + cited + citing
+  in a snowball search).
+
+- New
+  [`oa_cache_schema()`](https://openalexpro.github.io/openalexPro/reference/oa_cache_schema.md)
+  function copies schemas from a snapshot metadata directory
+  (e.g. `/Volumes/openalex/openalex-snapshot_metadata`) into the
+  user-level cache so the correct types are available even when the
+  volume is not mounted.
+
+- Factory-default schemas for all 21 OpenAlex entity types are now
+  bundled in `inst/extdata/schemata/` and used automatically when
+  `schema = "auto"`, so the feature works out-of-the-box without any
+  manual cache population.
+
+### Bug Fixes
+
+- [`oa_works_abstract_sql()`](https://openalexpro.github.io/openalexPro/reference/oa_works_abstract_sql.md)
+  now casts `abstract_inverted_index` through JSON
+  (`::JSON::MAP(VARCHAR, BIGINT[])`) before calling `map_entries()`.
+  This fixes abstract reconstruction when DuckDB infers the column as
+  `STRUCT` (which happens when a sampled API page contains no
+  duplicate-cased keys) rather than `MAP`. The expression now handles
+  `STRUCT`, `MAP`, and `VARCHAR` inputs uniformly (#XXX).
+
+- [`pro_request_parquet()`](https://openalexpro.github.io/openalexPro/reference/pro_request_parquet.md)
+  now overrides the inferred DuckDB type of `abstract_inverted_index` to
+  `MAP(VARCHAR, BIGINT[])` when building the paginated `read_json`
+  schema, so the fix applies even before the abstract SQL runs.
+
+### Breaking Changes
+
+- [`snapshot_to_parquet()`](https://openalexpro.github.io/openalexPro/reference/snapshot_to_parquet.md),
+  [`build_corpus_index()`](https://openalexpro.github.io/openalexPro/reference/build_corpus_index.md),
+  and
+  [`lookup_by_id()`](https://openalexpro.github.io/openalexPro/reference/lookup_by_id.md)
+  have moved to the **openalexSnapshot** package. Calling them in
+  `openalexPro` now raises an informative error. Their `_R` variants
+  have been removed entirely.
+
+- `pro_request_parquet_R()` and `pro_fetch_R()` removed.
+  [`pro_request_parquet()`](https://openalexpro.github.io/openalexPro/reference/pro_request_parquet.md)
+  and
+  [`pro_fetch()`](https://openalexpro.github.io/openalexPro/reference/pro_fetch.md)
+  are now the single pure-R/DuckDB implementations.
+
+### Internal Changes
+
+- Rust/Cargo build dependency removed; `openalexPro` is now a pure-R
+  package. No Rust toolchain is required to install or use it.
+
+- [`oa_works_abstract_sql()`](https://openalexpro.github.io/openalexPro/reference/oa_works_abstract_sql.md),
+  [`oa_works_citation_sql()`](https://openalexpro.github.io/openalexPro/reference/oa_works_citation_sql.md),
+  and
+  [`oa_normalize_duckdb_type()`](https://openalexpro.github.io/openalexPro/reference/oa_normalize_duckdb_type.md)
+  are now implemented in R (behaviour unchanged).
+
 ## openalexPro 0.9.0
 
 ### New Features
