@@ -25,12 +25,12 @@ test_that("schema harmonization prevents read errors from type conflicts", {
   if (dir.exists(output_parquet)) unlink(output_parquet, recursive = TRUE)
 
   # Convert with unified schema inference (the new default behavior)
-  result <- pro_request_jsonl_parquet(
+  result <- suppressWarnings(pro_request_jsonl_parquet(
     input_jsonl = input_jsonl,
     output = output_parquet,
     overwrite = TRUE,
     verbose = FALSE,
-  )
+  ))
 
   expect_true(dir.exists(output_parquet))
 
@@ -82,12 +82,12 @@ test_that("schema harmonization handles struct with different fields across file
   output_parquet <- file.path(tempdir(), "struct_fields_parquet")
   if (dir.exists(output_parquet)) unlink(output_parquet, recursive = TRUE)
 
-  result <- pro_request_jsonl_parquet(
+  result <- suppressWarnings(pro_request_jsonl_parquet(
     input_jsonl = input_jsonl,
     output = output_parquet,
     overwrite = TRUE,
     verbose = FALSE,
-  )
+  ))
 
   # Reading should not error - unified schema should include all fields
   expect_no_error({
@@ -131,12 +131,12 @@ test_that("schema harmonization handles null vs struct conflicts", {
   output_parquet <- file.path(tempdir(), "null_struct_parquet")
   if (dir.exists(output_parquet)) unlink(output_parquet, recursive = TRUE)
 
-  result <- pro_request_jsonl_parquet(
+  result <- suppressWarnings(pro_request_jsonl_parquet(
     input_jsonl = input_jsonl,
     output = output_parquet,
     overwrite = TRUE,
     verbose = FALSE,
-  )
+  ))
 
   expect_no_error({
     ds <- arrow::open_dataset(output_parquet)
@@ -178,12 +178,12 @@ test_that("schema harmonization handles nested struct variations", {
   output_parquet <- file.path(tempdir(), "nested_struct_parquet")
   if (dir.exists(output_parquet)) unlink(output_parquet, recursive = TRUE)
 
-  result <- pro_request_jsonl_parquet(
+  result <- suppressWarnings(pro_request_jsonl_parquet(
     input_jsonl = input_jsonl,
     output = output_parquet,
     overwrite = TRUE,
     verbose = FALSE,
-  )
+  ))
 
   expect_no_error({
     ds <- arrow::open_dataset(output_parquet)

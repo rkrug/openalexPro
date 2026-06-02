@@ -1,4 +1,24 @@
-# openalexPro (development)
+# openalexPro 0.10.4
+
+## Internal / Code Quality
+
+* `pro_request_parquet()` refactored into small internal helpers
+  (`.prr_prepare_output`, `.prr_discover_jsons`, `.prr_infer_schema`,
+  `.prr_apply_baseline`, `.prr_fix_json_types`, `.prr_output_paths`,
+  `.prr_convert_one`) to drop cyclomatic complexity below the
+  `goodpractice` threshold. Behaviour is unchanged.
+
+* Added tests for `find_oas_binary()`, `run_oas()`,
+  `pro_validate_credentials()`, `prepare_snapshot()`, and
+  `sample_parquet_n()`. Package test coverage rose from ~73% to ~80%.
+
+* Tests that intentionally exercise the deprecated
+  `pro_request_jsonl_R()` / `pro_request_jsonl_parquet()` pipeline now
+  wrap those calls in `suppressWarnings()` to keep test output clean.
+
+* Added a `.lintr` configuration setting `line_length_linter(100)`
+  (modern tidyverse default) and reflowed remaining long lines in
+  package code.
 
 ## New Features
 

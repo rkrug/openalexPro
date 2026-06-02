@@ -38,3 +38,4 @@
 ^src/Makevars$
 ^src/Makevars\.win$
 ^vignettes$
+^.lintr
