@@ -80,11 +80,11 @@ test_that("pro_request_jsonl_parquet: two-level hive partitioning", {
   make_minimal_jsonl(file.path(base_jsonl, "grp_a", "sub_y", "results_page_1.json"), page = 1L)
   make_minimal_jsonl(file.path(base_jsonl, "grp_b",          "results_page_1.json"), page = 1L)
 
-  out <- pro_request_jsonl_parquet(
+  out <- suppressWarnings(pro_request_jsonl_parquet(
     input_jsonl = base_jsonl,
     output = base_parquet,
     verbose = FALSE
-  )
+  ))
 
   parquet_files <- sort(list.files(out, "*.parquet", recursive = TRUE))
 
@@ -110,11 +110,11 @@ test_that("pro_request_jsonl_parquet: single-level hive partitioning unchanged",
   make_minimal_jsonl(file.path(base_jsonl, "chunk_1", "results_page_1.json"), page = 1L)
   make_minimal_jsonl(file.path(base_jsonl, "chunk_2", "results_page_1.json"), page = 1L)
 
-  out <- pro_request_jsonl_parquet(
+  out <- suppressWarnings(pro_request_jsonl_parquet(
     input_jsonl = base_jsonl,
     output = base_parquet,
     verbose = FALSE
-  )
+  ))
 
   parquet_files <- sort(list.files(out, "*.parquet", recursive = TRUE))
   expect_true(any(grepl("^query=chunk_1/", parquet_files)))
@@ -165,12 +165,12 @@ test_that("pro_request with nested list creates nested output dirs", {
 })
 
 test_that("pro_request_jsonl_R with nested subdirs", {
-  out <- pro_request_jsonl_R(
+  out <- suppressWarnings(pro_request_jsonl_R(
     input  = output_json_nested,
     output = output_jsonl_nested,
     verbose = FALSE,
     progress = TRUE
-  )
+  ))
 
   jsonl_files <- sort(list.files(output_jsonl_nested, "*.json", recursive = TRUE))
   expect_true(all(grepl("^grp_[ab]/", jsonl_files)))
@@ -178,11 +178,11 @@ test_that("pro_request_jsonl_R with nested subdirs", {
 })
 
 test_that("pro_request_jsonl_parquet with nested subdirs produces hive partitions", {
-  out <- pro_request_jsonl_parquet(
+  out <- suppressWarnings(pro_request_jsonl_parquet(
     input_jsonl = output_jsonl_nested,
     output      = output_parquet_nested,
     verbose     = FALSE
-  )
+  ))
 
   parquet_files <- sort(list.files(out, "*.parquet", recursive = TRUE))
   expect_true(any(grepl("^query=grp_a/query_l2=", parquet_files)))

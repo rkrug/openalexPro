@@ -35,12 +35,14 @@ test_that("pro_request single identifier", {
 
 test_that("pro_request_jsonl_R single identifier", {
   # Convert to jsonl
-  output_jsonl <- output_json |>
-    pro_request_jsonl_R(
-      output = output_jsonl,
-      verbose = FALSE,
-      progress = TRUE
-    )
+  output_jsonl <- suppressWarnings(
+    output_json |>
+      pro_request_jsonl_R(
+        output = output_jsonl,
+        verbose = FALSE,
+        progress = TRUE
+      )
+  )
 
   # Check that the output file contains the expected data (platform-agnostic)
   expect_snapshot_file(
@@ -52,11 +54,13 @@ test_that("pro_request_jsonl_R single identifier", {
 
 test_that("pro_request_jsonl_parquet single identifier", {
   # Convert to parquet
-  output_parquet <- output_jsonl |>
-    pro_request_jsonl_parquet(
-      output = output_parquet,
-      verbose = FALSE
-    )
+  output_parquet <- suppressWarnings(
+    output_jsonl |>
+      pro_request_jsonl_parquet(
+        output = output_parquet,
+        verbose = FALSE
+      )
+  )
 
   # Check that the output file exists
   expect_true(
