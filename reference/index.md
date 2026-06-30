@@ -23,12 +23,11 @@
 - [`lookup_by_id()`](https://openalexpro.github.io/openalexPro/reference/lookup_by_id.md)
   : Look up records by OpenAlex ID
 
-- [`oa_cache_schema()`](https://openalexpro.github.io/openalexPro/reference/oa_cache_schema.md)
-  : Populate the local baseline-schema cache from a snapshot metadata
-  directory
-
 - [`oa_normalize_duckdb_type()`](https://openalexpro.github.io/openalexPro/reference/oa_normalize_duckdb_type.md)
   : Canonicalise a DuckDB type string.
+
+- [`oa_schema()`](https://openalexpro.github.io/openalexPro/reference/oa_schema.md)
+  : Get or refresh an OpenAlex entity schema
 
 - [`oa_works_abstract_sql()`](https://openalexpro.github.io/openalexPro/reference/oa_works_abstract_sql.md)
   :
@@ -53,9 +52,6 @@
 - [`opt_select_fields()`](https://openalexpro.github.io/openalexPro/reference/opt_select_fields.md)
   : Get available select fields from OpenAlex API
 
-- [`prepare_snapshot()`](https://openalexpro.github.io/openalexPro/reference/prepare_snapshot.md)
-  : Prepare a directory for OpenAlex snapshot management
-
 - [`pro_api_key()`](https://openalexpro.github.io/openalexPro/reference/pro_api_key.md)
   : Retrieve the OpenAlex Pro API key
 
@@ -74,7 +70,7 @@
 - [`pro_request()`](https://openalexpro.github.io/openalexPro/reference/pro_request.md)
   : Fetch works from OpenAlex
 
-- [`pro_request_jsonl_R()`](https://openalexpro.github.io/openalexPro/reference/pro_request_jsonl_R.md)
+- [`pro_request_jsonl()`](https://openalexpro.github.io/openalexPro/reference/pro_request_jsonl.md)
   : Convert JSON files to jsonl files
 
 - [`pro_request_jsonl_parquet()`](https://openalexpro.github.io/openalexPro/reference/pro_request_jsonl_parquet.md)
@@ -91,6 +87,3 @@
 
 - [`sample_parquet_n()`](https://openalexpro.github.io/openalexPro/reference/sample_parquet_n.md)
   : Sample rows from Parquet files using DuckDB reservoir sampling
-
-- [`snapshot_to_parquet()`](https://openalexpro.github.io/openalexPro/reference/snapshot_to_parquet.md)
-  : Convert OA snapshot to Parquet format

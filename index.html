@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">openalexPro</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.5</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -185,7 +185,7 @@ To run online contract checks against the live OpenAlex API:</p>
 </h3>
 <p>This step prepares the json files for the final ingestion into a <code>parquet</code> database:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">openalex_jsonl_folder</span> <span class="op">&lt;-</span> <span class="fu">openalexPro</span><span class="fu">::</span><span class="fu">pro_request_jsonl</span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">openalex_jsonl_folder</span> <span class="op">&lt;-</span> <span class="fu">openalexPro</span><span class="fu">::</span><span class="fu"><a href="reference/pro_request_jsonl.html">pro_request_jsonl</a></span><span class="op">(</span></span>
 <span>  input_json <span class="op">=</span> <span class="va">json_files</span>,</span>
 <span>  output <span class="op">=</span> <span class="st">"jsonl_files"</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span>
@@ -207,7 +207,7 @@ To run online contract checks against the live OpenAlex API:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">corpus</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/pro_query.html">pro_query</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="reference/pro_request.html">pro_request</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">pro_request_jsonl</span><span class="op">(</span><span class="va">...</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="reference/pro_request_jsonl.html">pro_request_jsonl</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="reference/pro_request_jsonl_parquet.html">pro_request_jsonl_parquet</a></span><span class="op">(</span><span class="va">...</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
@@ -228,7 +228,7 @@ To run online contract checks against the live OpenAlex API:</p>
 </h1>
 <p>The retrieval of works and the initial processing / preparation can be split into these three steps:</p>
 <p>In a first step (<code><a href="reference/pro_request.html">openalexPro::pro_request()</a></code>), each page from the API call is saved into an individual json file as returned by the API. The number of retrieved records is effectively only limited by the space on the drive where the json files are saved. As the complete responses including metadata are saved, one could end here and use custom made code to further process the responses, i.e. ingest it into a database.</p>
-<p>In a second step (<code>openalexPro::pro_request_jsonl()</code>), the json files are processed on a per file basis using the <code>jq</code> command-line json processor. In this step the abstract text is re-constructed, a citation string for each work is generated, and optionally add a <code>page</code> field is added. It writes the resulting json file as a newline-delimited JSON (.jsonl), suitable for further processing using <code>arrow</code> or DuckDB.</p>
+<p>In a second step (<code><a href="reference/pro_request_jsonl.html">openalexPro::pro_request_jsonl()</a></code>), the json files are processed on a per file basis using the <code>jq</code> command-line json processor. In this step the abstract text is re-constructed, a citation string for each work is generated, and optionally add a <code>page</code> field is added. It writes the resulting json file as a newline-delimited JSON (.jsonl), suitable for further processing using <code>arrow</code> or DuckDB.</p>
 <p>In the third (and final) step (<code><a href="reference/pro_request_jsonl_parquet.html">openalexPro::pro_request_jsonl_parquet()</a></code>) converts the jsonl files into a parquet database partitioned by <code>page</code> using the <code>duckdb</code> package. Again, as the processing is done per page as well, the conversion is not limited by memory.</p>
 <p>This approach results in a stable pipeline which works for the retrieval of small as well as large to huge corpora. As the processing is done per page (which have a maximum of 200 works), the scaling should be more or less linear (in one application, more than 4 million works were retrieved without problems).</p>
 <p>One point which needs to be taken into consideration when retrieving huge corpora, are rate limits by OpenAlex (see <a href="https://docs.openalex.org/how-to-use-the-api/rate-limits-and-authentication" class="external-link">here</a> and <a href="https://help.openalex.org/hc/en-us/articles/24397762024087-Pricing" class="external-link">here</a> for further details). Use <code><a href="reference/pro_rate_limit_status.html">pro_rate_limit_status()</a></code> to inspect your current daily budget, usage, and remaining allowance at any time.</p>

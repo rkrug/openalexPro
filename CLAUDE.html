@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="index.html">openalexPro</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.5</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -72,7 +72,7 @@
 <div class="section level2">
 <h2 id="architecture">Architecture<a class="anchor" aria-label="anchor" href="#architecture"></a></h2>
 <p>The package has one functional area: <strong>OpenAlex API access</strong>.</p>
-<p>Snapshot conversion, corpus indexing, and ID-based record lookup have moved to the <strong><code>openalexSnapshot</code></strong> package. Calling <code><a href="reference/snapshot_to_parquet.html">snapshot_to_parquet()</a></code>, <code><a href="reference/build_corpus_index.html">build_corpus_index()</a></code>, or <code><a href="reference/lookup_by_id.html">lookup_by_id()</a></code> in <code>openalexPro</code> raises an informative error pointing to <code>openalexSnapshot</code>.</p>
+<p>Snapshot conversion, corpus indexing, and ID-based record lookup have moved to the <strong><code>openalexSnapshot</code></strong> package. Calling <code>snapshot_to_parquet()</code>, <code><a href="reference/build_corpus_index.html">build_corpus_index()</a></code>, or <code><a href="reference/lookup_by_id.html">lookup_by_id()</a></code> in <code>openalexPro</code> raises an informative error pointing to <code>openalexSnapshot</code>.</p>
 <div class="section level3">
 <h3 id="openalex-api-cloud">OpenAlex API (cloud)<a class="anchor" aria-label="anchor" href="#openalex-api-cloud"></a></h3>
 <p>Functions that query the live OpenAlex REST API:</p>
@@ -113,7 +113,8 @@
 <li>
 <code><a href="reference/opt_select_fields.html">opt_select_fields()</a></code>, <code><a href="reference/opt_filter_names.html">opt_filter_names()</a></code> — helpers for building API queries</li>
 <li>
-<code><a href="reference/prepare_snapshot.html">prepare_snapshot()</a></code> — snapshot download/preparation utilities</li>
+<code><a href="reference/oa_schema.html">oa_schema()</a></code> — get or refresh the baseline entity schema used by <code>pro_request_parquet(schema = "auto")</code>
+</li>
 </ul></div>
 </div>
 <div class="section level2">

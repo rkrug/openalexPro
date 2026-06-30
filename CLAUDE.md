@@ -44,7 +44,7 @@ The package has one functional area: **OpenAlex API access**.
 
 Snapshot conversion, corpus indexing, and ID-based record lookup have
 moved to the **`openalexSnapshot`** package. Calling
-[`snapshot_to_parquet()`](https://openalexpro.github.io/openalexPro/reference/snapshot_to_parquet.md),
+`snapshot_to_parquet()`,
 [`build_corpus_index()`](https://openalexpro.github.io/openalexPro/reference/build_corpus_index.md),
 or
 [`lookup_by_id()`](https://openalexpro.github.io/openalexPro/reference/lookup_by_id.md)
@@ -101,8 +101,9 @@ cassettes in `tests/fixtures/vcr/`.
 - [`opt_select_fields()`](https://openalexpro.github.io/openalexPro/reference/opt_select_fields.md),
   [`opt_filter_names()`](https://openalexpro.github.io/openalexPro/reference/opt_filter_names.md)
   — helpers for building API queries
-- [`prepare_snapshot()`](https://openalexpro.github.io/openalexPro/reference/prepare_snapshot.md)
-  — snapshot download/preparation utilities
+- [`oa_schema()`](https://openalexpro.github.io/openalexPro/reference/oa_schema.md)
+  — get or refresh the baseline entity schema used by
+  `pro_request_parquet(schema = "auto")`
 
 ## Branching
 

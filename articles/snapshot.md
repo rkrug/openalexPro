@@ -2,10 +2,9 @@
 
 > **Snapshot functionality has moved.**
 >
-> The full OpenAlex snapshot workflow — downloading, converting
-> `.json.gz` files to Parquet, building ID lookup indexes, and
-> extracting records by ID — is now part of the **`openalexSnapshot`**
-> package.
+> The full OpenAlex snapshot workflow — downloading the official Parquet
+> snapshot, building ID lookup indexes, and extracting records by ID —
+> is now part of the **`openalexSnapshot`** package.
 >
 > Please install `openalexSnapshot` and refer to its documentation.
 
@@ -15,8 +14,7 @@
 pak::pak("openalexSnapshot")
 ```
 
-Calling
-[`snapshot_to_parquet()`](https://openalexpro.github.io/openalexPro/reference/snapshot_to_parquet.md),
+Calling `snapshot_to_parquet()`,
 [`build_corpus_index()`](https://openalexpro.github.io/openalexPro/reference/build_corpus_index.md),
 or
 [`lookup_by_id()`](https://openalexpro.github.io/openalexPro/reference/lookup_by_id.md)

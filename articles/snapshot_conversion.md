@@ -2,7 +2,7 @@
 
 > **These functions have moved.**
 >
-> [`snapshot_to_parquet()`](https://openalexpro.github.io/openalexPro/reference/snapshot_to_parquet.md),
+> `snapshot_to_parquet()`,
 > [`build_corpus_index()`](https://openalexpro.github.io/openalexPro/reference/build_corpus_index.md),
 > and
 > [`lookup_by_id()`](https://openalexpro.github.io/openalexPro/reference/lookup_by_id.md)

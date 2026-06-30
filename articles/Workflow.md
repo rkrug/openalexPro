@@ -814,7 +814,7 @@ flowchart TD
 | [`pro_count()`](https://openalexpro.github.io/openalexPro/reference/pro_count.md) | Get result count | query_url |
 | [`pro_fetch()`](https://openalexpro.github.io/openalexPro/reference/pro_fetch.md) | **All-in-one download** | query_url, project_folder |
 | [`pro_request()`](https://openalexpro.github.io/openalexPro/reference/pro_request.md) | Download JSON | query_url, output, pages, workers |
-| `pro_request_jsonl()` | Convert to JSONL | input_json, output, workers |
+| [`pro_request_jsonl()`](https://openalexpro.github.io/openalexPro/reference/pro_request_jsonl.md) | Convert to JSONL | input_json, output, workers |
 | [`pro_request_jsonl_parquet()`](https://openalexpro.github.io/openalexPro/reference/pro_request_jsonl_parquet.md) | Convert to Parquet | input_jsonl, output, sample_size |
 | [`pro_validate_credentials()`](https://openalexpro.github.io/openalexPro/reference/pro_validate_credentials.md) | Test credentials (optional helper) | api_key |
 | [`pro_rate_limit_status()`](https://openalexpro.github.io/openalexPro/reference/pro_rate_limit_status.md) | Check rate limit usage & remaining budget | api_key, verbose |

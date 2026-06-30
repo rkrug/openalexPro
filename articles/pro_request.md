@@ -17,7 +17,9 @@ and related functions, including:
 - Progress bars and parallel processing
 - The complete data pipeline
   ([`pro_request()`](https://openalexpro.github.io/openalexPro/reference/pro_request.md)
-  → `pro_request_jsonl()` →
+  →
+  [`pro_request_jsonl()`](https://openalexpro.github.io/openalexPro/reference/pro_request_jsonl.md)
+  →
   [`pro_request_jsonl_parquet()`](https://openalexpro.github.io/openalexPro/reference/pro_request_jsonl_parquet.md))
 - Internal architecture and flow diagrams
 - Error handling and retry logic

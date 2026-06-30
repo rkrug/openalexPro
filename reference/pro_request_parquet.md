@@ -1,7 +1,7 @@
 # Convert JSON files from pro_request() directly to Apache Parquet
 
 Single-step replacement for the two-step
-[`pro_request_jsonl_R()`](https://openalexpro.github.io/openalexPro/reference/pro_request_jsonl_R.md) +
+[`pro_request_jsonl()`](https://openalexpro.github.io/openalexPro/reference/pro_request_jsonl.md) +
 [`pro_request_jsonl_parquet()`](https://openalexpro.github.io/openalexPro/reference/pro_request_jsonl_parquet.md)
 pipeline. Reads the JSON files written by
 [`pro_request()`](https://openalexpro.github.io/openalexPro/reference/pro_request.md)
@@ -86,7 +86,7 @@ pro_request_parquet(
 
   :   Auto-detect the OpenAlex entity type from the inferred columns,
       then load the matching schema from the user cache (populated by
-      [`oa_cache_schema()`](https://openalexpro.github.io/openalexPro/reference/oa_cache_schema.md))
+      [`oa_schema`](https://openalexpro.github.io/openalexPro/reference/oa_schema.md)`(update = TRUE)`)
       or the schemas bundled with the package. For each column where
       DuckDB runtime inference produced the ambiguous `JSON` fallback
       type, the baseline type is used instead. Falls back silently to
@@ -106,8 +106,7 @@ pro_request_parquet(
   A directory path
 
   :   Auto-detect entity, then look for `<entity>.csv` inside that
-      directory. Useful when pointing directly at a snapshot-metadata
-      schemata directory.
+      directory.
 
 ## Value
 
@@ -125,10 +124,6 @@ computed columns:
 
 - **`citation`** — `"Author (year)"` / `"A & B (year)"` /
   `"A et al. (year)"`.
-
-These expressions are identical to those used by the `openalex-snapshot`
-CLI binary, so the Parquet output matches the snapshot pipeline column
-for column.
 
 ## File format
 
@@ -150,7 +145,7 @@ filename (or subdirectory for multi-query inputs).
 
 [`pro_request()`](https://openalexpro.github.io/openalexPro/reference/pro_request.md)
 to download the JSON files,
-[`pro_request_jsonl_R()`](https://openalexpro.github.io/openalexPro/reference/pro_request_jsonl_R.md)
+[`pro_request_jsonl()`](https://openalexpro.github.io/openalexPro/reference/pro_request_jsonl.md)
 and
 [`pro_request_jsonl_parquet()`](https://openalexpro.github.io/openalexPro/reference/pro_request_jsonl_parquet.md)
 for the older two-step pipeline (now deprecated).

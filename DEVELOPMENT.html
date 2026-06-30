@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="index.html">openalexPro</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.10.5</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -51,36 +51,6 @@
 <p><strong>Bug:</strong> <code><a href="reference/pro_fetch.html">pro_fetch()</a></code> delegated <code>overwrite</code> to each of the three sub-functions (<code>pro_request</code>, <code>pro_request_jsonl</code>, <code>pro_request_jsonl_parquet</code>) individually, so directories were deleted one at a time as the pipeline progressed. If <code>overwrite = FALSE</code> and only <code>jsonl/</code> existed (not <code>json/</code>), the first step would succeed silently and only fail on the second.</p>
 <p><strong>Fix (<code>R/pro_fetch.R</code>):</strong> Upfront check across all three subdirectories before starting the pipeline: collect which of <code>json/</code>, <code>jsonl/</code>, <code>parquet/</code> exist, error with a combined message if <code>overwrite = FALSE</code>, delete all existing ones if <code>overwrite = TRUE</code>. Sub-functions receive <code>overwrite = FALSE</code>.</p>
 <p><strong>Key files:</strong> <code>R/pro_request.R</code>, <code>R/pro_fetch.R</code></p>
-<hr></div>
-<div class="section level2">
-<h2 id="id_2026-04-16--wrap-openalex-snapshot-binary-add-_r-fallbacks-070">2026-04-16 — Wrap <code>openalex-snapshot</code> binary; add <code>*_R()</code> fallbacks (0.7.0)<a class="anchor" aria-label="anchor" href="#id_2026-04-16--wrap-openalex-snapshot-binary-add-_r-fallbacks-070"></a></h2>
-<p><strong>Motivation:</strong> The companion Rust CLI <code>openalex-snapshot</code> is now more capable than the pure-R implementations for snapshot processing (adds verification, repair, progress monitoring, and schema comparison) and substantially faster. Rather than maintaining two competing implementations, the R package now delegates to the binary via <code><a href="https://rdrr.io/r/base/system2.html" class="external-link">system2()</a></code> while preserving the original R code under <code>*_R()</code> suffixed names.</p>
-<p><strong>Breaking API changes:</strong></p>
-<table class="table"><colgroup><col width="50%"><col width="50%"></colgroup><thead><tr><th>Old call</th>
-<th>New call</th>
-</tr></thead><tbody><tr><td><code>snapshot_to_parquet(snapshot_dir="...", parquet_dir="...")</code></td>
-<td><code>snapshot_to_parquet(root_dir="...")</code></td>
-</tr><tr><td><code>build_corpus_index(corpus_dir="...")</code></td>
-<td><code>build_corpus_index(root_dir="...")</code></td>
-</tr><tr><td><code>lookup_by_id(index_file="...", output="...")</code></td>
-<td><code>lookup_by_id(root_dir="...", project_dir="...")</code></td>
-</tr></tbody></table><p><strong>Root-dir layout:</strong> the binary derives all paths from a single <code>--root-dir</code>: <code>&lt;root&gt;/openalex-snapshot/</code> (raw JSON), <code>&lt;root&gt;/parquet/</code> (converted parquet), <code>&lt;root&gt;/.openalex-snapshot_metadata/</code> (metadata). <code>root_dir = "."</code> means the working directory.</p>
-<p><strong>New helpers (<code>R/oas_binary.R</code>):</strong></p>
-<ul><li>
-<code>find_oas_binary(oas_bin = NULL)</code>: resolves binary via <code>oas_bin</code> arg → <code>options("openalexPro.oas_bin")</code> → <code>Sys.which("openalex-snapshot")</code>. Errors with an actionable message if not found.</li>
-<li>
-<code>run_oas(args, oas_bin)</code>: calls <code>system2(binary, args)</code>, aborts on non-zero exit.</li>
-</ul><p><strong>Preserved pure-R fallbacks (exported):</strong></p>
-<ul><li>
-<code>snapshot_to_parquet_R()</code> — original R + DuckDB conversion</li>
-<li>
-<code>build_corpus_index_R()</code> — original R + DuckDB index building</li>
-<li>
-<code>lookup_by_id_R()</code> — original R + DuckDB record retrieval</li>
-</ul><p>These retain the original parameter names and work without any external binary.</p>
-<p><strong>Test pattern:</strong> Each test file has two sections — one for the <code>*_R()</code> function (always runs; requires arrow + duckdb) and one for the binary wrapper (gated with <code>skip_if(Sys.which("openalex-snapshot") == "", "...")</code>).</p>
-<p><strong>Makefile:</strong> <code>inst/Makefile.snapshot</code> rewritten to call the binary directly via <code>openalex-snapshot convert --root-dir ${ROOTDIR}</code> and <code>openalex-snapshot index --root-dir ${ROOTDIR}</code> instead of <code>Rscript</code>.</p>
-<p><strong>Key files:</strong> <code>R/oas_binary.R</code> (new), <code>R/snapshot_to_parquet.R</code>, <code>R/build_corpus_index.R</code>, <code>R/lookup_by_id.R</code>, <code>inst/Makefile.snapshot</code>, <code>tests/testthat/test-013-snapshot_to_parquet.R</code>, <code>tests/testthat/test-011-build_corpus_index.R</code>, <code>tests/testthat/test-012-lookup_by_id.R</code></p>
 <hr></div>
 <div class="section level2">
 <h2 id="id_2026-03-02--normalize-api_key-handling-add-live-contract-tests">2026-03-02 — Normalize <code>api_key</code> handling; add live contract tests<a class="anchor" aria-label="anchor" href="#id_2026-03-02--normalize-api_key-handling-add-live-contract-tests"></a></h2>
@@ -183,7 +153,7 @@
 <p>Additionally, <code><a href="https://rdrr.io/r/base/normalizePath.html" class="external-link">normalizePath()</a></code> uses <code>\</code> as a separator on Windows, but <code><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files()</a></code> and DuckDB use <code>/</code>, causing <code>%in%</code> comparisons to fail even when the short/long-name issue is absent.</p>
 <p><strong>Symptoms (12 test failures on Windows CI, none on macOS/Linux):</strong></p>
 <ol style="list-style-type: decimal"><li>
-<code>test-013</code> (resume detection in <code><a href="reference/snapshot_to_parquet.html">snapshot_to_parquet()</a></code>): <code>%in%</code> comparing <code><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files()</a></code> output (<code>/</code>) vs <code><a href="https://rdrr.io/r/base/normalizePath.html" class="external-link">normalizePath()</a></code> output (<code>\</code>) always <code>FALSE</code> → all files re-converted instead of skipped.</li>
+<code>test-013</code> (resume detection in <code>snapshot_to_parquet()</code>): <code>%in%</code> comparing <code><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files()</a></code> output (<code>/</code>) vs <code><a href="https://rdrr.io/r/base/normalizePath.html" class="external-link">normalizePath()</a></code> output (<code>\</code>) always <code>FALSE</code> → all files re-converted instead of skipped.</li>
 <li>
 <code>test-012</code> (<code><a href="reference/build_corpus_index.html">build_corpus_index()</a></code> + <code><a href="reference/lookup_by_id.html">lookup_by_id()</a></code> path doubling): <code><a href="reference/build_corpus_index.html">build_corpus_index()</a></code> used <code>regexp_replace(filename, '&lt;snapshot_dir&gt;', '')</code> in SQL. On Windows, <code>snapshot_dir</code> contained <code>\</code>, DuckDB <code>filename</code> uses <code>/</code> → regex never matched → full absolute path stored. <code><a href="reference/lookup_by_id.html">lookup_by_id()</a></code> then did <code>file.path(snapshot_path, abs_path)</code> doubling the path.</li>
 <li>
@@ -230,12 +200,12 @@
 <hr></div>
 <div class="section level2">
 <h2 id="id_2026-02-13--duckdb-temp-file-io-error-fix-temp_dir-in-makefile">2026-02-13 — DuckDB temp file IO error fix (TEMP_DIR in Makefile)<a class="anchor" aria-label="anchor" href="#id_2026-02-13--duckdb-temp-file-io-error-fix-temp_dir-in-makefile"></a></h2>
-<p><strong>Problem:</strong> During <code><a href="reference/snapshot_to_parquet.html">snapshot_to_parquet()</a></code> for the <code>works</code> dataset (resume run after an OOM kill), DuckDB raised:</p>
+<p><strong>Problem:</strong> During <code>snapshot_to_parquet()</code> for the <code>works</code> dataset (resume run after an OOM kill), DuckDB raised:</p>
 <pre><code>IO Error: Could not read enough bytes from file ".tmp/duckdb_temp_storage_DEFAULT-0.tmp":
   attempted to read 262144 bytes from location 24641536</code></pre>
 <p>DuckDB spills temporary data to <code>.tmp/</code> relative to the working directory by default. This directory can fill up (or be on a slow/full filesystem) causing the error.</p>
-<p><strong>Fix:</strong> Exposed <code>temp_directory</code> via a new <code>TEMP_DIR</code> Makefile variable (default <code>/tmp</code>) and passed it to <code><a href="reference/snapshot_to_parquet.html">snapshot_to_parquet()</a></code> in the <code>parquet</code> target. The <code><a href="reference/snapshot_to_parquet.html">snapshot_to_parquet()</a></code> function already accepted <code>temp_directory</code>; only the Makefile was missing the plumbing.</p>
-<p><strong>Changes:</strong> - Added <code>TEMP_DIR=/tmp</code> variable to <code>inst/Makefile.snapshot</code>. - Added <code>TEMP_DIR</code> to <code>help</code> output and the command-line override example. - Passed <code>temp_directory = "'${TEMP_DIR}'"</code> to <code><a href="reference/snapshot_to_parquet.html">snapshot_to_parquet()</a></code> in the <code>parquet</code> target. - Updated <code>vignettes/snapshot.qmd</code>: added <code>TEMP_DIR</code> to the variables table and added a Troubleshooting entry explaining the error and fix.</p>
+<p><strong>Fix:</strong> Exposed <code>temp_directory</code> via a new <code>TEMP_DIR</code> Makefile variable (default <code>/tmp</code>) and passed it to <code>snapshot_to_parquet()</code> in the <code>parquet</code> target. The <code>snapshot_to_parquet()</code> function already accepted <code>temp_directory</code>; only the Makefile was missing the plumbing.</p>
+<p><strong>Changes:</strong> - Added <code>TEMP_DIR=/tmp</code> variable to <code>inst/Makefile.snapshot</code>. - Added <code>TEMP_DIR</code> to <code>help</code> output and the command-line override example. - Passed <code>temp_directory = "'${TEMP_DIR}'"</code> to <code>snapshot_to_parquet()</code> in the <code>parquet</code> target. - Updated <code>vignettes/snapshot.qmd</code>: added <code>TEMP_DIR</code> to the variables table and added a Troubleshooting entry explaining the error and fix.</p>
 <p><strong>Key files:</strong> <code>inst/Makefile.snapshot</code>, <code>vignettes/snapshot.qmd</code></p>
 <hr></div>
 <div class="section level2">
@@ -272,13 +242,13 @@
 <span><span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">output</span>, <span class="va">fname</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
-<p><strong>Makefile improvements (<code>inst/Makefile.snapshot</code>):</strong> - Added <code>SAMPLE_SIZE=10000</code> variable (passed to <code><a href="reference/snapshot_to_parquet.html">snapshot_to_parquet()</a></code>). - Added <code>cli.progress_handlers_force = "cli"</code> to the <code>Rscript</code> options so progress bars render in non-interactive (Makefile) sessions. - Added <code>SAMPLE_SIZE</code> to <code>help</code> output and the override example line.</p>
+<p><strong>Makefile improvements (<code>inst/Makefile.snapshot</code>):</strong> - Added <code>SAMPLE_SIZE=10000</code> variable (passed to <code>snapshot_to_parquet()</code>). - Added <code>cli.progress_handlers_force = "cli"</code> to the <code>Rscript</code> options so progress bars render in non-interactive (Makefile) sessions. - Added <code>SAMPLE_SIZE</code> to <code>help</code> output and the override example line.</p>
 <p><strong>Key files:</strong> <code>R/snapshot_to_parquet.R</code>, <code>R/pro_request_jsonl_parquet.R</code>, <code>inst/Makefile.snapshot</code>, <code>tests/testthat/test-013-snapshot_to_parquet.R</code></p>
 <hr></div>
 <div class="section level2">
 <h2 id="id_2026-02-13--oom-kill-fix-for-schema-inference">2026-02-13 — OOM kill fix for schema inference<a class="anchor" aria-label="anchor" href="#id_2026-02-13--oom-kill-fix-for-schema-inference"></a></h2>
-<p><strong>Problem:</strong> Running <code><a href="reference/snapshot_to_parquet.html">snapshot_to_parquet()</a></code> on the <code>works</code> dataset (largest dataset, ~300 GB) with <code>SAMPLE_SIZE=1000</code> caused the R process to be killed (exit code 137 = OOM) during schema inference. The schema inference DuckDB connection had no memory limit, while the per-file conversion connections did.</p>
-<p><strong>Fix:</strong> Applied <code>memory_limit</code> and <code>temp_directory</code> settings to the schema inference connection in <code><a href="reference/snapshot_to_parquet.html">snapshot_to_parquet()</a></code> (same settings already applied to per-file workers). This enables DuckDB to spill to disk during inference rather than exhausting RAM.</p>
+<p><strong>Problem:</strong> Running <code>snapshot_to_parquet()</code> on the <code>works</code> dataset (largest dataset, ~300 GB) with <code>SAMPLE_SIZE=1000</code> caused the R process to be killed (exit code 137 = OOM) during schema inference. The schema inference DuckDB connection had no memory limit, while the per-file conversion connections did.</p>
+<p><strong>Fix:</strong> Applied <code>memory_limit</code> and <code>temp_directory</code> settings to the schema inference connection in <code>snapshot_to_parquet()</code> (same settings already applied to per-file workers). This enables DuckDB to spill to disk during inference rather than exhausting RAM.</p>
 <p><strong>Note:</strong> A batch-processing approach for schema inference (processing files in chunks rather than a single DESCRIBE query) was explored but reverted because it changed column ordering (DuckDB field order vs. <code>tapply</code> alphabetical sort), breaking test snapshots.</p>
 <p><strong>Key file:</strong> <code>R/snapshot_to_parquet.R</code> (Stage 1 connection setup, lines ~153–168)</p>
 <hr></div>
@@ -291,7 +261,7 @@
 <hr></div>
 <div class="section level2">
 <h2 id="earlier-050--snapshot_to_parquet-major-refactor">Earlier (0.5.0) — snapshot_to_parquet major refactor<a class="anchor" aria-label="anchor" href="#earlier-050--snapshot_to_parquet-major-refactor"></a></h2>
-<p><strong>Motivation:</strong> The original <code><a href="reference/snapshot_to_parquet.html">snapshot_to_parquet()</a></code> loaded all <code>.gz</code> files for a dataset into a single DuckDB query, which caused OOM errors for large datasets. The refactor converts each <code>.gz</code> to one <code>.parquet</code> file individually, enabling:</p>
+<p><strong>Motivation:</strong> The original <code>snapshot_to_parquet()</code> loaded all <code>.gz</code> files for a dataset into a single DuckDB query, which caused OOM errors for large datasets. The refactor converts each <code>.gz</code> to one <code>.parquet</code> file individually, enabling:</p>
 <ul><li>Parallelisation via <code>future_lapply()</code> with one DuckDB connection per worker.</li>
 <li>Per-file resume: already-converted files are skipped on re-run.</li>
 <li>Unified schema: a sample of files is used to infer a consistent schema before conversion, preventing type conflicts across parquet files.</li>
@@ -334,7 +304,7 @@ lookup_by_id(ids, corpus_dir, index_file)
 </ul><hr></div>
 <div class="section level2">
 <h2 id="earlier-03x--pro_fetch-convenience-wrapper">Earlier (0.3.x) — pro_fetch convenience wrapper<a class="anchor" aria-label="anchor" href="#earlier-03x--pro_fetch-convenience-wrapper"></a></h2>
-<p>Added <code><a href="reference/pro_fetch.html">pro_fetch()</a></code> as an all-in-one function that chains: <code><a href="reference/pro_request.html">pro_request()</a></code> → <code>pro_request_jsonl()</code> → <code><a href="reference/pro_request_jsonl_parquet.html">pro_request_jsonl_parquet()</a></code></p>
+<p>Added <code><a href="reference/pro_fetch.html">pro_fetch()</a></code> as an all-in-one function that chains: <code><a href="reference/pro_request.html">pro_request()</a></code> → <code><a href="reference/pro_request_jsonl.html">pro_request_jsonl()</a></code> → <code><a href="reference/pro_request_jsonl_parquet.html">pro_request_jsonl_parquet()</a></code></p>
 <p>into a single call with a <code>project_folder</code> argument. Useful for the common “give me a parquet dataset for this query” use case.</p>
 <hr></div>
 <div class="section level2">

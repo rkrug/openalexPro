@@ -11,18 +11,14 @@
   drop cyclomatic complexity below the `goodpractice` threshold.
   Behaviour is unchanged.
 
-- Added tests for
-  [`find_oas_binary()`](https://openalexpro.github.io/openalexPro/reference/find_oas_binary.md),
-  [`run_oas()`](https://openalexpro.github.io/openalexPro/reference/run_oas.md),
+- Added tests for `find_oas_binary()`, `run_oas()`,
   [`pro_validate_credentials()`](https://openalexpro.github.io/openalexPro/reference/pro_validate_credentials.md),
-  [`prepare_snapshot()`](https://openalexpro.github.io/openalexPro/reference/prepare_snapshot.md),
-  and
+  `prepare_snapshot()`, and
   [`sample_parquet_n()`](https://openalexpro.github.io/openalexPro/reference/sample_parquet_n.md).
   Package test coverage rose from ~73% to ~80%.
 
 - Tests that intentionally exercise the deprecated
-  [`pro_request_jsonl_R()`](https://openalexpro.github.io/openalexPro/reference/pro_request_jsonl_R.md)
-  /
+  `pro_request_jsonl_R()` /
   [`pro_request_jsonl_parquet()`](https://openalexpro.github.io/openalexPro/reference/pro_request_jsonl_parquet.md)
   pipeline now wrap those calls in
   [`suppressWarnings()`](https://rdrr.io/r/base/warning.html) to keep
@@ -42,9 +38,8 @@
   parquet files from separate API calls (e.g. keypaper + cited + citing
   in a snowball search).
 
-- New
-  [`oa_cache_schema()`](https://openalexpro.github.io/openalexPro/reference/oa_cache_schema.md)
-  function copies schemas from a snapshot metadata directory
+- New `oa_cache_schema()` function copies schemas from a snapshot
+  metadata directory
   (e.g. `/Volumes/openalex/openalex-snapshot_metadata`) into the
   user-level cache so the correct types are available even when the
   volume is not mounted.
@@ -71,7 +66,7 @@
 
 ### Breaking Changes
 
-- [`snapshot_to_parquet()`](https://openalexpro.github.io/openalexPro/reference/snapshot_to_parquet.md),
+- `snapshot_to_parquet()`,
   [`build_corpus_index()`](https://openalexpro.github.io/openalexPro/reference/build_corpus_index.md),
   and
   [`lookup_by_id()`](https://openalexpro.github.io/openalexPro/reference/lookup_by_id.md)
@@ -87,9 +82,6 @@
 
 ### Internal Changes
 
-- Rust/Cargo build dependency removed; `openalexPro` is now a pure-R
-  package. No Rust toolchain is required to install or use it.
-
 - [`oa_works_abstract_sql()`](https://openalexpro.github.io/openalexPro/reference/oa_works_abstract_sql.md),
   [`oa_works_citation_sql()`](https://openalexpro.github.io/openalexPro/reference/oa_works_citation_sql.md),
   and
@@ -99,12 +91,6 @@
 ## openalexPro 0.9.0
 
 ### New Features
-
-- **Rust backend via `extendr`.** Core functions now delegate to a
-  compiled Rust library (`openalex-core` v0.5.0) for JSON→Parquet
-  conversion, schema inference, corpus indexing, and ID-based record
-  lookup. Pure-R `_R` variants remain as fallbacks. This eliminates the
-  external `openalex-snapshot` binary dependency for the main pipeline.
 
 - **[`pro_rate_limit_status()`](https://openalexpro.github.io/openalexPro/reference/pro_rate_limit_status.md)**
   — query your OpenAlex API rate-limit status (daily budget, used,
@@ -143,7 +129,8 @@
 ### New Features
 
 - [`pro_request()`](https://openalexpro.github.io/openalexPro/reference/pro_request.md),
-  `pro_request_jsonl()`, and
+  [`pro_request_jsonl()`](https://openalexpro.github.io/openalexPro/reference/pro_request_jsonl.md),
+  and
   [`pro_request_jsonl_parquet()`](https://openalexpro.github.io/openalexPro/reference/pro_request_jsonl_parquet.md)
   now accept **nested lists** of query URLs. Each nesting level is
   preserved as a subdirectory in the output, and the parquet stage
@@ -160,12 +147,11 @@
 
 ### Breaking Changes
 
-- [`snapshot_to_parquet()`](https://openalexpro.github.io/openalexPro/reference/snapshot_to_parquet.md)
-  has a new signature. The old `snapshot_dir` and `parquet_dir`
-  parameters are replaced by a single `root_dir` parameter that matches
-  the directory layout used by the companion `openalex-snapshot` Rust
-  binary. The function now delegates to the binary rather than
-  performing conversion in R. **Migration:** replace
+- `snapshot_to_parquet()` has a new signature. The old `snapshot_dir`
+  and `parquet_dir` parameters are replaced by a single `root_dir`
+  parameter that matches the directory layout used by the companion
+  `openalex-snapshot` binary. The function now delegates to the binary
+  rather than performing conversion in R. **Migration:** replace
   `snapshot_to_parquet(snapshot_dir = "...", parquet_dir = "...")` with
   `snapshot_to_parquet(root_dir = "...")`.
 
@@ -203,11 +189,8 @@
   These retain the original parameter names and are useful when the
   `openalex-snapshot` binary is unavailable.
 
-- [`find_oas_binary()`](https://openalexpro.github.io/openalexPro/reference/find_oas_binary.md)
-  and
-  [`run_oas()`](https://openalexpro.github.io/openalexPro/reference/run_oas.md)
-  are exported internal helpers for resolving and invoking the
-  `openalex-snapshot` binary. They support:
+- `find_oas_binary()` and `run_oas()` are exported internal helpers for
+  resolving and invoking the `openalex-snapshot` binary. They support:
 
   1.  Explicit `oas_bin` argument
   2.  `options(openalexPro.oas_bin = "/path/to/binary")`
@@ -216,17 +199,6 @@
 - `inst/Makefile.snapshot` updated to use the `openalex-snapshot` binary
   directly (replacing `Rscript` invocations of the now-renamed R
   functions).
-
-### Dependencies
-
-- The `openalex-snapshot` Rust binary is now required for
-  [`snapshot_to_parquet()`](https://openalexpro.github.io/openalexPro/reference/snapshot_to_parquet.md),
-  [`build_corpus_index()`](https://openalexpro.github.io/openalexPro/reference/build_corpus_index.md),
-  and
-  [`lookup_by_id()`](https://openalexpro.github.io/openalexPro/reference/lookup_by_id.md).
-  Download from <https://github.com/rkrug/openalex-snapshot/releases> or
-  build with `cargo build --release`. The pure-R `*_R()` variants have
-  no binary dependency.
 
 ## openalexPro 0.6.1
 
@@ -344,8 +316,7 @@
 
 ### Bug Fixes
 
-- Fixed Windows path-normalization failures in
-  [`snapshot_to_parquet()`](https://openalexpro.github.io/openalexPro/reference/snapshot_to_parquet.md),
+- Fixed Windows path-normalization failures in `snapshot_to_parquet()`,
   [`build_corpus_index()`](https://openalexpro.github.io/openalexPro/reference/build_corpus_index.md),
   [`lookup_by_id()`](https://openalexpro.github.io/openalexPro/reference/lookup_by_id.md),
   and
@@ -356,9 +327,8 @@
   [`tempdir()`](https://rdrr.io/r/base/tempfile.html)-derived paths
   while [`list.files()`](https://rdrr.io/r/base/list.files.html) and
   DuckDB resolve to long names (`runneradmin`). Resume detection in
-  [`snapshot_to_parquet()`](https://openalexpro.github.io/openalexPro/reference/snapshot_to_parquet.md)
-  used `%in%` on paths with mixed separators (`\` vs `/`), causing
-  already-converted files to be reconverted.
+  `snapshot_to_parquet()` used `%in%` on paths with mixed separators
+  (`\` vs `/`), causing already-converted files to be reconverted.
   [`build_corpus_index()`](https://openalexpro.github.io/openalexPro/reference/build_corpus_index.md)
   embedded `snapshot_dir` (with `\`) inside a DuckDB `regexp_replace`
   pattern, which never matched — so the full absolute path was stored in
@@ -409,21 +379,17 @@
 
 #### Snapshot Handling
 
-- Added
-  [`prepare_snapshot()`](https://openalexpro.github.io/openalexPro/reference/prepare_snapshot.md)
-  function for setting up a directory with Makefile and documentation
-  for managing OpenAlex snapshots.
+- Added `prepare_snapshot()` function for setting up a directory with
+  Makefile and documentation for managing OpenAlex snapshots.
 - Added `Makefile.snapshot` in `inst/` for automating snapshot download,
   conversion, and indexing. Includes targets for `snapshot`, `parquet`,
   `parquet_index`, and automatic renaming of existing data with release
   dates.
-- Added
-  [`snapshot_to_parquet()`](https://openalexpro.github.io/openalexPro/reference/snapshot_to_parquet.md)
-  function for converting OpenAlex snapshot NDJSON files to Parquet
-  format using DuckDB. Processes each `.gz` file individually with
-  per-file resume support. Supports parallel processing via `workers`
-  (using `future_lapply()`) and unified schema inference via
-  `sample_size`.
+- Added `snapshot_to_parquet()` function for converting OpenAlex
+  snapshot NDJSON files to Parquet format using DuckDB. Processes each
+  `.gz` file individually with per-file resume support. Supports
+  parallel processing via `workers` (using `future_lapply()`) and
+  unified schema inference via `sample_size`.
 - Added
   [`build_corpus_index()`](https://openalexpro.github.io/openalexPro/reference/build_corpus_index.md)
   function for creating memory-efficient Parquet indexes for fast ID
@@ -450,18 +416,15 @@
 
 ### Changes
 
-- Refactored
-  [`snapshot_to_parquet()`](https://openalexpro.github.io/openalexPro/reference/snapshot_to_parquet.md)
-  to process each `.gz` file individually instead of all at once. This
-  reduces memory usage, enables per-file resume on interruption, and
-  shows progress with ETA. The `workers` parameter now controls parallel
-  `future` workers instead of DuckDB threads. Added `sample_size`
-  parameter for schema inference.
+- Refactored `snapshot_to_parquet()` to process each `.gz` file
+  individually instead of all at once. This reduces memory usage,
+  enables per-file resume on interruption, and shows progress with ETA.
+  The `workers` parameter now controls parallel `future` workers instead
+  of DuckDB threads. Added `sample_size` parameter for schema inference.
 - Extracted
   [`infer_json_schema()`](https://openalexpro.github.io/openalexPro/reference/infer_json_schema.md)
   and `convert_json_to_parquet()` internal helpers, shared by both
-  [`snapshot_to_parquet()`](https://openalexpro.github.io/openalexPro/reference/snapshot_to_parquet.md)
-  and
+  `snapshot_to_parquet()` and
   [`pro_request_jsonl_parquet()`](https://openalexpro.github.io/openalexPro/reference/pro_request_jsonl_parquet.md).
 - Refactored
   [`pro_request_jsonl_parquet()`](https://openalexpro.github.io/openalexPro/reference/pro_request_jsonl_parquet.md)
@@ -474,9 +437,8 @@
 
 - Fixed vignette parse errors in `pro_query.qmd` (malformed code block
   closings).
-- Fixed out-of-memory crash in
-  [`snapshot_to_parquet()`](https://openalexpro.github.io/openalexPro/reference/snapshot_to_parquet.md)
-  when `sample_size` exceeded the number of available files
+- Fixed out-of-memory crash in `snapshot_to_parquet()` when
+  `sample_size` exceeded the number of available files
   (e.g. `sample_size = 10000` with 1981 works files). Schema inference
   now processes one file at a time instead of a single bulk DuckDB
   query.
@@ -488,25 +450,22 @@
   preserves the data. Parse individual values with
   [`jsonlite::fromJSON()`](https://jeroen.r-universe.dev/jsonlite/reference/fromJSON.html)
   when needed.
-- Fixed DuckDB temp file IO errors during
-  [`snapshot_to_parquet()`](https://openalexpro.github.io/openalexPro/reference/snapshot_to_parquet.md)
-  by exposing a `TEMP_DIR` variable in `Makefile.snapshot` (default
+- Fixed DuckDB temp file IO errors during `snapshot_to_parquet()` by
+  exposing a `TEMP_DIR` variable in `Makefile.snapshot` (default
   `/tmp`).
 
 ### Changes
 
-- [`snapshot_to_parquet()`](https://openalexpro.github.io/openalexPro/reference/snapshot_to_parquet.md)
-  schema inference now runs one DuckDB `DESCRIBE` per file instead of a
-  single query across all sampled files. Results are cached in
-  `<parquet_ds>/.schema_cache/`: per-file CSVs
-  (`<update_date>_<part_name>.csv`) enable mid-run resume; a unified
-  `unified_schema.csv` is loaded on subsequent runs to skip inference
-  entirely. Delete `unified_schema.csv` to force re-inference.
+- `snapshot_to_parquet()` schema inference now runs one DuckDB
+  `DESCRIBE` per file instead of a single query across all sampled
+  files. Results are cached in `<parquet_ds>/.schema_cache/`: per-file
+  CSVs (`<update_date>_<part_name>.csv`) enable mid-run resume; a
+  unified `unified_schema.csv` is loaded on subsequent runs to skip
+  inference entirely. Delete `unified_schema.csv` to force re-inference.
 
 ### Tests
 
-- Added comprehensive tests for
-  [`snapshot_to_parquet()`](https://openalexpro.github.io/openalexPro/reference/snapshot_to_parquet.md),
+- Added comprehensive tests for `snapshot_to_parquet()`,
   [`build_corpus_index()`](https://openalexpro.github.io/openalexPro/reference/build_corpus_index.md),
   and
   [`lookup_by_id()`](https://openalexpro.github.io/openalexPro/reference/lookup_by_id.md).
@@ -563,7 +522,7 @@
   [`pro_fetch()`](https://openalexpro.github.io/openalexPro/reference/pro_fetch.md)
   with `project_folder` support for structured outputs.
 - Added progress reporting and parallelization for
-  `pro_request_jsonl()`.
+  [`pro_request_jsonl()`](https://openalexpro.github.io/openalexPro/reference/pro_request_jsonl.md).
 - Added
   [`sample_parquet_n()`](https://openalexpro.github.io/openalexPro/reference/sample_parquet_n.md)
   random sampling utilities with `select` support.

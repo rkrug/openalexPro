@@ -1675,7 +1675,8 @@ dbDisconnect(con)
   Get count of results without downloading
 - [`pro_request()`](https://openalexpro.github.io/openalexPro/reference/pro_request.md) -
   Execute API requests and save results
-- `pro_request_jsonl()` - Convert JSON to JSONL format
+- [`pro_request_jsonl()`](https://openalexpro.github.io/openalexPro/reference/pro_request_jsonl.md) -
+  Convert JSON to JSONL format
 - [`pro_request_jsonl_parquet()`](https://openalexpro.github.io/openalexPro/reference/pro_request_jsonl_parquet.md) -
   Convert JSONL to Parquet format (with schema harmonization)
 

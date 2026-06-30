@@ -245,7 +245,8 @@ which covers:
 
 - Using
   [`pro_request()`](https://openalexpro.github.io/openalexPro/reference/pro_request.md),
-  `pro_request_jsonl()`, and
+  [`pro_request_jsonl()`](https://openalexpro.github.io/openalexPro/reference/pro_request_jsonl.md),
+  and
   [`pro_request_jsonl_parquet()`](https://openalexpro.github.io/openalexPro/reference/pro_request_jsonl_parquet.md)
   separately
 - Parallel processing with multiple workers
