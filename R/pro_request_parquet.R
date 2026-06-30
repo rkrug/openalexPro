@@ -1,7 +1,7 @@
 #' Convert JSON files from pro_request() directly to Apache Parquet
 #'
 #' Single-step replacement for the two-step
-#' `pro_request_jsonl_R()` + `pro_request_jsonl_parquet()` pipeline.
+#' `pro_request_jsonl()` + `pro_request_jsonl_parquet()` pipeline.
 #' Reads the JSON files written by [pro_request()] and converts each one to a
 #' Parquet file using DuckDB, with no intermediate JSONL on disk.
 #'
@@ -11,9 +11,6 @@
 #' columns:
 #' - **`abstract`** — plain text reconstructed from `abstract_inverted_index`.
 #' - **`citation`** — `"Author (year)"` / `"A & B (year)"` / `"A et al. (year)"`.
-#'
-#' These expressions are identical to those used by the `openalex-snapshot` CLI
-#' binary, so the Parquet output matches the snapshot pipeline column for column.
 #'
 #' @section File format:
 #' [pro_request()] writes one JSON file per API page.  For paginated queries
@@ -52,24 +49,23 @@
 #'   \describe{
 #'     \item{`"auto"` (default)}{Auto-detect the OpenAlex entity type from the
 #'       inferred columns, then load the matching schema from the user cache
-#'       (populated by \code{\link{oa_cache_schema}()}) or the schemas bundled
-#'       with the package.  For each column where DuckDB runtime inference
-#'       produced the ambiguous `JSON` fallback type, the baseline type is used
-#'       instead.  Falls back silently to runtime-only inference when the entity
-#'       cannot be detected or no schema is found.}
+#'       (populated by \code{\link{oa_schema}(update = TRUE)}) or the schemas
+#'       bundled with the package.  For each column where DuckDB runtime
+#'       inference produced the ambiguous `JSON` fallback type, the baseline
+#'       type is used instead.  Falls back silently to runtime-only inference
+#'       when the entity cannot be detected or no schema is found.}
 #'     \item{`"none"` or `NULL`}{Skip the baseline entirely; behaviour is
 #'       identical to package versions before this feature was added.}
 #'     \item{A file path}{Path to a CSV with columns `col_name` / `col_type`.
 #'       Used directly as the baseline.}
 #'     \item{A directory path}{Auto-detect entity, then look for
-#'       `<entity>.csv` inside that directory.  Useful when pointing directly
-#'       at a snapshot-metadata schemata directory.}
+#'       `<entity>.csv` inside that directory.}
 #'   }
 #'
 #' @return Output directory path (invisibly).
 #'
 #' @seealso [pro_request()] to download the JSON files,
-#'   [pro_request_jsonl_R()] and [pro_request_jsonl_parquet()] for the older
+#'   [pro_request_jsonl()] and [pro_request_jsonl_parquet()] for the older
 #'   two-step pipeline (now deprecated).
 #'
 #' @importFrom duckdb duckdb

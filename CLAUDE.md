@@ -67,7 +67,7 @@ error inspection, and `httr2` plumbing. Tests use VCR cassettes in
 - `id_block()` — converts an OpenAlex ID to its block number (`floor(numeric_id / 10000)`)
 - `infer_json_schema()` — per-file schema inference with two-level caching
 - `opt_select_fields()`, `opt_filter_names()` — helpers for building API queries
-- `prepare_snapshot()` — snapshot download/preparation utilities
+- `oa_schema()` — get or refresh the baseline entity schema used by `pro_request_parquet(schema = "auto")`
 
 ## Branching
 

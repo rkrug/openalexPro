@@ -53,18 +53,17 @@ resolution.  Possible values:
 \describe{
 \item{\code{"auto"} (default)}{Auto-detect the OpenAlex entity type from the
 inferred columns, then load the matching schema from the user cache
-(populated by \code{\link{oa_cache_schema}()}) or the schemas bundled
-with the package.  For each column where DuckDB runtime inference
-produced the ambiguous \code{JSON} fallback type, the baseline type is used
-instead.  Falls back silently to runtime-only inference when the entity
-cannot be detected or no schema is found.}
+(populated by \code{\link{oa_schema}(update = TRUE)}) or the schemas
+bundled with the package.  For each column where DuckDB runtime
+inference produced the ambiguous \code{JSON} fallback type, the baseline
+type is used instead.  Falls back silently to runtime-only inference
+when the entity cannot be detected or no schema is found.}
 \item{\code{"none"} or \code{NULL}}{Skip the baseline entirely; behaviour is
 identical to package versions before this feature was added.}
 \item{A file path}{Path to a CSV with columns \code{col_name} / \code{col_type}.
 Used directly as the baseline.}
 \item{A directory path}{Auto-detect entity, then look for
-\verb{<entity>.csv} inside that directory.  Useful when pointing directly
-at a snapshot-metadata schemata directory.}
+\verb{<entity>.csv} inside that directory.}
 }}
 }
 \value{
@@ -72,7 +71,7 @@ Output directory path (invisibly).
 }
 \description{
 Single-step replacement for the two-step
-\code{pro_request_jsonl_R()} + \code{pro_request_jsonl_parquet()} pipeline.
+\code{pro_request_jsonl()} + \code{pro_request_jsonl_parquet()} pipeline.
 Reads the JSON files written by \code{\link[=pro_request]{pro_request()}} and converts each one to a
 Parquet file using DuckDB, with no intermediate JSONL on disk.
 }
@@ -85,9 +84,6 @@ columns:
 \item \strong{\code{abstract}} — plain text reconstructed from \code{abstract_inverted_index}.
 \item \strong{\code{citation}} — \code{"Author (year)"} / \code{"A & B (year)"} / \code{"A et al. (year)"}.
 }
-
-These expressions are identical to those used by the \code{openalex-snapshot} CLI
-binary, so the Parquet output matches the snapshot pipeline column for column.
 }
 \section{File format}{
 
@@ -108,6 +104,6 @@ multi-query inputs).
 
 \seealso{
 \code{\link[=pro_request]{pro_request()}} to download the JSON files,
-\code{\link[=pro_request_jsonl_R]{pro_request_jsonl_R()}} and \code{\link[=pro_request_jsonl_parquet]{pro_request_jsonl_parquet()}} for the older
+\code{\link[=pro_request_jsonl]{pro_request_jsonl()}} and \code{\link[=pro_request_jsonl_parquet]{pro_request_jsonl_parquet()}} for the older
 two-step pipeline (now deprecated).
 }

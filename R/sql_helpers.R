@@ -1,8 +1,6 @@
 # sql_helpers -------------------------------------------------------------------
 #
 # Pure-R implementations of DuckDB SQL expression helpers.
-# These were previously backed by Rust (via extendr / openalex-core); the
-# strings are identical so all call sites continue to work unchanged.
 
 #' Return the DuckDB SQL expression that reconstructs a plain-text abstract
 #' from the \code{abstract_inverted_index} column in OpenAlex works data.

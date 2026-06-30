@@ -11,9 +11,9 @@ vignette: >
 
 > **Snapshot functionality has moved.**
 >
-> The full OpenAlex snapshot workflow — downloading, converting `.json.gz` files
-> to Parquet, building ID lookup indexes, and extracting records by ID — is now
-> part of the **`openalexSnapshot`** package.
+> The full OpenAlex snapshot workflow — downloading the official Parquet snapshot,
+> building ID lookup indexes, and extracting records by ID — is now part of the
+> **`openalexSnapshot`** package.
 >
 > Please install `openalexSnapshot` and refer to its documentation.
 

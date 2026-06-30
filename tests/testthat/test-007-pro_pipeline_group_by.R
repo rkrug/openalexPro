@@ -39,11 +39,11 @@ test_that("pro_request `biodiversity` and group by `type`", {
 })
 
 
-test_that("pro_request_jsonl_R `biodiversity` and group by type", {
+test_that("pro_request_jsonl `biodiversity` and group by type", {
   # Convert to jsonl
   output_jsonl <- suppressWarnings(
     output_json |>
-      pro_request_jsonl_R(
+      pro_request_jsonl(
         output = output_jsonl,
         verbose = FALSE,
         progress = TRUE

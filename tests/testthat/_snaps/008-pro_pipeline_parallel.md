@@ -28,7 +28,7 @@
       [1] "results_page_1.json" "results_page_1.json" "results_page_1.json"
       [4] "results_page_1.json"
 
-# pro_request_jsonl_R with subfolders
+# pro_request_jsonl with subfolders
 
     Code
       basename(fns)
