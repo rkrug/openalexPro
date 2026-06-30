@@ -5,4 +5,4 @@
 - [x] re-rwrite `api_request()` to use `httr2` https://github.com/rkrug/openalexPro/issues/4
 - [x] Add tests https://github.com/rkrug/openalexPro/issues/5
 - [x] Add Abstract and Citation function based on the corpus from `pro_request_json_to_parquet()`
-- [ ] decide if R implementation of convert and index should stay ore use openalex-snapshot
+- [x] convert and index moved to openalexSnapshot package

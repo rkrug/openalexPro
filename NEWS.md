@@ -43,21 +43,12 @@
 
 ## Internal Changes
 
-* Rust/Cargo build dependency removed; `openalexPro` is now a pure-R package.
-  No Rust toolchain is required to install or use it.
-
 * `oa_works_abstract_sql()`, `oa_works_citation_sql()`, and
   `oa_normalize_duckdb_type()` are now implemented in R (behaviour unchanged).
 
 # openalexPro 0.9.0
 
 ## New Features
-
-* **Rust backend via `extendr`.**  Core functions now delegate to a compiled
-  Rust library (`openalex-core` v0.5.0) for JSON→Parquet conversion, schema
-  inference, corpus indexing, and ID-based record lookup.  Pure-R `_R` variants
-  remain as fallbacks.  This eliminates the external `openalex-snapshot` binary
-  dependency for the main pipeline.
 
 * **`pro_rate_limit_status()`** — query your OpenAlex API rate-limit status
   (daily budget, used, remaining, prepaid balance, reset time, per-endpoint
@@ -106,15 +97,15 @@
 
 * `snapshot_to_parquet()` has a new signature. The old `snapshot_dir` and
   `parquet_dir` parameters are replaced by a single `root_dir` parameter that
-  matches the directory layout used by the companion `openalex-snapshot` Rust
-  binary. The function now delegates to the binary rather than performing
-  conversion in R. **Migration:** replace
+  matches the directory layout used by the companion `openalex-snapshot` binary.
+  The function now delegates to the binary rather than performing conversion in R.
+  **Migration:** replace
   `snapshot_to_parquet(snapshot_dir = "...", parquet_dir = "...")` with
   `snapshot_to_parquet(root_dir = "...")`.
 
 * `build_corpus_index()` has a new signature. The old `corpus_dir` parameter
   is replaced by `root_dir`. The function now delegates to the
-  `openalex-snapshot` binary. **Migration:** replace
+  `openalex-snapshot` binary.  **Migration:** replace
   `build_corpus_index(corpus_dir = "...")` with
   `build_corpus_index(root_dir = "...")`.
 
@@ -144,14 +135,6 @@
 
 * `inst/Makefile.snapshot` updated to use the `openalex-snapshot` binary
   directly (replacing `Rscript` invocations of the now-renamed R functions).
-
-## Dependencies
-
-* The `openalex-snapshot` Rust binary is now required for
-  `snapshot_to_parquet()`, `build_corpus_index()`, and `lookup_by_id()`.
-  Download from <https://github.com/rkrug/openalex-snapshot/releases> or build
-  with `cargo build --release`. The pure-R `*_R()` variants have no binary
-  dependency.
 
 # openalexPro 0.6.1
 
