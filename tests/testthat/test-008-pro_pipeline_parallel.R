@@ -70,11 +70,11 @@ test_that("pro_request with url list  and parallel", {
   }
 })
 
-test_that("pro_request_jsonl_R with subfolders", {
+test_that("pro_request_jsonl with subfolders", {
   # Convert to jsonl
   output_jsonl <- suppressWarnings(
     output_json |>
-      pro_request_jsonl_R(
+      pro_request_jsonl(
         output = output_jsonl,
         verbose = FALSE,
         progress = TRUE

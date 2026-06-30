@@ -13,8 +13,13 @@ opt_select_fields <- function(update = FALSE) {
   }
 
   if (is.null(getOption("openalexPro")$select_fields)) {
-    resp <- httr2::request("https://api.openalex.org/works/W1775749144") |>
-      httr2::req_url_query(select = "DOESNTEXIST") |>
+    api_key <- pro_api_key()
+    req <- httr2::request("https://api.openalex.org/works/W1775749144") |>
+      httr2::req_url_query(select = "DOESNTEXIST")
+    if (!is.null(api_key) && nzchar(api_key)) {
+      req <- req |> httr2::req_url_query(api_key = api_key)
+    }
+    resp <- req |>
       api_call(get_html_response = NULL) |>
       httr2::resp_body_json()
 

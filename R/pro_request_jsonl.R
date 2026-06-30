@@ -58,7 +58,7 @@
 #'
 #' @export
 
-pro_request_jsonl_R <- function(
+pro_request_jsonl <- function(
   input_json = NULL,
   output = NULL,
   add_columns = list(),
@@ -71,7 +71,7 @@ pro_request_jsonl_R <- function(
   .Deprecated(
     new = "pro_request_parquet",
     msg = paste0(
-      "`pro_request_jsonl_R()` + `pro_request_jsonl_parquet()` are deprecated.\n",
+      "`pro_request_jsonl()` + `pro_request_jsonl_parquet()` are deprecated.\n",
       "Use `pro_request_parquet()` instead: it converts JSON directly to Parquet\n",
       "in one step with no intermediate JSONL files on disk."
     )
@@ -188,63 +188,73 @@ pro_request_jsonl_R <- function(
     progressr::handlers("cli")
   }
 
-  progressr::with_progress({
-    p <- if (progress) progressr::progressor(steps = length(jsons)) else NULL
+  progressr::with_progress(
+    {
+      p <- if (progress) progressr::progressor(steps = length(jsons)) else NULL
 
-    future.apply::future_lapply(seq_along(jsons), function(i) {
-      fn <- jsons[i]
-      if (verbose) {
-        message("Preparing ", i, " of ", length(jsons), " : ", fn)
-      }
+      future.apply::future_lapply(seq_along(jsons), function(i) {
+        fn <- jsons[i]
+        if (verbose) {
+          message("Preparing ", i, " of ", length(jsons), " : ", fn)
+        }
 
-      ## Extract page number into pn
-      pn <- basename(fn) |>
-        strsplit(split = "_")
-      pn <- pn[[1]]
+        ## Extract page number into pn
+        pn <- basename(fn) |>
+          strsplit(split = "_")
+        pn <- pn[[1]]
 
-      pn <- pn[length(pn)] |>
-        gsub(pattern = ".json", replacement = "")
+        pn <- pn[length(pn)] |>
+          gsub(pattern = ".json", replacement = "")
 
-      if (has_subdirs) {
-        # Preserve full relative subdirectory path (handles arbitrary nesting depth)
-        input_depth <- length(strsplit(gsub("\\\\", "/", input_json), "/")[[1]])
-        f_parts     <- strsplit(gsub("\\\\", "/", dirname(fn)), "/")[[1]]
-        rel_parts   <- f_parts[seq(input_depth + 1L, length(f_parts))]
-        jsonl <- do.call(file.path, c(list(output), as.list(rel_parts), list(basename(fn))))
-        pn <- basename(dirname(fn))
-      } else {
-        jsonl <- file.path(output, basename(fn))
-        pn <- pn
-      }
-      dir.create(dirname(jsonl), recursive = TRUE, showWarnings = FALSE)
-
-      try(
-        {
-          ## do the following in the json:"
-          ## - Convert `inverted_abstract_index` to `abstract`
-          ## - remove `inverted_abstract_index`
-          ## - add `page` = pn
-          jq_execute(
-            input_json = fn,
-            output_jsonl = jsonl,
-            add_columns = add_columns,
-            jq_filter = NULL,
-            page = pn,
-            type = types
+        if (has_subdirs) {
+          # Preserve full relative subdirectory path (handles arbitrary nesting depth)
+          input_depth <- length(strsplit(gsub("\\\\", "/", input_json), "/")[[
+            1
+          ]])
+          f_parts <- strsplit(gsub("\\\\", "/", dirname(fn)), "/")[[1]]
+          rel_parts <- f_parts[seq(input_depth + 1L, length(f_parts))]
+          jsonl <- do.call(
+            file.path,
+            c(list(output), as.list(rel_parts), list(basename(fn)))
           )
-          if (file.size(jsonl) < 5) {
-            unlink(jsonl)
-          }
-        },
-        silent = !verbose
-      )
+          pn <- basename(dirname(fn))
+        } else {
+          jsonl <- file.path(output, basename(fn))
+          pn <- pn
+        }
+        dir.create(dirname(jsonl), recursive = TRUE, showWarnings = FALSE)
 
-      # Update progress
-      if (!is.null(p)) p()
+        try(
+          {
+            ## do the following in the json:"
+            ## - Convert `inverted_abstract_index` to `abstract`
+            ## - remove `inverted_abstract_index`
+            ## - add `page` = pn
+            jq_execute(
+              input_json = fn,
+              output_jsonl = jsonl,
+              add_columns = add_columns,
+              jq_filter = NULL,
+              page = pn,
+              type = types
+            )
+            if (file.size(jsonl) < 5) {
+              unlink(jsonl)
+            }
+          },
+          silent = !verbose
+        )
 
-      invisible(NULL)
-    })
-  }, enable = progress)
+        # Update progress
+        if (!is.null(p)) {
+          p()
+        }
+
+        invisible(NULL)
+      })
+    },
+    enable = progress
+  )
 
   if (verbose) {
     message("Done")

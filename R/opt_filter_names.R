@@ -13,9 +13,13 @@ opt_filter_names <- function(update = FALSE) {
   }
 
   if (is.null(getOption("openalexPro")$filter_names)) {
-    url <- "https://api.openalex.org/works?filter=DOESNTEXIST%3A1"
-    resp <- httr2::request("https://api.openalex.org/works") |>
-      httr2::req_url_query(filter = "DOESNTEXIST:1") |>
+    api_key <- pro_api_key()
+    req <- httr2::request("https://api.openalex.org/works") |>
+      httr2::req_url_query(filter = "DOESNTEXIST:1")
+    if (!is.null(api_key) && nzchar(api_key)) {
+      req <- req |> httr2::req_url_query(api_key = api_key)
+    }
+    resp <- req |>
       api_call(get_html_response = NULL) |>
       httr2::resp_body_json()
 

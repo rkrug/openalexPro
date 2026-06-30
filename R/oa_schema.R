@@ -8,8 +8,8 @@
 #           +-- oa_detect_entity()        # which entity is this JSON?
 #           +-- oa_load_baseline_schema() # load CSV from user cache or inst/extdata
 #
-# User-facing: oa_cache_schema() populates the persistent user cache from a
-# mounted snapshot-metadata directory so the baseline survives volume unmounts.
+# User-facing: oa_schema() reads (update = FALSE) or refreshes (update = TRUE)
+# the persistent schema cache from a Parquet corpus directory.
 
 # -- Entity detection --------------------------------------------------------
 
@@ -115,62 +115,107 @@ oa_load_baseline_schema <- function(entity) {
   NULL
 }
 
-# -- Public cache-population function ----------------------------------------
+# -- Public schema function ---------------------------------------------------
 
-#' Populate the local baseline-schema cache from a snapshot metadata directory
+#' Get or refresh an OpenAlex entity schema
 #'
-#' Copies \code{unified_schema.csv} files from an OpenAlex snapshot metadata
-#' directory (e.g. \code{/Volumes/openalex/openalex-snapshot_metadata}) into
-#' the user-level cache used by \code{\link{pro_request_parquet}(schema = "auto")}.
+#' Returns the baseline column schema for an OpenAlex entity (used by
+#' \code{\link{pro_request_parquet}(schema = "auto")} to resolve ambiguous
+#' DuckDB JSON types), and optionally refreshes the user-level cache from a
+#' local Parquet corpus.
 #'
-#' Once cached, the schemas are used even when the source volume is not mounted.
-#' Update the cache periodically to pick up new fields added by OpenAlex (run
-#' with \code{overwrite = TRUE}).
+#' @section Resolution order (\code{update = FALSE}):
+#' \enumerate{
+#'   \item User cache (\code{tools::R_user_dir("openalexPro","cache")/schemata/<entity>.csv})
+#'   \item Schemas bundled with the package (\code{inst/extdata/schemata/<entity>.csv})
+#' }
 #'
-#' @param source Path to the snapshot metadata directory, e.g.
-#'   \code{"/Volumes/openalex/openalex-snapshot_metadata"}.
-#' @param entities Character vector of entity names to cache, or \code{"all"}
-#'   (default) to cache every entity directory found under \code{source}.
-#' @param overwrite Logical.  Overwrite an existing cached file?  Default
-#'   \code{FALSE}.
+#' @section Refreshing the cache (\code{update = TRUE}):
+#' Reads the schema of each entity corpus from \code{parquet_dir} using
+#' DuckDB and writes the result to the user cache.  After updating, the new
+#' schema is available to subsequent calls with \code{update = FALSE} and to
+#' \code{pro_request_parquet(schema = "auto")}.  Run periodically to pick up
+#' new fields added by OpenAlex.
+#'
+#' @param entity Character scalar.  Entity name, e.g. \code{"works"}.
+#'   Required when \code{update = FALSE}; ignored when \code{update = TRUE}
+#'   and \code{entities != "all"} is a vector.
+#' @param parquet_dir Character scalar.  Root Parquet directory containing one
+#'   sub-directory per entity, e.g. \code{"/Volumes/openalex/parquet"}.
+#'   Required when \code{update = TRUE}; ignored otherwise.
+#' @param entities Character vector or \code{"all"} (default).  Entities to
+#'   refresh when \code{update = TRUE}.  \code{"all"} auto-discovers
+#'   sub-directories of \code{parquet_dir}, excluding \code{*_aws} staging
+#'   directories.
+#' @param overwrite Logical.  When \code{update = TRUE}, overwrite an existing
+#'   cached CSV?  Default \code{FALSE}.
+#' @param update Logical.  When \code{TRUE}, read schema from \code{parquet_dir}
+#'   and write to the user cache.  Default \code{FALSE}.
 #' @param verbose Logical.  Print progress messages?  Default \code{TRUE}.
 #'
-#' @return The path to the schemata cache directory (invisibly).
+#' @return
+#'   \code{update = FALSE}: a \code{data.frame} with columns \code{col_name}
+#'   and \code{col_type}, or \code{NULL} if no schema is found for
+#'   \code{entity}.\cr
+#'   \code{update = TRUE}: the path to the schemata cache directory
+#'   (invisibly).
 #'
 #' @seealso \code{\link{pro_request_parquet}} for the \code{schema} parameter.
 #'
 #' @importFrom tools R_user_dir
-#' @importFrom utils read.csv
+#' @importFrom utils read.csv write.csv
+#' @importFrom DBI dbConnect dbDisconnect dbGetQuery
+#' @importFrom duckdb duckdb
 #'
 #' @export
-oa_cache_schema <- function(
-  source,
-  entities  = "all",
-  overwrite = FALSE,
-  verbose   = TRUE
+oa_schema <- function(
+  entity     = NULL,
+  parquet_dir = NULL,
+  entities   = "all",
+  overwrite  = FALSE,
+  update     = FALSE,
+  verbose    = TRUE
 ) {
-  if (!dir.exists(source)) {
-    stop("source directory does not exist: ", source, call. = FALSE)
-  }
-
   schemata_dir <- file.path(
     tools::R_user_dir("openalexPro", "cache"),
     "schemata"
   )
+
+  # -- Read mode ---------------------------------------------------------------
+  if (!update) {
+    if (is.null(entity) || !nzchar(entity)) {
+      stop("`entity` must be provided when update = FALSE.", call. = FALSE)
+    }
+    return(oa_load_baseline_schema(entity))
+  }
+
+  # -- Update mode -------------------------------------------------------------
+  if (is.null(parquet_dir) || !nzchar(parquet_dir)) {
+    stop("`parquet_dir` must be provided when update = TRUE.", call. = FALSE)
+  }
+  if (!dir.exists(parquet_dir)) {
+    stop("parquet_dir does not exist: ", parquet_dir, call. = FALSE)
+  }
+
   dir.create(schemata_dir, recursive = TRUE, showWarnings = FALSE)
 
-  entities_to_cache <- if (identical(entities, "all")) {
-    basename(list.dirs(source, recursive = FALSE))
+  entities_to_update <- if (identical(entities, "all")) {
+    subdirs <- list.dirs(parquet_dir, recursive = FALSE, full.names = FALSE)
+    # Exclude _aws staging dirs (e.g. works_aws) and any stray files
+    subdirs[!grepl("_aws$", subdirs)]
   } else {
     entities
   }
 
-  for (e in entities_to_cache) {
-    src_file  <- file.path(source, e, "schemata", "unified_schema.csv")
-    dest_file <- file.path(schemata_dir, paste0(e, ".csv"))
+  con <- DBI::dbConnect(duckdb::duckdb())
+  on.exit(DBI::dbDisconnect(con, shutdown = TRUE), add = TRUE)
 
-    if (!file.exists(src_file)) {
-      if (verbose) message("No schema found for entity '", e, "' - skipping.")
+  for (e in entities_to_update) {
+    entity_dir <- file.path(parquet_dir, e)
+    dest_file  <- file.path(schemata_dir, paste0(e, ".csv"))
+
+    if (!dir.exists(entity_dir)) {
+      if (verbose) message("No parquet directory for entity '", e, "' - skipping.")
       next
     }
     if (file.exists(dest_file) && !overwrite) {
@@ -182,8 +227,24 @@ oa_cache_schema <- function(
       }
       next
     }
-    file.copy(src_file, dest_file, overwrite = TRUE)
-    if (verbose) message("Cached schema for '", e, "'.")
+
+    pq_glob <- file.path(entity_dir, "**", "*.parquet")
+    sql <- sprintf(
+      "DESCRIBE SELECT * FROM read_parquet('%s', union_by_name = true)",
+      gsub("'", "\\'", pq_glob, fixed = TRUE)
+    )
+    tryCatch({
+      desc <- DBI::dbGetQuery(con, sql)
+      schema_df <- data.frame(
+        col_name = desc$column_name,
+        col_type = desc$column_type,
+        stringsAsFactors = FALSE
+      )
+      utils::write.csv(schema_df, dest_file, row.names = FALSE)
+      if (verbose) message("Updated schema for '", e, "'.")
+    }, error = function(err) {
+      if (verbose) message("Failed to read schema for '", e, "': ", conditionMessage(err))
+    })
   }
 
   invisible(schemata_dir)

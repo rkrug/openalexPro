@@ -73,76 +73,106 @@ test_that("oa_load_baseline_schema() loads all 21 bundled entities without error
   }
 })
 
-# ── oa_cache_schema() ─────────────────────────────────────────────────────────
+# ── oa_schema() ───────────────────────────────────────────────────────────────
 
-test_that("oa_cache_schema() errors on non-existent source directory", {
+test_that("oa_schema(update = FALSE) returns bundled schema data frame", {
+  df <- oa_schema(entity = "works", update = FALSE)
+  expect_s3_class(df, "data.frame")
+  expect_true(all(c("col_name", "col_type") %in% names(df)))
+  expect_gt(nrow(df), 10L)
+})
+
+test_that("oa_schema(update = FALSE) returns NULL for unknown entity", {
+  expect_null(oa_schema(entity = "nonexistent_xyz", update = FALSE))
+})
+
+test_that("oa_schema(update = FALSE) requires entity argument", {
+  expect_error(oa_schema(update = FALSE), "entity")
+})
+
+test_that("oa_schema(update = TRUE) requires parquet_dir", {
+  expect_error(oa_schema(update = TRUE), "parquet_dir")
+})
+
+test_that("oa_schema(update = TRUE) errors on non-existent parquet_dir", {
   expect_error(
-    oa_cache_schema("/nonexistent/path/xyz"),
+    oa_schema(update = TRUE, parquet_dir = "/nonexistent/path/xyz"),
     "does not exist"
   )
 })
 
-test_that("oa_cache_schema() copies CSVs to user cache directory", {
-  skip_if_not(
-    dir.exists("/Volumes/openalex/openalex-snapshot_metadata"),
-    "openalex snapshot volume not mounted"
+test_that("oa_schema(update = TRUE) reads schema from parquet files and caches", {
+  skip_if_not_installed("arrow")
+  skip_if_not_installed("duckdb")
+
+  # Build a minimal fake parquet corpus: parquet_dir/myentity/part_000.parquet
+  pq_root  <- tempfile("oa_schema_pq_root")
+  pq_dir   <- file.path(pq_root, "myentity")
+  dir.create(pq_dir, recursive = TRUE)
+  on.exit(unlink(pq_root, recursive = TRUE), add = TRUE)
+
+  arrow::write_parquet(
+    data.frame(id = "W1", title = "Test", stringsAsFactors = FALSE),
+    file.path(pq_dir, "part_000.parquet")
   )
 
-  tmp_cache <- tempfile("oa_schema_cache_test")
+  # Redirect user cache so real cache is not polluted
+  tmp_cache <- tempfile("oa_schema_cache")
   on.exit(unlink(tmp_cache, recursive = TRUE), add = TRUE)
 
-  # Monkey-patch R_user_dir to point at tmp_cache so we don't pollute
-  # the real user cache during tests.
   withr::with_envvar(
     c(R_USER_CACHE_DIR = tmp_cache),
     {
-      result <- oa_cache_schema(
-        source    = "/Volumes/openalex/openalex-snapshot_metadata",
-        entities  = c("works", "authors"),
-        overwrite = TRUE,
-        verbose   = FALSE
+      result <- oa_schema(
+        update      = TRUE,
+        parquet_dir = pq_root,
+        entities    = "myentity",
+        overwrite   = TRUE,
+        verbose     = FALSE
       )
       expect_type(result, "character")
-      expect_true(file.exists(file.path(result, "works.csv")))
-      expect_true(file.exists(file.path(result, "authors.csv")))
+      cached_csv <- file.path(result, "myentity.csv")
+      expect_true(file.exists(cached_csv))
+      df <- utils::read.csv(cached_csv, stringsAsFactors = FALSE)
+      expect_true(all(c("col_name", "col_type") %in% names(df)))
+      expect_true("id" %in% df$col_name)
     }
   )
 })
 
-test_that("oa_cache_schema() skips existing files when overwrite = FALSE", {
-  # Use a fake entity name ("test-entity") that never exists in the bundled
-  # schemas, so we don't pollute the real user cache for "works", "authors", etc.
-  fake_entity <- "test-entity-xyz"
+test_that("oa_schema(update = TRUE) skips existing when overwrite = FALSE", {
+  skip_if_not_installed("arrow")
+  skip_if_not_installed("duckdb")
 
-  tmp_src    <- tempfile("oa_fake_meta")
-  fake_schema_src <- file.path(tmp_src, fake_entity, "schemata", "unified_schema.csv")
-  dir.create(dirname(fake_schema_src), recursive = TRUE)
-  writeLines("col_name,col_type\nid,VARCHAR\ntitle,VARCHAR", fake_schema_src)
-  on.exit(unlink(tmp_src, recursive = TRUE), add = TRUE)
-
-  # Clean up the user cache entry we're about to create
-  user_dest <- file.path(
-    tools::R_user_dir("openalexPro", "cache"), "schemata",
-    paste0(fake_entity, ".csv")
+  pq_root <- tempfile("oa_schema_skip_pq")
+  pq_dir  <- file.path(pq_root, "skipentity")
+  dir.create(pq_dir, recursive = TRUE)
+  on.exit(unlink(pq_root, recursive = TRUE), add = TRUE)
+  arrow::write_parquet(
+    data.frame(id = "W1", stringsAsFactors = FALSE),
+    file.path(pq_dir, "part_000.parquet")
   )
-  on.exit(unlink(user_dest), add = TRUE)
+
+  tmp_cache <- tempfile("oa_schema_skip_cache")
+  on.exit(unlink(tmp_cache, recursive = TRUE), add = TRUE)
 
   msgs <- character(0L)
-  withCallingHandlers(
+  withr::with_envvar(
+    c(R_USER_CACHE_DIR = tmp_cache),
     {
-      # First call: write to user cache
-      oa_cache_schema(tmp_src, entities = fake_entity, overwrite = TRUE,  verbose = FALSE)
-      # Second call: file already exists, should print skip message
-      oa_cache_schema(tmp_src, entities = fake_entity, overwrite = FALSE, verbose = TRUE)
-    },
-    message = function(m) {
-      msgs <<- c(msgs, conditionMessage(m))
-      invokeRestart("muffleMessage")
+      oa_schema(update = TRUE, parquet_dir = pq_root, entities = "skipentity",
+                overwrite = TRUE, verbose = FALSE)
+      withCallingHandlers(
+        oa_schema(update = TRUE, parquet_dir = pq_root, entities = "skipentity",
+                  overwrite = FALSE, verbose = TRUE),
+        message = function(m) {
+          msgs <<- c(msgs, conditionMessage(m))
+          invokeRestart("muffleMessage")
+        }
+      )
     }
   )
   expect_true(any(grepl("already cached", msgs)))
-  # Content must not have changed (still the fake CSV we wrote)
-  expect_true(file.exists(user_dest))
 })
 
 # ── Integration: pro_request_parquet with schema = "auto" ────────────────────
