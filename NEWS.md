@@ -1,3 +1,24 @@
+# openalexPro 0.10.5
+
+## Bug fixes
+
+* `extract_doi()` no longer truncates DOIs containing `<`, `>`, `[` or `]`.
+  The character class excluded them, so a SICI-style DOI such as
+  `10.1175/1520-0450(1963)002<0713:ooasds>2.0.co;2` matched only up to the
+  first `<` and returned `10.1175/1520-0450(1963)002`. The truncated remainder
+  then *passed* the normalisation whitelist, so the function returned a
+  plausible-looking wrong DOI with no warning and no `NA` -- silent corruption
+  rather than a visible failure. Roughly 0.4% of OpenAlex works carry such
+  DOIs (~1.4 million records).
+
+  Both the match pattern and the normalisation whitelist now admit those
+  characters. Note the fix required reordering rather than escaping: in a
+  POSIX bracket expression a backslash is literal, so `]` must be the first
+  character in the class and `-` the last.
+
+  This also fixes `openalexConvert`'s `.normalize_doi()`, which delegates here
+  and therefore emitted truncated DOIs into CSL-JSON output.
+
 # openalexPro 0.10.4
 
 ## Internal / Code Quality
