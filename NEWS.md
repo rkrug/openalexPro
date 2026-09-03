@@ -1,5 +1,17 @@
 # openalexPro 0.10.5
 
+## Breaking changes
+
+* **`build_corpus_index()` and `lookup_by_id()` are removed.** They had been
+  left behind as stubs that raised "moved to the openalexSnapshot package".
+  That was actively harmful: an exported stub **masks** the real function
+  whenever both packages are attached, so
+  `library(openalexSnapshot); library(openalexPro)` made the stub win and the
+  call fail. Use `openalexSnapshot::build_corpus_index()` and
+  `openalexSnapshot::lookup_by_id()`.
+
+  `id_block()` and `read_corpus()` are unaffected and remain exported.
+
 ## Bug fixes
 
 * `extract_doi()` no longer truncates DOIs containing `<`, `>`, `[` or `]`.
