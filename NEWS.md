@@ -1,4 +1,4 @@
-# openalexPro 0.10.5
+# openalexPro 0.11.0
 
 ## Breaking changes
 
